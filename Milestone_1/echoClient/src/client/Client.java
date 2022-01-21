@@ -92,8 +92,8 @@ public class Client extends Thread {
 		setRunning(false);
 		logger.info("tearing down the connection ...");
 		if (clientSocket != null) {
-			input.close();
-			output.close();
+			//input.close();
+			//output.close();
 			clientSocket.close();
 			clientSocket = null;
 			logger.info("connection closed!");
