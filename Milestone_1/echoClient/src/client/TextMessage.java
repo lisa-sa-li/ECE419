@@ -1,7 +1,6 @@
 package client;
 
 import java.io.Serializable;
-
 /**
  * Represents a simple text message, which is intended to be received and sent 
  * by the server.
