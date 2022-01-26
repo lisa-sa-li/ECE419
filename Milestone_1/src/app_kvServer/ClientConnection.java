@@ -44,6 +44,7 @@ public class ClientConnection implements Runnable {
 	 * Loops until the connection is closed or aborted by the client.
 	 */
 	public void run() {
+		KVStore store = new KVStore("hi");
 		try {
 			output = clientSocket.getOutputStream();
 			input = clientSocket.getInputStream();
@@ -60,7 +61,21 @@ public class ClientConnection implements Runnable {
 					JSONMessage latestMsg = receiveJSONMessage();
 
 					// TODO add PUT, GET logic here
-					sendJSONMessage(latestMsg);
+					if (latestMsg.status.name() == "put") {
+						try {
+							store.put(latestMsg.key, latestMsg.value);
+							sendTextMessage(new TextMessage("Successfully put key:" + latestMsg.key + ", value: " + latestMsg.value))
+						} catch {
+							sendTextMessage(new TextMessage("Failed to put key:" + latestMsg.key + ", value: " + latestMsg.value))
+						}
+					} else if (latestMsg.status.name() == "get") {
+						try {
+							JSONMessage getJSON = store.get(latestMsg.key);
+							sendTextMessage(new TextMessage("Successfully get key:" + getJSON.key + ", value is: " + getJSON.value))
+						} catch {
+							sendTextMessage(new TextMessage("Failed to get key:" + latestMsg.key))
+						}
+					}
 					
 				/* connection either terminated by the client or lost due to 
 				 * network problems*/	
