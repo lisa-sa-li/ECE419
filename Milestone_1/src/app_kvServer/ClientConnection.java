@@ -10,6 +10,8 @@ import org.apache.log4j.*;
 import shared.messages.JSONMessage;
 import shared.messages.TextMessage;
 
+import client.KVStore;
+
 
 /**
  * Represents a connection end point for a particular client that is 
@@ -44,7 +46,12 @@ public class ClientConnection implements Runnable {
 	 * Loops until the connection is closed or aborted by the client.
 	 */
 	public void run() {
-		KVStore store = new KVStore("hi");
+		KVStore kvStore = new KVStore("temp", 123);
+		String key;
+		String value;
+		JSONMessage latestMsg;
+		String kvStoreValue;
+
 		try {
 			output = clientSocket.getOutputStream();
 			input = clientSocket.getInputStream();
@@ -58,22 +65,24 @@ public class ClientConnection implements Runnable {
 				try {
 					// TextMessage latestMsg = receiveMessage();
 					// sendTextMessage(latestMsg);
-					JSONMessage latestMsg = receiveJSONMessage();
+					latestMsg = receiveJSONMessage();
+					key = latestMsg.getKey();
+					value = latestMsg.getValue();
 
 					// TODO add PUT, GET logic here
-					if (latestMsg.status.name() == "put") {
+					if (latestMsg.getStatus().name() == "put") {
 						try {
-							store.put(latestMsg.key, latestMsg.value);
-							sendTextMessage(new TextMessage("Successfully put key:" + latestMsg.key + ", value: " + latestMsg.value))
-						} catch {
-							sendTextMessage(new TextMessage("Failed to put key:" + latestMsg.key + ", value: " + latestMsg.value))
+							kvStore.put(key, value);
+							sendTextMessage(new TextMessage("Successfully put key:" + key + ", value: " + value));
+						} catch (Exception e) {
+							sendTextMessage(new TextMessage("Failed to put key:" + key + ", value: " + value));
 						}
-					} else if (latestMsg.status.name() == "get") {
+					} else if (latestMsg.getStatus().name() == "get") {
 						try {
-							JSONMessage getJSON = store.get(latestMsg.key);
-							sendTextMessage(new TextMessage("Successfully get key:" + getJSON.key + ", value is: " + getJSON.value))
-						} catch {
-							sendTextMessage(new TextMessage("Failed to get key:" + latestMsg.key))
+							kvStoreValue = kvStore.get(key);
+							sendTextMessage(new TextMessage("Successfully get key:" + key + ", value is: " + kvStoreValue));
+						} catch (Exception e) {
+							sendTextMessage(new TextMessage("Failed to get key:" + key));
 						}
 					}
 					
