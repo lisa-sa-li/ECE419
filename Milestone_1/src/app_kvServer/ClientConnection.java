@@ -58,6 +58,8 @@ public class ClientConnection implements Runnable {
 					// TextMessage latestMsg = receiveMessage();
 					// sendTextMessage(latestMsg);
 					JSONMessage latestMsg = receiveJSONMessage();
+
+					// TODO add PUT, GET logic here
 					sendJSONMessage(latestMsg);
 					
 				/* connection either terminated by the client or lost due to 
@@ -238,7 +240,7 @@ public class ClientConnection implements Runnable {
 		
 		msgBytes = tmp;
 		
-		/* build final String */
+		/* build final Object */
 		JSONMessage json = new JSONMessage();
 		// bytes to string
 		String jsonStr = json.byteToString(tmp);
