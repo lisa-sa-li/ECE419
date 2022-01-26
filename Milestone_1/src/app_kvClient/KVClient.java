@@ -2,7 +2,6 @@ package app_kvClient;
 
 import client.KVCommInterface;
 import client.KVStore;
-import shared.messages.JSONMessage;
 import shared.messages.KVMessage;
 import logger.LogSetup;
 import java.net.UnknownHostException;
@@ -13,7 +12,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 
-public class KVClient implements IKVClient {
+public class KVClient implements IKVClient, Runnable {
     private static Logger logger = Logger.getRootLogger();
     private static final String PROMPT = "KVClient> ";
     private KVCommInterface commInterfaceClient;
@@ -73,7 +72,6 @@ public class KVClient implements IKVClient {
                             logger.error(e);
                         }
                     } else {
-                        // printError("Invalid number of parameters!");
                         logger.error("Invalid number of parameters!");
                     }
                     break;
@@ -83,11 +81,14 @@ public class KVClient implements IKVClient {
                         if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes idk
                             if (tokens.length >= 3) {
                                 // CREATE or UPDATE key,value
-                                JSONMessage json = new JSONMessage();
-                                // load values into json format + get string
-                                json.setMessage(tokens[0], tokens[1], tokens[2]);
-                                String valStr = json.serialize();
-
+                                StringBuilder val = new StringBuilder();
+                                for (int i = 1; i < tokens.length; i++) {
+                                    val.append(tokens[i]);
+                                    if (i != tokens.length - 1) {
+                                        val.append(" ");
+                                    }
+                                }
+                                String valStr = val.toString();
                                 if (valStr.length() <= 120000) {
                                     try {
                                         KVMessage msg = this.commInterfaceClient.put(tokens[1], valStr);
