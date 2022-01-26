@@ -2,6 +2,7 @@ package app_kvClient;
 
 import client.KVCommInterface;
 import client.KVStore;
+import shared.messages.JSONMessage;
 import shared.messages.KVMessage;
 import logger.LogSetup;
 import java.net.UnknownHostException;
@@ -81,14 +82,12 @@ public class KVClient implements IKVClient {
                         String key = tokens[1];
                         if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes idk
                             if (tokens.length >= 3) {
-                                StringBuilder val = new StringBuilder();
-                                for (int i = 1; i < tokens.length; i++) {
-                                    val.append(tokens[i]);
-                                    if (i != tokens.length - 1) {
-                                        val.append(" ");
-                                    }
-                                }
-                                String valStr = val.toString();
+                                // CREATE or UPDATE key,value
+                                JSONMessage json = new JSONMessage();
+                                // load values into json format + get string
+                                json.setMessage(tokens[0], tokens[1], tokens[2]);
+                                String valStr = json.serialize();
+
                                 if (valStr.length() <= 120000) {
                                     try {
                                         KVMessage msg = this.commInterfaceClient.put(tokens[1], valStr);
@@ -101,6 +100,7 @@ public class KVClient implements IKVClient {
                                     logger.error("Value length must be max 120000."); // Exact size of val bytes idk
                                 }
                             } else if (tokens.length == 2) {
+                                // DELETE key,value pair
                                 try {
                                     KVMessage msg = this.commInterfaceClient.put(tokens[1], "null");
                                     // PLACE status message here

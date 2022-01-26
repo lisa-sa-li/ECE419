@@ -1,18 +1,17 @@
 package ui;
 
+import client.Client;
+import client.ClientSocketListener;
+import client.TextMessage;
+import logging.LogSetup;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import shared.messages.JSONMessage;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
-import logging.LogSetup;
-
-import client.Client;
-import client.ClientSocketListener;
-import client.TextMessage;
 
 public class Application implements ClientSocketListener {
 
@@ -79,6 +78,23 @@ public class Application implements ClientSocketListener {
 						}
 					}	
 					sendMessage(msg.toString());
+				} else {
+					printError("Not connected!");
+				}
+			} else {
+				printError("No message passed!");
+			}
+
+		} else if(tokens[0].equals("PUT")) {
+			if(tokens.length == 3) {
+				if(client != null && client.isRunning()){
+					//TODO error check
+					// SERIALIZE HERE
+					JSONMessage msg = new JSONMessage();
+					msg.setMessage(tokens[0], tokens[1], tokens[2]);
+					System.out.print("HERE");
+					System.out.print(msg.serialize());
+					sendMessage(msg.serialize());
 				} else {
 					printError("Not connected!");
 				}

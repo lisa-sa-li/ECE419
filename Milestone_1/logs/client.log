@@ -1,0 +1,3 @@
+2022-01-26 01:06:07,380 WARN  [main] root: Not connected to any store.
+2022-01-26 01:06:10,286 ERROR [main] root: Unknown command.
+2022-01-26 01:06:12,691 INFO  [main] root: Application exit.
