@@ -202,8 +202,12 @@ public class ServerConnection implements IServerConnection, Runnable {
 							output = clientSocket.getOutputStream();
 			
 							JSONMessage recievedMesage = receiveJSONMessage();
+							System.out.println("RECEIVED MESSAGE");
 							JSONMessage sendMessage = handleMessage(recievedMesage);
+							System.out.println("HANDLED MESSAGE");
 							sendJSONMessage(sendMessage);
+							System.out.println("SENT MESSAGE");
+
 						} catch (IOException e) {
 							logger.error("Server connection lost: ", e);
 							this.isOpen = false;

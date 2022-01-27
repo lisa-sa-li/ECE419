@@ -405,3 +405,7 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-27 15:22:43,371 ERROR [main] root: java.lang.NullPointerException
 =======
 >>>>>>> 9c762937efafe34de4d0c409e757d1cbae217e23
+2022-01-27 15:44:28,841 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 15:44:28,842 INFO  [main] root: Connection established.
+2022-01-27 15:44:33,543 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hi":"sandra",}'
+2022-01-27 15:44:33,543 ERROR [main] root: java.lang.NullPointerException
