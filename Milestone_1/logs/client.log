@@ -1,3 +1,8 @@
 2022-01-26 01:06:07,380 WARN  [main] root: Not connected to any store.
 2022-01-26 01:06:10,286 ERROR [main] root: Unknown command.
 2022-01-26 01:06:12,691 INFO  [main] root: Application exit.
+2022-01-26 23:35:47,216 WARN  [main] root: Not connected to any store.
+2022-01-26 23:36:06,612 INFO  [main] root: Connected to localhost on port 8080
+2022-01-26 23:36:06,613 INFO  [main] root: Connection established.
+2022-01-26 23:36:49,191 INFO  [main] root: Connected to localhost on port 8080
+2022-01-26 23:36:49,196 INFO  [main] root: Connection established.
