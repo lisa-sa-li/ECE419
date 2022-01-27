@@ -139,15 +139,16 @@ public class ServerConnection implements IServerConnection, Runnable {
 		JSONMessage json = new JSONMessage();
 		// bytes to string
 		String jsonStr = json.byteToString(tmp);
+		if (jsonStr == null || jsonStr.strip() == ""){
+			// TODO?? null message
+			return null;
+		} 
 		// deserialize
-		System.out.println("ABOUT TO DESERIALIZE");
 		json.deserialize(jsonStr);
-		System.out.println("DESERIALIZED: " + json.getJSON());
 		logger.info("RECEIVE \t<"
 				+ clientSocket.getInetAddress().getHostAddress() + ":"
 				+ clientSocket.getPort() + ">: '"
 				+ json.getJSON().trim() + "'");
-		System.out.println("RETURNING");
 		return json;
 	}
 
@@ -204,13 +205,13 @@ public class ServerConnection implements IServerConnection, Runnable {
 							input = clientSocket.getInputStream();
 							output = clientSocket.getOutputStream();
 			
-							System.out.println("BEFORE RECEIVED MESSAGE");
 							JSONMessage recievedMesage = receiveJSONMessage();
-							System.out.println("RECEIVED MESSAGE");
-							// JSONMessage sendMessage = handleMessage(recievedMesage);
-							// System.out.println("HANDLED MESSAGE");
-							// sendJSONMessage(sendMessage);
-							// System.out.println("SENT MESSAGE");
+							if (recievedMesage != null){
+								JSONMessage sendMessage = handleMessage(recievedMesage);
+								System.out.println("HANDLED MESSAGE");
+								sendJSONMessage(sendMessage);
+								System.out.println("SENT MESSAGE");
+							}
 
 						} catch (IOException e) {
 							logger.error("Server connection lost: ", e);
