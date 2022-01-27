@@ -144,10 +144,13 @@ public class ClientConnection implements IClientConnection {
 	public void sendJSONMessage(JSONMessage json) throws IOException {
 		byte[] jsonBytes = json.getJSONByte();
 
+		System.out.println("jsonBytes: " + jsonBytes);
+		System.out.println("len: " + jsonBytes.length);
+		System.out.println(json.getJSON());
+
 		output.write(jsonBytes, 0, jsonBytes.length);
 		System.out.println("HERHHER swag");
 		output.flush();
-		System.out.println(json.getJSON());
 
 		logger.info("SEND \t<"
 				+ clientSocket.getInetAddress().getHostAddress() + ":"

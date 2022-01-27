@@ -49396,3 +49396,33 @@
 =======
 >>>>>>> 7bf807522ac88494cbd865158d722872c24db65b
 >>>>>>> 9b9b766de0bfdd97d701353f76d6d241e541f662
+2022-01-27 14:42:06,025 INFO  [main] root: Directory already exists.
+2022-01-27 14:42:06,030 INFO  [main] root: File already exists.
+2022-01-27 14:42:06,032 INFO  [main] root: Initialize server ...
+2022-01-27 14:42:06,197 INFO  [main] root: Server listening on port: 8080
+2022-01-27 14:42:10,569 INFO  [main] root: Connected to localhost on port 51768
+2022-01-27 14:42:10,578 INFO  [main] root: Connected to localhost on port 51768
+2022-01-27 14:46:37,673 INFO  [main] root: Directory already exists.
+2022-01-27 14:46:37,674 INFO  [main] root: File already exists.
+2022-01-27 14:46:37,674 INFO  [main] root: Initialize server ...
+2022-01-27 14:46:37,760 INFO  [main] root: Server listening on port: 8080
+2022-01-27 14:46:46,082 INFO  [main] root: Connected to localhost on port 51949
+2022-01-27 14:46:46,083 INFO  [main] root: Connected to localhost on port 51949
+2022-01-27 14:50:09,155 INFO  [main] root: Directory already exists.
+2022-01-27 14:50:09,160 INFO  [main] root: File already exists.
+2022-01-27 14:50:09,160 INFO  [main] root: Initialize server ...
+2022-01-27 14:50:09,291 INFO  [main] root: Server listening on port: 8080
+2022-01-27 14:50:16,181 INFO  [main] root: Connected to localhost on port 52055
+2022-01-27 14:50:16,186 INFO  [main] root: Connected to localhost on port 52055
+2022-01-27 14:51:30,957 INFO  [main] root: Directory already exists.
+2022-01-27 14:51:30,972 INFO  [main] root: File already exists.
+2022-01-27 14:51:31,096 INFO  [main] root: Initialize server ...
+2022-01-27 14:51:31,168 INFO  [main] root: Server listening on port: 8080
+2022-01-27 14:51:39,110 INFO  [main] root: Connected to localhost on port 52083
+2022-01-27 14:51:39,112 INFO  [main] root: Connected to localhost on port 52083
+2022-01-27 14:53:41,523 INFO  [main] root: Directory already exists.
+2022-01-27 14:53:41,524 INFO  [main] root: File already exists.
+2022-01-27 14:53:41,524 INFO  [main] root: Initialize server ...
+2022-01-27 14:53:41,559 INFO  [main] root: Server listening on port: 8080
+2022-01-27 14:53:49,050 INFO  [main] root: Connected to localhost on port 52173
+2022-01-27 14:53:49,059 INFO  [main] root: Connected to localhost on port 52173
