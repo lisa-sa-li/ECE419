@@ -67,7 +67,7 @@ public class PersistantStorage implements IPersistantStorage {
             String keyFromFile;
             boolean foundKey = false;
             JSONMessage json;
-            StatusType putStatus = null;
+            StatusType putStatus = StatusType.NO_STATUS;
 
             while ((line = file.readLine()) != null) {
                 // Covert each line to a JSON so we can read the key and value
