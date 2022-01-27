@@ -10,11 +10,15 @@ import org.apache.log4j.Logger;
 
 import shared.messages.TextMessage;
 import logger.LogSetup;
+import app_kvServer.PersistantStorage;
+
 public class KVServer extends Thread implements IKVServer {
 
 	private static Logger logger = Logger.getRootLogger();
 
 	private int port;
+	private int cacheSize;
+	private PersistantStorage persistantStorage;
 	private ServerSocket serverSocket;
 	private boolean running;
 	private String hostName;
@@ -32,11 +36,12 @@ public class KVServer extends Thread implements IKVServer {
 	public KVServer(int port, int cacheSize, String strategy) {
 		// TODO Auto-generated method stub
 		this.port = port;
+		this.cacheSize = cacheSize;
+		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
 	}
 	
 	@Override
 	public int getPort(){
-		// TODO Auto-generated method stub
 		return this.port;
 	}
 
@@ -54,14 +59,12 @@ public class KVServer extends Thread implements IKVServer {
 
 	@Override
     public int getCacheSize(){
-		// TODO Auto-generated method stub
-		return -1;
+		return this.cacheSize;
 	}
 
 	@Override
     public boolean inStorage(String key){
-		// TODO Auto-generated method stub
-		return false;
+		return this.persistantStorage.inStorage(key);
 	}
 
 	@Override
@@ -72,13 +75,21 @@ public class KVServer extends Thread implements IKVServer {
 
 	@Override
     public String getKV(String key) throws Exception{
-		// TODO Auto-generated method stub
-		return "";
+		String value = this.persistantStorage.get(key);
+		if (value == null) {
+			logger.warn(key + " is not found");
+			throw new Exception("Key is not found");
+		}
+		return value;
 	}
 
 	@Override
     public void putKV(String key, String value) throws Exception{
-		// TODO Auto-generated method stub
+		boolean success = this.persistantStorage.put(key, value);
+		if (success == false) {
+			logger.warn("Unable to put " + key + ": " + value + ")");
+			throw new Exception("Unable to put (" + key + ": " + value + ")");
+		}
 	}
 
 	@Override
@@ -88,7 +99,7 @@ public class KVServer extends Thread implements IKVServer {
 
 	@Override
     public void clearStorage(){
-		// TODO Auto-generated method stub
+		this.persistantStorage.clearStorage();
 	}
 
 	private boolean initializeServer() {
