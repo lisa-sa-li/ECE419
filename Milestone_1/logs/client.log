@@ -1,6 +1,13 @@
 2022-01-26 01:06:07,380 WARN  [main] root: Not connected to any store.
 2022-01-26 01:06:10,286 ERROR [main] root: Unknown command.
 2022-01-26 01:06:12,691 INFO  [main] root: Application exit.
+<<<<<<< HEAD
+2022-01-26 23:35:47,216 WARN  [main] root: Not connected to any store.
+2022-01-26 23:36:06,612 INFO  [main] root: Connected to localhost on port 8080
+2022-01-26 23:36:06,613 INFO  [main] root: Connection established.
+2022-01-26 23:36:49,191 INFO  [main] root: Connected to localhost on port 8080
+2022-01-26 23:36:49,196 INFO  [main] root: Connection established.
+=======
 2022-01-26 23:02:36,506 ERROR [main] root: Unknown command.
 2022-01-26 23:02:44,720 ERROR [main] root: Error! Unable to establish connection. 
 
@@ -57,6 +64,7 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-26 23:32:29,891 ERROR [main] root: java.lang.NullPointerException
 2022-01-26 23:37:51,983 INFO  [main] root: Tearing down the connection ...
 2022-01-26 23:37:51,983 INFO  [main] root: Application exit.
+<<<<<<< HEAD
 2022-01-26 23:57:18,134 INFO  [main] root: Connected to localhost on port 8008
 2022-01-26 23:57:18,135 INFO  [main] root: Connection established.
 2022-01-26 23:57:27,283 ERROR [main] root: java.lang.NullPointerException
@@ -68,3 +76,6 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-27 00:13:12,414 ERROR [main] root: java.lang.NullPointerException
 2022-01-27 00:14:56,103 INFO  [main] root: Tearing down the connection ...
 2022-01-27 00:14:56,103 INFO  [main] root: Application exit.
+=======
+>>>>>>> 611cf7e6a927926d2ef3533d3e788bbcfbac5bcb
+>>>>>>> 3cbdffa0809a779e96dbee603662638d4d4a5f4d
