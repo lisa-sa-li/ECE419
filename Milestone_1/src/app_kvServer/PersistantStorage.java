@@ -19,11 +19,14 @@ public class PersistantStorage implements IPersistantStorage {
     private String pathToFile;
     private String dir = "./storage";
 
-    public PersistantStorage(String name) throws Exception {
+    public PersistantStorage(String name) {
         this.fileName = name.trim() + "_storage.txt";
         this.pathToFile = dir + "/" + this.fileName;
-
-        initFile();
+        try {
+            initFile();
+        } catch (Exception e) {
+            logger.error(e);
+        }
     }
 
     private void initFile() throws Exception {

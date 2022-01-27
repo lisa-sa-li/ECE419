@@ -340,3 +340,24 @@ java.net.ConnectException: Connection refused (Connection refused)
 	at app_kvClient.KVClient.main(KVClient.java:270)
 2022-01-27 14:13:46,816 INFO  [main] root: Connection established.
 2022-01-27 14:13:54,941 ERROR [main] root: java.lang.NullPointerException
+2022-01-27 14:21:15,053 ERROR [main] root: Error! Unable to establish connection. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:255)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:237)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+	at client.KVStore.connect(KVStore.java:45)
+	at app_kvClient.KVClient.newConnection(KVClient.java:29)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:63)
+	at app_kvClient.KVClient.run(KVClient.java:257)
+	at app_kvClient.KVClient.main(KVClient.java:270)
+2022-01-27 14:21:15,056 INFO  [main] root: Connection established.
+2022-01-27 14:21:55,478 ERROR [main] root: java.io.IOException: Connection is already established
+2022-01-27 14:23:29,812 INFO  [main] root: Tearing down the connection ...
+2022-01-27 14:23:29,813 INFO  [main] root: Application exit.

@@ -69,3 +69,5 @@
 2022-01-27 13:46:13,925 INFO  [main] root: File already exists.
 2022-01-27 14:15:08,346 INFO  [main] root: Directory already exists.
 2022-01-27 14:15:08,347 INFO  [main] root: File already exists.
+2022-01-27 14:21:02,502 INFO  [main] root: Directory created: storage
+2022-01-27 14:21:02,503 INFO  [main] root: File created: 8008_storage.txt
