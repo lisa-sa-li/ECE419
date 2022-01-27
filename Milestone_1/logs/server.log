@@ -49396,3 +49396,13 @@
 =======
 >>>>>>> 7bf807522ac88494cbd865158d722872c24db65b
 >>>>>>> 9b9b766de0bfdd97d701353f76d6d241e541f662
+2022-01-27 14:42:52,588 INFO  [main] root: Directory already exists.
+2022-01-27 14:42:52,589 INFO  [main] root: File already exists.
+2022-01-27 14:43:02,324 INFO  [main] root: Directory already exists.
+2022-01-27 14:43:02,325 INFO  [main] root: File created: 8080_storage.txt
+2022-01-27 14:44:34,424 INFO  [main] root: Directory already exists.
+2022-01-27 14:44:34,425 INFO  [main] root: File already exists.
+2022-01-27 14:46:26,792 INFO  [main] root: Directory already exists.
+2022-01-27 14:46:26,792 INFO  [main] root: File already exists.
+2022-01-27 14:56:17,314 INFO  [main] root: Directory already exists.
+2022-01-27 14:56:17,315 INFO  [main] root: File already exists.
