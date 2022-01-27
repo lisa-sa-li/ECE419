@@ -48,3 +48,24 @@
 =======
 >>>>>>> 611cf7e6a927926d2ef3533d3e788bbcfbac5bcb
 >>>>>>> 3cbdffa0809a779e96dbee603662638d4d4a5f4d
+2022-01-27 13:42:46,101 INFO  [main] root: Directory created: storage
+2022-01-27 13:42:46,102 INFO  [main] root: File created: 8080_storage.txt
+2022-01-27 13:42:46,103 INFO  [Thread-0] root: Initialize server ...
+2022-01-27 13:42:46,143 INFO  [Thread-0] root: Server listening on port: 8080
+2022-01-27 13:43:08,654 INFO  [Thread-1] root: SEND 	<127.0.0.1:49625>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8080'
+2022-01-27 13:43:08,660 INFO  [Thread-0] root: Connected to localhost on port 49625
+2022-01-27 13:43:27,501 ERROR [Thread-1] root: Error! Connection lost!
+2022-01-27 13:43:40,482 INFO  [main] root: Directory already exists.
+2022-01-27 13:43:40,483 INFO  [main] root: File already exists.
+2022-01-27 13:43:54,864 INFO  [main] root: Directory created: storage
+2022-01-27 13:43:54,865 INFO  [main] root: File created: 8080_storage.txt
+2022-01-27 13:44:06,365 INFO  [main] root: Directory already exists.
+2022-01-27 13:44:06,365 INFO  [main] root: File already exists.
+2022-01-27 13:44:19,585 INFO  [main] root: Directory already exists.
+2022-01-27 13:44:19,586 INFO  [main] root: File already exists.
+2022-01-27 13:44:33,903 INFO  [main] root: Directory created: storage
+2022-01-27 13:44:33,904 INFO  [main] root: File created: 8080_storage.txt
+2022-01-27 13:46:13,924 INFO  [main] root: Directory already exists.
+2022-01-27 13:46:13,925 INFO  [main] root: File already exists.
+2022-01-27 14:15:08,346 INFO  [main] root: Directory already exists.
+2022-01-27 14:15:08,347 INFO  [main] root: File already exists.

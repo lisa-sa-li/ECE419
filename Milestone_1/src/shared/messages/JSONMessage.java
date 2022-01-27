@@ -124,8 +124,8 @@ public class JSONMessage implements KVMessage, Serializable {
             setStatus(status);
             setKey(key);
             setValue(value);
-            System.out.print("HERE");
-            System.out.print(String.join(status, key, value));
+            // System.out.print("HERE");
+            // System.out.print(String.join(status, key, value));
         }
     }
 
