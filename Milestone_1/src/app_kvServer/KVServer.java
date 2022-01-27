@@ -4,6 +4,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
 import java.net.BindException;
+import java.util.ArrayList;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -11,8 +12,10 @@ import org.apache.log4j.Logger;
 import shared.messages.TextMessage;
 import logger.LogSetup;
 import app_kvServer.PersistantStorage;
+import app_kvServer.ServerConnection;
 
-public class KVServer extends Thread implements IKVServer {
+
+public class KVServer implements IKVServer, Runnable {
 
 	private static Logger logger = Logger.getRootLogger();
 
@@ -22,6 +25,7 @@ public class KVServer extends Thread implements IKVServer {
 	private ServerSocket serverSocket;
 	private boolean running;
 	private String hostName;
+	private ArrayList<Thread> threads;
 
 	/**
 	 * Start KV Server at given port
@@ -38,6 +42,7 @@ public class KVServer extends Thread implements IKVServer {
 		this.port = port;
 		this.cacheSize = cacheSize;
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
+		this.threads = new ArrayList<Thread>();
 	}
 	
 	@Override
@@ -120,23 +125,37 @@ public class KVServer extends Thread implements IKVServer {
     }
 
 	@Override
-    public void run(){
+    public void run() {
 		// TODO Auto-generated method stub
 		running = initializeServer();
 
-		if(serverSocket != null){
-			while(isRunning()){
+		if (serverSocket != null) {
+			while (isRunning()) {
 				try{
 					Socket client = serverSocket.accept();
-					ClientConnection connection = new ClientConnection(client);
-					new Thread(connection).start();
+					ServerConnection serverConnection = new ServerConnection(client, this);
+					// ????
+					Thread newThread = new Thread(serverConnection);
+					newThread.start();
+					this.threads.add(newThread);
 
 					logger.info("Connected to "
 							+ client.getInetAddress().getHostName()
 							+ " on port " + client.getPort());
+
+					// Socket clientSocket = serverSocket.accept();
+					// KVCommunicationServer communication = new KVCommunicationServer(clientSocket, this);
+					// Thread clientThread = new Thread(communication);
+					// clientThread.start();
+					// clientThreads.add(clientThread);
+					// logger.info("Connected to " + clientSocket.getInetAddress().getHostName() +
+					// 		" on port " + clientSocket.getPort());
 				} catch (IOException e) {
 					logger.error("Error! " + "Unable to establish connection. \n", e);
+				} catch (Exception e) {
+					logger.error("Error! \n", e);
 				}
+
 			}
 		}
 		logger.info("Server stopped.");
@@ -171,7 +190,8 @@ public class KVServer extends Thread implements IKVServer {
 			} else {
 				int port = Integer.parseInt(args[0]);
 				// TODO: set params for cache size and strategy
-				new KVServer(port, 1, "").start();
+				new KVServer(port, 1, "");
+				// .start();
 			}
 		} catch (IOException e) {
 			System.out.println("Error! Unable to initialize logger!");
