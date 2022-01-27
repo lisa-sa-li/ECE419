@@ -84,7 +84,7 @@ public class KVClient implements IKVClient, Runnable {
                             if (tokens.length >= 3) {
                                 // CREATE or UPDATE key,value
                                 StringBuilder val = new StringBuilder();
-                                for (int i = 1; i < tokens.length; i++) {
+                                for (int i = 2; i < tokens.length; i++) {
                                     val.append(tokens[i]);
                                     if (i != tokens.length - 1) {
                                         val.append(" ");
@@ -105,6 +105,7 @@ public class KVClient implements IKVClient, Runnable {
                             } else if (tokens.length == 2) {
                                 // DELETE key,value pair
                                 try {
+                                    System.out.println("u are about to null");
                                     JSONMessage msg = this.kvStore.put(tokens[1], "null");
                                     // PLACE status message here
                                     logger.info(msg);
