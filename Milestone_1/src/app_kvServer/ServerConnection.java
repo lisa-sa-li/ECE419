@@ -73,6 +73,16 @@ public class ServerConnection implements IServerConnection, Runnable {
 				+ json.getJSON() + "'");
 	}
 
+	public void sendTextMessage(TextMessage msg) throws IOException {
+		byte[] msgBytes = msg.getMsgBytes();
+		output.write(msgBytes, 0, msgBytes.length);
+		output.flush();
+		logger.info("SEND \t<"
+				+ clientSocket.getInetAddress().getHostAddress() + ":"
+				+ clientSocket.getPort() + ">: '"
+				+ msg.getMsg() + "'");
+	}
+
 	@Override
 	public JSONMessage receiveJSONMessage() throws IOException {
 		int index = 0;
@@ -178,29 +188,45 @@ public class ServerConnection implements IServerConnection, Runnable {
 
 	public void run() {
 		// while connection is open, listen for messages
-		while (this.isOpen) {
-			try {
-				JSONMessage recievedMesage = receiveJSONMessage();
-				JSONMessage sendMessage = handleMessage(recievedMesage);
-				sendJSONMessage(sendMessage);
-			} catch (IOException e) {
-				logger.error("Server connection lost: ", e);
-				this.isOpen = false;
-			} catch (Exception e) {
-				logger.error(e);
-			}
+		try {
+			output = clientSocket.getOutputStream();
+			input = clientSocket.getInputStream();
+		
+			sendTextMessage(new TextMessage(
+					"Connection to MSRG Echo server established: " 
+					+ clientSocket.getLocalAddress() + " / "
+					+ clientSocket.getLocalPort()));
+					while (this.isOpen) {
+						try {
+							input = clientSocket.getInputStream();
+							output = clientSocket.getOutputStream();
+			
+							JSONMessage recievedMesage = receiveJSONMessage();
+							JSONMessage sendMessage = handleMessage(recievedMesage);
+							sendJSONMessage(sendMessage);
+						} catch (IOException e) {
+							logger.error("Server connection lost: ", e);
+							this.isOpen = false;
+						} catch (Exception e) {
+							logger.error(e);
+						}
+					}
+		} catch (IOException ioe) {
+			logger.error("Error! Connection could not be established!", ioe);
+		
+		} finally {
+			try{
+				// close connection
+				if (clientSocket != null) {
+						input.close();
+						output.close();
+						clientSocket.close();
+					}
+				} catch (IOException ioe) {
+					logger.error("Error! Unable to tear down connection!", ioe);
+				}
 		}
-
-		// close connection
-		if (clientSocket != null) {
-			try {
-				input.close();
-				output.close();
-				clientSocket.close();
-			} catch (IOException e) {
-				logger.error("Unable to close connection!", e);
-			}
-		}
+		
 	}
 
 }
