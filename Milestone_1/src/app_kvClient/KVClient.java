@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 
 public class KVClient implements IKVClient, Runnable {
     private static Logger logger = Logger.getRootLogger();
@@ -61,15 +62,15 @@ public class KVClient implements IKVClient, Runnable {
                             String serverHostName = tokens[1];
                             int serverPort = Integer.parseInt(tokens[2]);
                             newConnection(serverHostName, serverPort);
-                            System.out
-                                    .println(PROMPT + "Connection established to " + serverHostName + ":" + tokens[2]);
-                            logger.info("Connection established.");
+                            // System.out
+                            //        .println(PROMPT + "Connection established to " + serverHostName + ":" + tokens[2]);
+                            logger.info("Connection established to " + serverHostName + ":" + tokens[2]);
                         } catch (NumberFormatException nfe) {
                             logger.error("No valid address. Port must be a number! ", nfe);
                         } catch (UnknownHostException e) {
                             logger.error("Unknown Host! ", e);
                         } catch (IOException e) {
-                            logger.error(e);
+                            logger.error("Something went wrong! ", e);
                         }
                     } else {
                         logger.error("Invalid number of parameters!");
