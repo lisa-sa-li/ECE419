@@ -142,10 +142,12 @@ public class ServerConnection implements IServerConnection, Runnable {
 		// deserialize
 		System.out.println("ABOUT TO DESERIALIZE");
 		json.deserialize(jsonStr);
+		System.out.println("DESERIALIZED: " + json.getJSON());
 		logger.info("RECEIVE \t<"
 				+ clientSocket.getInetAddress().getHostAddress() + ":"
 				+ clientSocket.getPort() + ">: '"
 				+ json.getJSON().trim() + "'");
+		System.out.println("RETURNING");
 		return json;
 	}
 

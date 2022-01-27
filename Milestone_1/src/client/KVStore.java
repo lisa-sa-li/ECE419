@@ -27,8 +27,8 @@ public class KVStore implements KVCommInterface {
 	String address;
 	int port;
 	private Socket clientSocket;
-	private OutputStream output;
-	private InputStream input;
+	// private OutputStream output;
+	// private InputStream input;
 	private static Logger logger = Logger.getRootLogger();
 	private static final int BUFFER_SIZE = 1024;
 	private static final int DROP_SIZE = 1024 * BUFFER_SIZE;
@@ -44,8 +44,8 @@ public class KVStore implements KVCommInterface {
 		try {
 			Socket clientSocket = new Socket(address, port);
 			clientConnection = new ClientConnection(clientSocket);
-			output = clientSocket.getOutputStream();
-			input = clientSocket.getInputStream();
+			// output = clientSocket.getOutputStream();
+			// input = clientSocket.getInputStream();
 
 			logger.info("Connected to "
 					+ clientSocket.getInetAddress().getHostName()

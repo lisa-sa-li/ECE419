@@ -120,6 +120,8 @@ public class JSONMessage implements KVMessage, Serializable {
     }
 
     public void deserialize(String json) {
+        this.json = json;
+        
         StringTokenizer messageTokens = new StringTokenizer(json, "{}:,\"");
 
         System.out.println("JSON");
