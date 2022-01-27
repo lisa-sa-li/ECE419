@@ -49426,3 +49426,11 @@
 2022-01-27 14:53:41,559 INFO  [main] root: Server listening on port: 8080
 2022-01-27 14:53:49,050 INFO  [main] root: Connected to localhost on port 52173
 2022-01-27 14:53:49,059 INFO  [main] root: Connected to localhost on port 52173
+2022-01-27 15:02:52,947 INFO  [main] root: Directory already exists.
+2022-01-27 15:02:52,952 INFO  [main] root: File already exists.
+2022-01-27 15:02:52,952 INFO  [main] root: Initialize server ...
+2022-01-27 15:02:52,979 INFO  [main] root: Server listening on port: 8080
+2022-01-27 15:03:00,507 INFO  [main] root: Connected to localhost on port 52551
+2022-01-27 15:03:00,508 INFO  [main] root: Connected to localhost on port 52551
+2022-01-27 15:03:02,897 ERROR [Thread-0] root: java.util.NoSuchElementException
+2022-01-27 15:03:02,912 ERROR [Thread-0] root: java.util.NoSuchElementException

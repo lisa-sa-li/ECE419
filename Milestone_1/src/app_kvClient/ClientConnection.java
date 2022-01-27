@@ -41,6 +41,8 @@ public class ClientConnection implements IClientConnection {
 	public ClientConnection(Socket clientSocket) throws Exception {
 		this.clientSocket = clientSocket;
 		this.isOpen = true;
+		output = clientSocket.getOutputStream();
+
 		// this.kvServer = new KVServer(this.clientSocket.getPort(), -1, "");
 	}
 
@@ -144,14 +146,8 @@ public class ClientConnection implements IClientConnection {
 	public void sendJSONMessage(JSONMessage json) throws IOException {
 		byte[] jsonBytes = json.getJSONByte();
 
-		System.out.println("jsonBytes: " + jsonBytes);
-		System.out.println("len: " + jsonBytes.length);
-		System.out.println(json.getJSON());
-
 		output.write(jsonBytes, 0, jsonBytes.length);
-		System.out.println("HERHHER swag");
 		output.flush();
-
 		logger.info("SEND \t<"
 				+ clientSocket.getInetAddress().getHostAddress() + ":"
 				+ clientSocket.getPort() + ">: '"
