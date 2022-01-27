@@ -12,6 +12,8 @@ import shared.messages.TextMessage;
 
 import client.KVStore;
 
+import app_kvServer.KVServer;
+
 
 /**
  * Represents a connection end point for a particular client that is 
@@ -31,14 +33,17 @@ public class ClientConnection implements Runnable {
 	private Socket clientSocket;
 	private InputStream input;
 	private OutputStream output;
+	// private KVServer kvServer;
+
 	
 	/**
 	 * Constructs a new CientConnection object for a given TCP socket.
 	 * @param clientSocket the Socket object for the client connection.
 	 */
-	public ClientConnection(Socket clientSocket) {
+	public ClientConnection(Socket clientSocket) throws Exception {
 		this.clientSocket = clientSocket;
 		this.isOpen = true;
+		// this.kvServer = new KVServer(this.clientSocket.getPort(), -1, "");
 	}
 	
 	/**
@@ -46,12 +51,14 @@ public class ClientConnection implements Runnable {
 	 * Loops until the connection is closed or aborted by the client.
 	 */
 	public void run() {
+		System.out.print("hhiii");
+
 		KVStore kvStore = new KVStore("temp", 123);
 		String key;
 		String value;
 		JSONMessage latestMsg;
 		String kvStoreValue;
-
+		
 		try {
 			output = clientSocket.getOutputStream();
 			input = clientSocket.getInputStream();
@@ -72,16 +79,16 @@ public class ClientConnection implements Runnable {
 					// TODO add PUT, GET logic here
 					if (latestMsg.getStatus().name() == "put") {
 						try {
-							// KVServer.put
-							kvStore.put(key, value);
+							this.kvServer.putKV(key, value);
 							sendTextMessage(new TextMessage("Successfully put key:" + key + ", value: " + value));
 						} catch (Exception e) {
 							sendTextMessage(new TextMessage("Failed to put key:" + key + ", value: " + value));
 						}
 					} else if (latestMsg.getStatus().name() == "get") {
 						try {
-							kvStoreValue = kvStore.get(key);
-							TextMessage txt = kvStore.get(key);
+							kvStoreValue = this.kvServer.getKV(key);
+							// kvStoreValue = kvStore.get(key);
+							// TextMessage txt = kvStore.get(key);
 							sendTextMessage(new TextMessage("Successfully get key:" + key + ", value is: " + kvStoreValue));
 						} catch (Exception e) {
 							sendTextMessage(new TextMessage("Failed to get key:" + key));
@@ -91,6 +98,9 @@ public class ClientConnection implements Runnable {
 				/* connection either terminated by the client or lost due to 
 				 * network problems*/	
 				} catch (IOException ioe) {
+					logger.error("Error! Connection lost!");
+					isOpen = false;
+				} catch (Exception e) {
 					logger.error("Error! Connection lost!");
 					isOpen = false;
 				}				
