@@ -2,6 +2,8 @@ package shared.messages;
 
 import java.io.Serializable;
 import java.util.StringTokenizer;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JSONMessage implements KVMessage, Serializable {
 
@@ -120,18 +122,30 @@ public class JSONMessage implements KVMessage, Serializable {
     public void deserialize(String json) {
         StringTokenizer messageTokens = new StringTokenizer(json, "{}:,\"");
 
-        while (messageTokens.hasMoreTokens()) {
-            String k = messageTokens.nextToken();
-            String status = messageTokens.nextToken();
-            String key = messageTokens.nextToken();
-            String value = messageTokens.nextToken();
+        System.out.println("JSON");
+        System.out.println(json);
 
-            setStatus(status);
-            setKey(key);
-            setValue(value);
-            System.out.print("HERE DESERIALIZE");
-            System.out.print(status + key + value);
+        // create Array object
+        String[] tokens = null;
+        tokens = new String[ messageTokens.countTokens() ];
+ 
+        // iterate through StringTokenizer tokens
+        int count = 0;
+        while(messageTokens.hasMoreTokens()) {
+            // add tokens to Array
+            String nextTok = messageTokens.nextToken();
+            tokens[count++]= nextTok;
         }
+
+        String status = tokens[1];
+        String key = tokens[2];
+        String value = tokens[3];
+
+        setStatus(status);
+        setKey(key);
+        setValue(value);
+
+        System.out.println("Status:key:value -> " + status +":"+ key +":"+ value);
     }
 
 }
