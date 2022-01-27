@@ -20,6 +20,11 @@
   <property name="servermanifest.file" value="SERVER_MANIFEST.MF"/>
   <property name="servermain.class" value="app_kvServer.KVServer"/>
 
+  <!-- Configuration for performance test -->
+  <property name="performancetest.file"      value="m1-performance-test.jar"/>
+  <property name="performancetestmanifest.file" value="PERFORMANCE_TEST_MANIFEST.MF"/>
+  <property name="performancetestmain.class" value="testing.PerformanceTest"/>
+
   <!-- path to libraries-->
   <path id="external.jars">
     <fileset dir="${lib.dir}" includes="**/*.jar"/>
