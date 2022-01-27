@@ -67,7 +67,7 @@ public class KVStore implements KVCommInterface {
 	}
 
 	@Override
-	public KVMessage put(String key, String value) throws Exception {
+	public TextMessage put(String key, String value) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
 		jsonMessage.setMessage(KVMessage.StatusType.PUT, key, value);
 		sendMessage(jsonMessage);
@@ -75,7 +75,7 @@ public class KVStore implements KVCommInterface {
 	}
 
 	@Override
-	public KVMessage get(String key) throws Exception {
+	public TextMessage get(String key) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
 		jsonMessage.setMessage(KVMessage.StatusType.GET, key, "");
 		sendMessage(jsonMessage);
