@@ -74,10 +74,10 @@ public class KVStore implements KVCommInterface {
 	@Override
 	public JSONMessage put(String key, String value) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
-		System.out.println("HERE");
-		System.out.println(key + ":" + value);
 		jsonMessage.setMessage("PUT", key, value);
 		this.clientConnection.sendJSONMessage(jsonMessage);
+		System.out.println("AFTER CLIENT CONNECT SEND");
+
 		return this.clientConnection.receiveJSONMessage();
 	}
 

@@ -366,4 +366,28 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-27 14:25:31,614 INFO  [main] root: Connected to localhost on port 8080
 2022-01-27 14:25:31,615 INFO  [main] root: Connection established.
 2022-01-27 14:25:35,997 ERROR [main] root: java.lang.NullPointerException
+<<<<<<< HEAD
+2022-01-27 14:30:18,791 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 14:30:18,793 INFO  [main] root: Connection established.
+2022-01-27 14:30:21,944 ERROR [main] root: java.lang.NullPointerException
+2022-01-27 14:31:17,399 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 14:31:17,405 INFO  [main] root: Connection established.
+2022-01-27 14:31:21,051 ERROR [main] root: java.lang.NullPointerException
+2022-01-27 14:32:05,559 INFO  [main] root: Tearing down the connection ...
+2022-01-27 14:32:05,560 INFO  [main] root: Disconnected.
+2022-01-27 14:32:07,169 INFO  [main] root: Application exit.
+2022-01-27 14:32:38,111 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 14:32:38,112 INFO  [main] root: Connection established.
+2022-01-27 14:32:39,736 ERROR [main] root: java.lang.NullPointerException
+2022-01-27 14:36:30,516 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 14:36:30,517 INFO  [main] root: Connection established.
+2022-01-27 14:36:32,396 ERROR [main] root: java.lang.NullPointerException
+2022-01-27 14:37:33,251 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 14:37:33,252 INFO  [main] root: Connection established.
+2022-01-27 14:37:35,363 ERROR [main] root: java.lang.NullPointerException
+2022-01-27 14:39:02,611 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 14:39:02,612 INFO  [main] root: Connection established.
+2022-01-27 14:39:05,055 ERROR [main] root: java.lang.NullPointerException
+=======
 >>>>>>> 7bf807522ac88494cbd865158d722872c24db65b
+>>>>>>> 9b9b766de0bfdd97d701353f76d6d241e541f662

@@ -51,6 +51,9 @@ public class JSONMessage implements KVMessage, Serializable {
     }
 
     public byte[] getJSONByte() {
+        if(this.byteJSON == null){
+            this.stringToByte(this.json);
+        }
         return this.byteJSON;
     }
 
@@ -58,6 +61,8 @@ public class JSONMessage implements KVMessage, Serializable {
         setStatus(inStatus);
         setKey(inKey);
         setValue(inValue);
+
+        this.json = this.serialize();
     }
 
     public StatusType getStatus() {
