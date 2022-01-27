@@ -340,3 +340,6 @@ java.net.ConnectException: Connection refused (Connection refused)
 	at app_kvClient.KVClient.main(KVClient.java:270)
 2022-01-27 14:13:46,816 INFO  [main] root: Connection established.
 2022-01-27 14:13:54,941 ERROR [main] root: java.lang.NullPointerException
+2022-01-27 14:25:31,614 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 14:25:31,615 INFO  [main] root: Connection established.
+2022-01-27 14:25:35,997 ERROR [main] root: java.lang.NullPointerException
