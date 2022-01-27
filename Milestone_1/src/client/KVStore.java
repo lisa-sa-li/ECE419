@@ -69,7 +69,7 @@ public class KVStore implements KVCommInterface {
 	@Override
 	public TextMessage put(String key, String value) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
-		jsonMessage.setMessage(KVMessage.StatusType.PUT, key, value);
+		jsonMessage.setMessage("PUT", key, value);
 		sendMessage(jsonMessage);
 		return receiveMessage();
 	}
@@ -77,17 +77,19 @@ public class KVStore implements KVCommInterface {
 	@Override
 	public TextMessage get(String key) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
-		jsonMessage.setMessage(KVMessage.StatusType.GET, key, "");
+		jsonMessage.setMessage("GET", key, "");
 		sendMessage(jsonMessage);
 		return receiveMessage();
 	}
 
-	public void sendMessage(TextMessage msg) throws IOException {
-		byte[] msgBytes = msg.getMsgBytes();
+	public void sendMessage(JSONMessage msg) throws IOException {
+		String temp = msg.serialize();
+		byte[] msgBytes = msg.stringToByte(temp);
+		// byte[] msgBytes = msg.getMsgBytes();
 		output.write(msgBytes, 0, msgBytes.length);
 		output.flush();
 		logger.info("Send message:\t '" + clientSocket.getInetAddress().getHostAddress() + ":"
-				+ clientSocket.getPort() + ">: '" + msg.getMsg() +"'");
+				+ clientSocket.getPort() + ">: '" + msg.serialize() +"'");
 	}
 
 	private TextMessage receiveMessage() throws IOException {
