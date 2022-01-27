@@ -10,10 +10,11 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import shared.messages.TextMessage;
+import shared.messages.KVMessage.StatusType;
+
 import logger.LogSetup;
 import app_kvServer.PersistantStorage;
 import app_kvServer.ServerConnection;
-
 
 public class KVServer implements IKVServer, Runnable {
 
@@ -29,13 +30,15 @@ public class KVServer implements IKVServer, Runnable {
 
 	/**
 	 * Start KV Server at given port
-	 * @param port given port for storage server to operate
+	 * 
+	 * @param port      given port for storage server to operate
 	 * @param cacheSize specifies how many key-value pairs the server is allowed
-	 *           to keep in-memory
-	 * @param strategy specifies the cache replacement strategy in case the cache
-	 *           is full and there is a GET- or PUT-request on a key that is
-	 *           currently not contained in the cache. Options are "FIFO", "LRU",
-	 *           and "LFU".
+	 *                  to keep in-memory
+	 * @param strategy  specifies the cache replacement strategy in case the cache
+	 *                  is full and there is a GET- or PUT-request on a key that is
+	 *                  currently not contained in the cache. Options are "FIFO",
+	 *                  "LRU",
+	 *                  and "LFU".
 	 */
 	public KVServer(int port, int cacheSize, String strategy) throws Exception {
 		// TODO Auto-generated method stub
@@ -44,42 +47,42 @@ public class KVServer implements IKVServer, Runnable {
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
 		this.threads = new ArrayList<Thread>();
 	}
-	
+
 	@Override
-	public int getPort(){
+	public int getPort() {
 		return this.port;
 	}
 
 	@Override
-    public String getHostname(){
+	public String getHostname() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-    public CacheStrategy getCacheStrategy(){
+	public CacheStrategy getCacheStrategy() {
 		// TODO Auto-generated method stub
 		return IKVServer.CacheStrategy.None;
 	}
 
 	@Override
-    public int getCacheSize(){
+	public int getCacheSize() {
 		return this.cacheSize;
 	}
 
 	@Override
-    public boolean inStorage(String key) throws Exception {
+	public boolean inStorage(String key) throws Exception {
 		return this.persistantStorage.inStorage(key);
 	}
 
 	@Override
-    public boolean inCache(String key){
+	public boolean inCache(String key) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-    public String getKV(String key) throws Exception{
+	public String getKV(String key) throws Exception {
 		String value = this.persistantStorage.get(key);
 		if (value == null) {
 			logger.warn(key + " is not found");
@@ -89,49 +92,49 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	@Override
-    public void putKV(String key, String value) throws Exception{
-		boolean success = this.persistantStorage.put(key, value);
-		if (success == false) {
-			logger.warn("Unable to put " + key + ": " + value + ")");
-			throw new Exception("Unable to put (" + key + ": " + value + ")");
-		}
+	public StatusType putKV(String key, String value) throws Exception {
+		StatusType putStatus = this.persistantStorage.put(key, value);
+		// if (putStatus.equals(StatusType.DELETE_ERROR) ||
+		// putStatus.equals(StatusType.PUT_ERROR)) {
+		// throw new Exception("Unable to put (" + key + ": " + value + ")");
+		// }
+		return putStatus;
 	}
 
 	@Override
-    public void clearCache(){
+	public void clearCache() {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-    public void clearStorage(){
+	public void clearStorage() {
 		this.persistantStorage.clearStorage();
 	}
 
 	private boolean initializeServer() {
-    	logger.info("Initialize server ...");
-    	try {
-            serverSocket = new ServerSocket(port);
-            logger.info("Server listening on port: " 
-            		+ serverSocket.getLocalPort());    
-            return true;
-        
-        } catch (IOException e) {
-        	logger.error("Error! Cannot open server socket:");
-            if(e instanceof BindException){
-            	logger.error("Port " + port + " is already bound!");
-            }
-            return false;
-        }
-    }
+		logger.info("Initialize server ...");
+		try {
+			serverSocket = new ServerSocket(port);
+			logger.info("Server listening on port: "
+					+ serverSocket.getLocalPort());
+			return true;
+
+		} catch (IOException e) {
+			logger.error("Error! Cannot open server socket:");
+			if (e instanceof BindException) {
+				logger.error("Port " + port + " is already bound!");
+			}
+			return false;
+		}
+	}
 
 	@Override
-    public void run() {
-		// TODO Auto-generated method stub
+	public void run() {
 		running = initializeServer();
 
 		if (serverSocket != null) {
 			while (isRunning()) {
-				try{
+				try {
 					Socket client = serverSocket.accept();
 					ServerConnection serverConnection = new ServerConnection(client, this);
 					// ????
@@ -154,19 +157,19 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	private boolean isRunning() {
-        return this.running;
-    }
-
-	@Override
-    public void kill(){
+		return this.running;
 	}
 
 	@Override
-    public void close(){
+	public void kill() {
+	}
+
+	@Override
+	public void close() {
 		running = false;
 		try {
 			serverSocket.close();
-		} catch (IOException e){
+		} catch (IOException e) {
 			logger.error("Error! " +
 					"Unable to close socket on port: " + port, e);
 		}
@@ -174,9 +177,8 @@ public class KVServer implements IKVServer, Runnable {
 
 	public static void main(String[] args) {
 		try {
-			// TODO: param for log level
 			new LogSetup("logs/server.log", Level.ALL);
-			if(args.length != 1){
+			if (args.length != 1) {
 				System.out.println("Error! Invalid number of arguments!");
 				System.out.println("Usage: Server <port>!");
 			} else {

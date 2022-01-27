@@ -1,9 +1,10 @@
-package app_kvServer;
+package app_kvClient;
 
 import shared.messages.JSONMessage;
 import java.io.IOException;
 
 public interface IClientConnection {
-	public JSONMessage receiveJSONMessage() throws IOException;
+    public JSONMessage receiveJSONMessage() throws IOException;
+
     public void sendJSONMessage(JSONMessage json) throws IOException;
 }

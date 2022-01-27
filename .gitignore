@@ -4,3 +4,4 @@
 *.jar
 *.MF
 *.log
+*/storage/*_storage.txt

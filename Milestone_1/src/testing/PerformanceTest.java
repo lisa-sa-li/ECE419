@@ -1,7 +1,8 @@
-package testing;
+// package testing;
 
-import client.KVStore;
+// import client.KVStore;
 
+<<<<<<< HEAD
 public class PerformanceTest {
 
     private KVStore kvStore;
@@ -28,5 +29,24 @@ public class PerformanceTest {
     public static void main(String[] args)  {
         new PerformanceTest().runTests();
     }
+=======
 
-}
+// public class PerformanceTest {
+
+//     private KVServer server;
+//     private static final int numRequests = 2000;
+
+//     public PerformanceTest() {
+
+//     }
+
+//     public void testStub() {
+//         assertTrue(true);
+//     }
+
+//     public static void main(String[] args)  {
+//         new PerformanceTest().runTest();
+//     }
+>>>>>>> 26180650653095d45808999b1f6e3ffe3f81054a
+
+// }
