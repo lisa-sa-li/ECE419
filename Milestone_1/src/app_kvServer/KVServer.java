@@ -33,7 +33,7 @@ public class KVServer extends Thread implements IKVServer {
 	 *           currently not contained in the cache. Options are "FIFO", "LRU",
 	 *           and "LFU".
 	 */
-	public KVServer(int port, int cacheSize, String strategy) {
+	public KVServer(int port, int cacheSize, String strategy) throws Exception {
 		// TODO Auto-generated method stub
 		this.port = port;
 		this.cacheSize = cacheSize;
@@ -63,7 +63,7 @@ public class KVServer extends Thread implements IKVServer {
 	}
 
 	@Override
-    public boolean inStorage(String key){
+    public boolean inStorage(String key) throws Exception {
 		return this.persistantStorage.inStorage(key);
 	}
 
@@ -180,6 +180,9 @@ public class KVServer extends Thread implements IKVServer {
 		} catch (NumberFormatException nfe) {
 			System.out.println("Error! Invalid argument <port>! Not a number!");
 			System.out.println("Usage: Server <port>!");
+			System.exit(1);
+		} catch (Exception e) {
+			System.out.println("Error! Something went wrong!");
 			System.exit(1);
 		}
 	}

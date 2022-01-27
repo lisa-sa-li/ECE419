@@ -37,7 +37,7 @@ public interface IKVServer {
      * NOTE: does not modify any other properties
      * @return  true if key in storage, false otherwise
      */
-    public boolean inStorage(String key);
+    public boolean inStorage(String key) throws Exception;
 
     /**
      * Check if key is in storage.
