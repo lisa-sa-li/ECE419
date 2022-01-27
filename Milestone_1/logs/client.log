@@ -787,3 +787,28 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-27 17:03:27,732 INFO  [main] root: Connection established to 127.0.0.1:8080
 2022-01-27 17:03:32,429 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hi":"sandra love",}'
 2022-01-27 17:03:32,429 ERROR [main] root: java.lang.NullPointerException
+2022-01-27 17:10:55,323 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 17:10:55,323 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 17:10:57,697 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hi":"sandra love",}'
+2022-01-27 17:10:57,698 ERROR [main] root: java.lang.NullPointerException
+2022-01-27 17:13:31,899 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 17:13:31,900 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 17:13:36,107 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hi":"sandra love",}'
+2022-01-27 17:13:36,107 ERROR [main] root: java.lang.NullPointerException
+2022-01-27 17:15:26,611 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 17:15:26,611 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 17:15:30,577 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hi":"sandra love",}'
+2022-01-27 17:15:30,578 ERROR [main] root: java.lang.NullPointerException
+2022-01-27 17:16:46,851 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 17:16:46,851 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 17:16:49,507 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hi":"sandra love",}'
+2022-01-27 17:16:49,507 ERROR [main] root: java.lang.NullPointerException
+2022-01-27 17:18:24,498 ERROR [main] root: Unknown command.
+2022-01-27 17:18:32,080 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 17:18:32,080 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 17:18:35,192 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hi":"sandra love",}'
+2022-01-27 17:18:35,192 ERROR [main] root: java.lang.NullPointerException
+2022-01-27 17:26:35,084 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 17:26:35,085 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 17:26:38,820 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hi":"sandra love",}'
+2022-01-27 17:26:38,820 ERROR [main] root: java.lang.NullPointerException
