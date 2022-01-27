@@ -7,6 +7,12 @@ import java.net.Socket;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.io.BufferedReader;  
+import java.io.FileReader;
+import java.lang.StringBuffer;
+import java.io.FileOutputStream;  
+import shared.messages.JSONMessage;
 import shared.messages.TextMessage;
 
 public class KVStore implements KVCommInterface {
@@ -36,7 +42,6 @@ public class KVStore implements KVCommInterface {
 			Socket clientSocket = new Socket(address, port);
 			output = clientSocket.getOutputStream();
 			input = clientSocket.getInputStream();
-		//	logger.info("Connection established");
 
 			logger.info("Connected to "
 					+ clientSocket.getInetAddress().getHostName()
@@ -48,8 +53,6 @@ public class KVStore implements KVCommInterface {
 
 	@Override
 	public void disconnect() {
-		// TODO Auto-generated method stub
-		// setRunning(false);
 		logger.info("Tearing down the connection ...");
 		try {
 			if (clientSocket != null) {
@@ -64,27 +67,29 @@ public class KVStore implements KVCommInterface {
 	}
 
 	@Override
-	public KVMessage put(String key, String value) throws Exception {
-		// TODO Auto-generated method stub
-		// System.out.println(KVMessage.StatusType.PUT);
-		// KVMessage req = new KVMessage(KVMessage.StatusType.PUT);
-		// System.out.println(req);
-
-		return null;
+	public TextMessage put(String key, String value) throws Exception {
+		JSONMessage jsonMessage = new JSONMessage();
+		jsonMessage.setMessage("PUT", key, value);
+		sendMessage(jsonMessage);
+		return receiveMessage();
 	}
 
 	@Override
-	public KVMessage get(String key) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public TextMessage get(String key) throws Exception {
+		JSONMessage jsonMessage = new JSONMessage();
+		jsonMessage.setMessage("GET", key, "");
+		sendMessage(jsonMessage);
+		return receiveMessage();
 	}
 
-	public void sendMessage(TextMessage msg) throws IOException {
-		byte[] msgBytes = msg.getMsgBytes();
+	public void sendMessage(JSONMessage msg) throws IOException {
+		String temp = msg.serialize();
+		byte[] msgBytes = msg.stringToByte(temp);
+		// byte[] msgBytes = msg.getMsgBytes();
 		output.write(msgBytes, 0, msgBytes.length);
 		output.flush();
 		logger.info("Send message:\t '" + clientSocket.getInetAddress().getHostAddress() + ":"
-				+ clientSocket.getPort() + ">: '" + msg.getMsg() +"'");
+				+ clientSocket.getPort() + ">: '" + msg.serialize() +"'");
 	}
 
 	private TextMessage receiveMessage() throws IOException {
