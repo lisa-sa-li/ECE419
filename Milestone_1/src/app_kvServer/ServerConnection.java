@@ -22,7 +22,7 @@ import app_kvServer.KVServer;
  * The class also implements the echo functionality. Thus whenever a message 
  * is received it is going to be echoed back to the client.
  */
-public class ServerConnection implements IServerConnection {
+public class ServerConnection implements IServerConnection, Runnable{
 
 	private static Logger logger = Logger.getRootLogger();
 	
@@ -134,6 +134,37 @@ public class ServerConnection implements IServerConnection {
 				+ clientSocket.getPort() + ">: '" 
 				+ json.getJSON().trim() + "'");
 		return json;
+    }
+
+	public void run(){
+		// while connection is open, listen for messages
+        while (this.isOpen) {
+            try {
+                JSONMessage jsonMsg = receiveJSONMessage();
+				// what is going on here?
+                // JSONMessage sendMsg = process(recvMsg);
+                sendJSONMessage(jsonMsg);
+            }
+            catch (IOException e) {
+                logger.error("Server connection lost: ", e);
+                this.isOpen = false;
+            }
+            catch (Exception e) {
+                logger.error(e);
+            }
+        }
+
+        // close connection
+        if (clientSocket != null) {
+            try {
+                input.close();
+                output.close();
+                clientSocket.close();
+            }
+            catch (IOException e) {
+                logger.error("Unable to close connection!", e);
+            }
+        } 
     }
 	
 
