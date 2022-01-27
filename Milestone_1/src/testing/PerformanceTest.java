@@ -1,4 +1,3 @@
-/*
 package testing;
 
 import client.KVStore;
@@ -12,16 +11,16 @@ public class PerformanceTest {
         try {
             kvStore = new KVStore("localhost", 50000);
         } catch (Exception e) {
-            System.err.println(e.message());
+            System.out.println(e);
         }
     }
 
-    public void runTest() {
+    public void runTests() {
         // Iterate to test different ratios of PUT and GET requests to the server
-        float[] ratioListPUT = [0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2];
+        double[] ratioListPUT = {0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2};
         for (int i = 0; i < ratioListPUT.length; i++) {
             for (int j = 0; j < numRequests; j++) {
-
+                System.out.println("IN loop");
             }
         }
     }
@@ -31,4 +30,4 @@ public class PerformanceTest {
     }
 
 }
-*/
+
