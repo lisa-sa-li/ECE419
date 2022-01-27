@@ -12,7 +12,6 @@ import org.apache.log4j.Level;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-
 public class KVClient implements IKVClient, Runnable {
     private static Logger logger = Logger.getRootLogger();
     private static final String PROMPT = "KVClient> ";
@@ -35,13 +34,12 @@ public class KVClient implements IKVClient, Runnable {
     }
 
     @Override
-    public KVStore getStore(){
-        // TODO Auto-generated method stub
+    public KVStore getStore() {
         return this.kvStore;
     }
 
     private void disconnect() {
-        if(this.kvStore != null) {
+        if (this.kvStore != null) {
             this.kvStore.disconnect();
             this.kvStore = null;
         }
@@ -50,7 +48,7 @@ public class KVClient implements IKVClient, Runnable {
     private void handleCommand(String cmdLine) {
         String[] tokens = cmdLine.split("\\s+");
         try {
-            switch(tokens[0]) {
+            switch (tokens[0]) {
                 case "quit":
                     stop = true;
                     disconnect();
@@ -63,7 +61,8 @@ public class KVClient implements IKVClient, Runnable {
                             String serverHostName = tokens[1];
                             int serverPort = Integer.parseInt(tokens[2]);
                             newConnection(serverHostName, serverPort);
-                            System.out.println(PROMPT + "Connection established to " + serverHostName + ":" + tokens[2]);
+                            System.out
+                                    .println(PROMPT + "Connection established to " + serverHostName + ":" + tokens[2]);
                             logger.info("Connection established.");
                         } catch (NumberFormatException nfe) {
                             logger.error("No valid address. Port must be a number! ", nfe);
@@ -153,9 +152,9 @@ public class KVClient implements IKVClient, Runnable {
                     }
                     break;
                 case "logLevel":
-                    if(tokens.length == 2) {
+                    if (tokens.length == 2) {
                         String level = setLevel(tokens[1]);
-                        if(level.equals(LogSetup.UNKNOWN_LEVEL)) {
+                        if (level.equals(LogSetup.UNKNOWN_LEVEL)) {
                             logger.error("No valid log level!");
                             printPossibleLogLevels();
                         } else {
@@ -175,31 +174,31 @@ public class KVClient implements IKVClient, Runnable {
                     printHelp();
                     break;
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Unkown Error: " + e.getMessage());
         }
     }
 
     private String setLevel(String levelString) {
-        if(levelString.equals(Level.ALL.toString())) {
+        if (levelString.equals(Level.ALL.toString())) {
             logger.setLevel(Level.ALL);
             return Level.ALL.toString();
-        } else if(levelString.equals(Level.DEBUG.toString())) {
+        } else if (levelString.equals(Level.DEBUG.toString())) {
             logger.setLevel(Level.DEBUG);
             return Level.DEBUG.toString();
-        } else if(levelString.equals(Level.INFO.toString())) {
+        } else if (levelString.equals(Level.INFO.toString())) {
             logger.setLevel(Level.INFO);
             return Level.INFO.toString();
-        } else if(levelString.equals(Level.WARN.toString())) {
+        } else if (levelString.equals(Level.WARN.toString())) {
             logger.setLevel(Level.WARN);
             return Level.WARN.toString();
-        } else if(levelString.equals(Level.ERROR.toString())) {
+        } else if (levelString.equals(Level.ERROR.toString())) {
             logger.setLevel(Level.ERROR);
             return Level.ERROR.toString();
-        } else if(levelString.equals(Level.FATAL.toString())) {
+        } else if (levelString.equals(Level.FATAL.toString())) {
             logger.setLevel(Level.FATAL);
             return Level.FATAL.toString();
-        } else if(levelString.equals(Level.OFF.toString())) {
+        } else if (levelString.equals(Level.OFF.toString())) {
             logger.setLevel(Level.OFF);
             return Level.OFF.toString();
         } else {
@@ -208,7 +207,7 @@ public class KVClient implements IKVClient, Runnable {
     }
 
     private void printError(String error) {
-        System.out.println(PROMPT + "Error! " +  error);
+        System.out.println(PROMPT + "Error! " + error);
     }
 
     private void printPossibleLogLevels() {
@@ -247,7 +246,7 @@ public class KVClient implements IKVClient, Runnable {
     }
 
     public void run() {
-        while(!stop) {
+        while (!stop) {
             BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
             System.out.print(PROMPT);
             try {

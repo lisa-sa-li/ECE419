@@ -10,54 +10,62 @@ public interface IKVServer {
 
     /**
      * Get the port number of the server
-     * @return  port number
+     * 
+     * @return port number
      */
     public int getPort();
 
     /**
      * Get the hostname of the server
-     * @return  hostname of server
+     * 
+     * @return hostname of server
      */
     public String getHostname();
 
     /**
      * Get the cache strategy of the server
-     * @return  cache strategy
+     * 
+     * @return cache strategy
      */
     public CacheStrategy getCacheStrategy();
 
     /**
      * Get the cache size
-     * @return  cache size
+     * 
+     * @return cache size
      */
     public int getCacheSize();
 
     /**
      * Check if key is in storage.
      * NOTE: does not modify any other properties
-     * @return  true if key in storage, false otherwise
+     * 
+     * @return true if key in storage, false otherwise
      */
     public boolean inStorage(String key) throws Exception;
 
     /**
      * Check if key is in storage.
      * NOTE: does not modify any other properties
-     * @return  true if key in storage, false otherwise
+     * 
+     * @return true if key in storage, false otherwise
      */
     public boolean inCache(String key);
 
     /**
      * Get the value associated with the key
-     * @return  value associated with key
+     * 
+     * @return value associated with key
      * @throws Exception
-     *      when key not in the key range of the server
+     *                   when key not in the key range of the server
      */
     public String getKV(String key) throws Exception;
 
     /**
      * Put the key-value pair into storage
+     * 
      * @throws Exception
-     *      when key not in the key range of the server
+     *                   when key not in the key range of the server
      */
     public void putKV(String key, String value) throws Exception;
 
