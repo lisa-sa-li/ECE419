@@ -40,7 +40,7 @@ public class KVServer implements IKVServer, Runnable {
 	 *                  "LRU",
 	 *                  and "LFU".
 	 */
-	public KVServer(int port, int cacheSize, String strategy) throws Exception {
+	public KVServer(int port, int cacheSize, String strategy) {
 		// TODO Auto-generated method stub
 		this.port = port;
 		this.cacheSize = cacheSize;

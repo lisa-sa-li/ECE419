@@ -69,6 +69,10 @@
 2022-01-27 13:46:13,925 INFO  [main] root: File already exists.
 2022-01-27 14:15:08,346 INFO  [main] root: Directory already exists.
 2022-01-27 14:15:08,347 INFO  [main] root: File already exists.
+<<<<<<< HEAD
+2022-01-27 14:21:02,502 INFO  [main] root: Directory created: storage
+2022-01-27 14:21:02,503 INFO  [main] root: File created: 8008_storage.txt
+=======
 2022-01-27 14:19:01,105 INFO  [main] root: Directory already exists.
 2022-01-27 14:19:01,107 INFO  [main] root: File already exists.
 2022-01-27 14:20:43,766 INFO  [main] root: Directory already exists.
@@ -83,6 +87,7 @@
 2022-01-27 14:25:03,621 INFO  [main] root: Server listening on port: 8080
 2022-01-27 14:25:31,612 INFO  [main] root: Connected to localhost on port 51170
 2022-01-27 14:25:31,613 INFO  [main] root: Connected to localhost on port 51170
+<<<<<<< HEAD
 2022-01-27 14:30:08,208 INFO  [main] root: Directory already exists.
 2022-01-27 14:30:08,209 INFO  [main] root: File already exists.
 2022-01-27 14:30:08,220 INFO  [main] root: Initialize server ...
@@ -49388,3 +49393,6 @@
 2022-01-27 14:38:56,458 INFO  [main] root: Server listening on port: 8080
 2022-01-27 14:39:02,611 INFO  [main] root: Connected to localhost on port 51651
 2022-01-27 14:39:02,613 INFO  [main] root: Connected to localhost on port 51651
+=======
+>>>>>>> 7bf807522ac88494cbd865158d722872c24db65b
+>>>>>>> 9b9b766de0bfdd97d701353f76d6d241e541f662

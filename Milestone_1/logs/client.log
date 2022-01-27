@@ -340,9 +340,33 @@ java.net.ConnectException: Connection refused (Connection refused)
 	at app_kvClient.KVClient.main(KVClient.java:270)
 2022-01-27 14:13:46,816 INFO  [main] root: Connection established.
 2022-01-27 14:13:54,941 ERROR [main] root: java.lang.NullPointerException
+<<<<<<< HEAD
+2022-01-27 14:21:15,053 ERROR [main] root: Error! Unable to establish connection. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:255)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:237)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+	at client.KVStore.connect(KVStore.java:45)
+	at app_kvClient.KVClient.newConnection(KVClient.java:29)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:63)
+	at app_kvClient.KVClient.run(KVClient.java:257)
+	at app_kvClient.KVClient.main(KVClient.java:270)
+2022-01-27 14:21:15,056 INFO  [main] root: Connection established.
+2022-01-27 14:21:55,478 ERROR [main] root: java.io.IOException: Connection is already established
+2022-01-27 14:23:29,812 INFO  [main] root: Tearing down the connection ...
+2022-01-27 14:23:29,813 INFO  [main] root: Application exit.
+=======
 2022-01-27 14:25:31,614 INFO  [main] root: Connected to localhost on port 8080
 2022-01-27 14:25:31,615 INFO  [main] root: Connection established.
 2022-01-27 14:25:35,997 ERROR [main] root: java.lang.NullPointerException
+<<<<<<< HEAD
 2022-01-27 14:30:18,791 INFO  [main] root: Connected to localhost on port 8080
 2022-01-27 14:30:18,793 INFO  [main] root: Connection established.
 2022-01-27 14:30:21,944 ERROR [main] root: java.lang.NullPointerException
@@ -364,3 +388,6 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-27 14:39:02,611 INFO  [main] root: Connected to localhost on port 8080
 2022-01-27 14:39:02,612 INFO  [main] root: Connection established.
 2022-01-27 14:39:05,055 ERROR [main] root: java.lang.NullPointerException
+=======
+>>>>>>> 7bf807522ac88494cbd865158d722872c24db65b
+>>>>>>> 9b9b766de0bfdd97d701353f76d6d241e541f662
