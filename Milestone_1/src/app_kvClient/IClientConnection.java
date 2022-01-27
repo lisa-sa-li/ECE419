@@ -1,4 +1,4 @@
-package app_kvServer;
+package app_kvClient;
 
 import shared.messages.JSONMessage;
 import java.io.IOException;

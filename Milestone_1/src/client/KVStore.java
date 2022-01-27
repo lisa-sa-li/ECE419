@@ -15,7 +15,7 @@ import java.io.FileOutputStream;
 import shared.messages.JSONMessage;
 import shared.messages.TextMessage;
 
-import app_kvServer.ClientConnection;
+import app_kvClient.ClientConnection;
 
 public class KVStore implements KVCommInterface {
 	/**

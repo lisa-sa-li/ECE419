@@ -1,4 +1,4 @@
-package app_kvServer;
+package app_kvClient;
 
 import java.io.InputStream;
 import java.io.IOException;
