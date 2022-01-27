@@ -10,25 +10,26 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import shared.messages.TextMessage;
 
 
 public class KVClient implements IKVClient, Runnable {
     private static Logger logger = Logger.getRootLogger();
     private static final String PROMPT = "KVClient> ";
-    private KVCommInterface commInterfaceClient;
+    private KVCommInterface kvStore;
     private boolean stop = false;
 
     @Override
     public void newConnection(String hostname, int port) throws Exception {
         // TODO Auto-generated method stub
-        if (this.commInterfaceClient != null) {
+        if (this.kvStore != null) {
             throw new IOException("Connection is already established");
         }
         try {
-            this.commInterfaceClient = new KVStore(hostname, port);
-            this.commInterfaceClient.connect();
+            this.kvStore = new KVStore(hostname, port);
+            this.kvStore.connect();
         } catch (IOException e) {
-            this.commInterfaceClient = null;
+            this.kvStore = null;
             throw e;
         }
     }
@@ -36,13 +37,13 @@ public class KVClient implements IKVClient, Runnable {
     @Override
     public KVCommInterface getStore(){
         // TODO Auto-generated method stub
-        return this.commInterfaceClient;
+        return this.kvStore;
     }
 
     private void disconnect() {
-        if(this.commInterfaceClient != null) {
-            this.commInterfaceClient.disconnect();
-            this.commInterfaceClient = null;
+        if(this.kvStore != null) {
+            this.kvStore.disconnect();
+            this.kvStore = null;
         }
     }
 
@@ -76,7 +77,9 @@ public class KVClient implements IKVClient, Runnable {
                     }
                     break;
                 case "put":
-                    if (this.commInterfaceClient != null) { // && this.commInterfaceClient.isRunning()) {
+                    // System
+                    // logger.info("Swag")
+                    if (this.kvStore != null) { // && this.kvStore.isRunning()) {
                         String key = tokens[1];
                         if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes idk
                             if (tokens.length >= 3) {
@@ -91,7 +94,7 @@ public class KVClient implements IKVClient, Runnable {
                                 String valStr = val.toString();
                                 if (valStr.length() <= 120000) {
                                     try {
-                                        KVMessage msg = this.commInterfaceClient.put(tokens[1], valStr);
+                                        TextMessage msg = this.kvStore.put(tokens[1], valStr);
                                         // PLACE status message here
                                         logger.info(msg);
                                     } catch (Exception e) {
@@ -103,7 +106,7 @@ public class KVClient implements IKVClient, Runnable {
                             } else if (tokens.length == 2) {
                                 // DELETE key,value pair
                                 try {
-                                    KVMessage msg = this.commInterfaceClient.put(tokens[1], "null");
+                                    TextMessage msg = this.kvStore.put(tokens[1], "null");
                                     // PLACE status message here
                                     logger.info(msg);
                                 } catch (Exception e) {
@@ -121,11 +124,11 @@ public class KVClient implements IKVClient, Runnable {
                     }
                     break;
                 case "get":
-                    if (this.commInterfaceClient != null) { // && this.commInterfaceClient.isRunning()) {
+                    if (this.kvStore != null) { // && this.kvStore.isRunning()) {
                         String key = tokens[1];
                         if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes idk
                             try {
-                                KVMessage msg = this.commInterfaceClient.get(key);
+                                TextMessage msg = this.kvStore.get(key);
                                 // PLACE status message here
                                 logger.info(msg);
                             } catch (Exception e) {
@@ -140,7 +143,7 @@ public class KVClient implements IKVClient, Runnable {
                     }
                     break;
                 case "disconnect":
-                    if (this.commInterfaceClient != null) {
+                    if (this.kvStore != null) {
                         disconnect();
                         System.out.println(PROMPT + "Disconnected.");
                         logger.info("Disconnected.");
