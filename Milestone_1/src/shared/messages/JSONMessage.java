@@ -101,13 +101,13 @@ public class JSONMessage implements KVMessage, Serializable {
 
         // Beginning chars
         strMessage.append("{");
-        String statusEntry = String.join("\"status\":\"", this.status.name(), "\",");
+        String statusEntry = ("\"status\":\"" + this.status.name() + "\",");
         strMessage.append(statusEntry);
         if (this.value != null && this.value != "null" && !this.value.trim().isEmpty()) {
-            String KVEntry = String.join("\"", this.key, "\":\"", this.value, "\",");
+            String KVEntry = ("\"" + this.key + "\":\"" + this.value + "\",");
             strMessage.append(KVEntry);
         } else {
-            String KVEntry = String.join("\"", this.key, "\":\"\"");
+            String KVEntry = ("\"" + this.key + "\":\"\"");
             strMessage.append(KVEntry);
         }
         strMessage.append("}");
@@ -129,8 +129,8 @@ public class JSONMessage implements KVMessage, Serializable {
             setStatus(status);
             setKey(key);
             setValue(value);
-            // System.out.print("HERE");
-            // System.out.print(String.join(status, key, value));
+            System.out.print("HERE DESERIALIZE");
+            System.out.print(status + key + value);
         }
     }
 
