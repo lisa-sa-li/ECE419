@@ -201,6 +201,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 							input = clientSocket.getInputStream();
 							output = clientSocket.getOutputStream();
 			
+							System.out.println("BEFORE RECEIVED MESSAGE");
 							JSONMessage recievedMesage = receiveJSONMessage();
 							System.out.println("RECEIVED MESSAGE");
 							JSONMessage sendMessage = handleMessage(recievedMesage);
