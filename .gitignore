@@ -5,3 +5,5 @@
 *.MF
 *.log
 */storage/*_storage.txt
+bin/
+out/
