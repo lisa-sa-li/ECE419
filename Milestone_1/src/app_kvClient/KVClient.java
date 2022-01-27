@@ -3,6 +3,7 @@ package app_kvClient;
 import client.KVCommInterface;
 import client.KVStore;
 import shared.messages.KVMessage;
+import shared.messages.TextMessage;
 import logger.LogSetup;
 import java.net.UnknownHostException;
 import java.io.IOException;

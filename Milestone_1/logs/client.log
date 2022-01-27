@@ -1,3 +1,67 @@
 2022-01-26 01:06:07,380 WARN  [main] root: Not connected to any store.
 2022-01-26 01:06:10,286 ERROR [main] root: Unknown command.
 2022-01-26 01:06:12,691 INFO  [main] root: Application exit.
+<<<<<<< HEAD
+2022-01-26 23:35:47,216 WARN  [main] root: Not connected to any store.
+2022-01-26 23:36:06,612 INFO  [main] root: Connected to localhost on port 8080
+2022-01-26 23:36:06,613 INFO  [main] root: Connection established.
+2022-01-26 23:36:49,191 INFO  [main] root: Connected to localhost on port 8080
+2022-01-26 23:36:49,196 INFO  [main] root: Connection established.
+=======
+2022-01-26 23:02:36,506 ERROR [main] root: Unknown command.
+2022-01-26 23:02:44,720 ERROR [main] root: Error! Unable to establish connection. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:255)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:237)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+	at client.KVStore.connect(KVStore.java:42)
+	at app_kvClient.KVClient.newConnection(KVClient.java:29)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:64)
+	at app_kvClient.KVClient.run(KVClient.java:252)
+	at app_kvClient.KVClient.main(KVClient.java:265)
+2022-01-26 23:02:44,723 INFO  [main] root: Connection established.
+2022-01-26 23:04:32,787 WARN  [main] root: Not connected to any store.
+2022-01-26 23:04:40,117 WARN  [main] root: Not connected to any store.
+2022-01-26 23:04:43,856 WARN  [main] root: Nothing was connected.
+2022-01-26 23:04:48,682 INFO  [main] root: Printed out help.
+2022-01-26 23:04:56,701 INFO  [main] root: Log level changed to level DEBUG
+2022-01-26 23:05:02,692 INFO  [main] root: Log level changed to level ALL
+2022-01-26 23:05:03,652 INFO  [main] root: Application exit.
+2022-01-26 23:06:17,373 INFO  [main] root: Application exit.
+2022-01-26 23:06:59,228 INFO  [main] root: Connected to localhost on port 8008
+2022-01-26 23:06:59,230 INFO  [main] root: Connection established.
+2022-01-26 23:09:15,978 INFO  [main] root: Connected to localhost on port 8008
+2022-01-26 23:09:15,979 INFO  [main] root: Connection established.
+2022-01-26 23:12:01,159 INFO  [main] root: Connected to localhost on port 8008
+2022-01-26 23:12:01,160 INFO  [main] root: Connection established.
+2022-01-26 23:12:05,891 ERROR [main] root: java.lang.NullPointerException
+2022-01-26 23:17:56,001 INFO  [main] root: Tearing down the connection ...
+2022-01-26 23:17:56,002 INFO  [main] root: Application exit.
+2022-01-26 23:18:10,413 INFO  [main] root: Connected to localhost on port 8008
+2022-01-26 23:18:10,414 INFO  [main] root: Connection established.
+2022-01-26 23:18:20,490 ERROR [main] root: java.lang.NullPointerException
+2022-01-26 23:23:24,240 INFO  [main] root: Tearing down the connection ...
+2022-01-26 23:23:24,240 INFO  [main] root: Application exit.
+2022-01-26 23:23:35,938 INFO  [main] root: Connected to localhost on port 8008
+2022-01-26 23:23:35,939 INFO  [main] root: Connection established.
+2022-01-26 23:23:39,006 ERROR [main] root: java.lang.NullPointerException
+2022-01-26 23:25:10,248 INFO  [main] root: Tearing down the connection ...
+2022-01-26 23:25:10,248 INFO  [main] root: Application exit.
+2022-01-26 23:25:21,153 INFO  [main] root: Connected to localhost on port 8008
+2022-01-26 23:25:21,154 INFO  [main] root: Connection established.
+2022-01-26 23:25:25,450 ERROR [main] root: java.lang.NullPointerException
+2022-01-26 23:32:11,718 INFO  [main] root: Tearing down the connection ...
+2022-01-26 23:32:11,720 INFO  [main] root: Application exit.
+2022-01-26 23:32:25,623 INFO  [main] root: Connected to localhost on port 8008
+2022-01-26 23:32:25,624 INFO  [main] root: Connection established.
+2022-01-26 23:32:29,891 ERROR [main] root: java.lang.NullPointerException
+2022-01-26 23:37:51,983 INFO  [main] root: Tearing down the connection ...
+2022-01-26 23:37:51,983 INFO  [main] root: Application exit.
+>>>>>>> 611cf7e6a927926d2ef3533d3e788bbcfbac5bcb
