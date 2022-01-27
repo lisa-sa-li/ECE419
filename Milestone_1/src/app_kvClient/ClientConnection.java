@@ -216,7 +216,7 @@ public class ClientConnection implements IClientConnection {
 //     }
 	
 	
-	private JSONMessage receiveJSONMessage() throws IOException {
+	public JSONMessage receiveJSONMessage() throws IOException {
 		
 		int index = 0;
 		byte[] msgBytes = null, tmp = null;

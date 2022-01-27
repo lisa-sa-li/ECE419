@@ -142,14 +142,6 @@ public class KVServer implements IKVServer, Runnable {
 					logger.info("Connected to "
 							+ client.getInetAddress().getHostName()
 							+ " on port " + client.getPort());
-
-					// Socket clientSocket = serverSocket.accept();
-					// KVCommunicationServer communication = new KVCommunicationServer(clientSocket, this);
-					// Thread clientThread = new Thread(communication);
-					// clientThread.start();
-					// clientThreads.add(clientThread);
-					// logger.info("Connected to " + clientSocket.getInetAddress().getHostName() +
-					// 		" on port " + clientSocket.getPort());
 				} catch (IOException e) {
 					logger.error("Error! " + "Unable to establish connection. \n", e);
 				} catch (Exception e) {

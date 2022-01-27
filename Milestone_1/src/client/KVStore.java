@@ -43,7 +43,7 @@ public class KVStore implements KVCommInterface {
 	public void connect() throws Exception {
 		try {
 			Socket clientSocket = new Socket(address, port);
-			clientConnection = new KVCommunicationClient(clientSocket);
+			clientConnection = new ClientConnection(clientSocket);
 			output = clientSocket.getOutputStream();
 			input = clientSocket.getInputStream();
 
@@ -76,16 +76,16 @@ public class KVStore implements KVCommInterface {
 	public JSONMessage put(String key, String value) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
 		jsonMessage.setMessage("PUT", key, value);
-		clientConnection.sendMessage(jsonMessage);
-		return clientConnection.receiveMessage();
+		this.clientConnection.sendJSONMessage(jsonMessage);
+		return this.clientConnection.receiveJSONMessage();
 	}
 
 	@Override
 	public JSONMessage get(String key) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
 		jsonMessage.setMessage("GET", key, "");
-		clientConnection.sendMessage(jsonMessage);
-		return receiveMessage();
+		this.clientConnection.sendJSONMessage(jsonMessage);
+		return this.clientConnection.receiveJSONMessage();
 	}
 
 // 	public void sendMessage(JSONMessage msg) throws IOException {

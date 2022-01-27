@@ -48,7 +48,7 @@ public class ServerConnection implements IServerConnection, Runnable{
 	}
 
 	@Override
-	public void connect() throws Exception {
+	public void connect() throws IOException {
 		try {
 			output = this.clientSocket.getOutputStream();
 			input = this.clientSocket.getInputStream();
@@ -71,7 +71,7 @@ public class ServerConnection implements IServerConnection, Runnable{
 				+ json.getJSON() +"'");
     }
 	
-	private JSONMessage receiveJSONMessage() throws IOException {
+	public JSONMessage receiveJSONMessage() throws IOException {
 		
 		int index = 0;
 		byte[] msgBytes = null, tmp = null;
