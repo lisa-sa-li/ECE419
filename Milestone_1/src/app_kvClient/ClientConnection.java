@@ -137,6 +137,7 @@ public class ClientConnection implements IClientConnection {
 	// 			+ msg.getMsg() +"'");
     // }
 
+	@Override
 	public void sendJSONMessage(JSONMessage json) throws IOException {
 		byte[] jsonBytes = json.getJSONByte();
 		output.write(jsonBytes, 0, jsonBytes.length);
@@ -215,7 +216,7 @@ public class ClientConnection implements IClientConnection {
 // 		return msg;
 //     }
 	
-	
+	@Override
 	public JSONMessage receiveJSONMessage() throws IOException {
 		
 		int index = 0;

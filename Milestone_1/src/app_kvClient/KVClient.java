@@ -1,9 +1,9 @@
 package app_kvClient;
 
-import client.KVCommInterface;
+// import client.KVCommInterface;
 import client.KVStore;
 import shared.messages.KVMessage;
-import shared.messages.TextMessage;
+import shared.messages.JSONMessage;
 import logger.LogSetup;
 import java.net.UnknownHostException;
 import java.io.IOException;
@@ -11,13 +11,12 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import shared.messages.TextMessage;
 
 
 public class KVClient implements IKVClient, Runnable {
     private static Logger logger = Logger.getRootLogger();
     private static final String PROMPT = "KVClient> ";
-    private KVCommInterface kvStore;
+    private KVStore kvStore;
     private boolean stop = false;
 
     @Override
@@ -36,7 +35,7 @@ public class KVClient implements IKVClient, Runnable {
     }
 
     @Override
-    public KVCommInterface getStore(){
+    public KVStore getStore(){
         // TODO Auto-generated method stub
         return this.kvStore;
     }
@@ -95,7 +94,7 @@ public class KVClient implements IKVClient, Runnable {
                                 String valStr = val.toString();
                                 if (valStr.length() <= 120000) {
                                     try {
-                                        TextMessage msg = this.kvStore.put(tokens[1], valStr);
+                                        JSONMessage msg = this.kvStore.put(tokens[1], valStr);
                                         // PLACE status message here
                                         logger.info(msg);
                                     } catch (Exception e) {
@@ -107,7 +106,7 @@ public class KVClient implements IKVClient, Runnable {
                             } else if (tokens.length == 2) {
                                 // DELETE key,value pair
                                 try {
-                                    TextMessage msg = this.kvStore.put(tokens[1], "null");
+                                    JSONMessage msg = this.kvStore.put(tokens[1], "null");
                                     // PLACE status message here
                                     logger.info(msg);
                                 } catch (Exception e) {
@@ -129,7 +128,7 @@ public class KVClient implements IKVClient, Runnable {
                         String key = tokens[1];
                         if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes idk
                             try {
-                                TextMessage msg = this.kvStore.get(key);
+                                JSONMessage msg = this.kvStore.get(key);
                                 // PLACE status message here
                                 logger.info(msg);
                             } catch (Exception e) {

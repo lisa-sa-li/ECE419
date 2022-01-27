@@ -61,6 +61,7 @@ public class ServerConnection implements IServerConnection, Runnable{
 		}
 	}
 
+	@Override
 	public void sendJSONMessage(JSONMessage json) throws IOException {
 		byte[] jsonBytes = json.getJSONByte();
 		output.write(jsonBytes, 0, jsonBytes.length);
@@ -71,6 +72,7 @@ public class ServerConnection implements IServerConnection, Runnable{
 				+ json.getJSON() +"'");
     }
 	
+	@Override
 	public JSONMessage receiveJSONMessage() throws IOException {
 		
 		int index = 0;

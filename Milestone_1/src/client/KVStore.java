@@ -13,7 +13,6 @@ import java.io.FileReader;
 import java.lang.StringBuffer;
 import java.io.FileOutputStream;  
 import shared.messages.JSONMessage;
-import shared.messages.TextMessage;
 
 import app_kvClient.ClientConnection;
 
@@ -66,10 +65,9 @@ public class KVStore implements KVCommInterface {
 
 				// HOW DO WE CLOSE clientConnection?????
 			}
-		}  catch (IOException e) {
+		} catch (IOException e) {
 			logger.error("Error! Unable to close connection. \n", e);
 		}
-
 	}
 
 	@Override
@@ -87,7 +85,7 @@ public class KVStore implements KVCommInterface {
 		this.clientConnection.sendJSONMessage(jsonMessage);
 		return this.clientConnection.receiveJSONMessage();
 	}
-
+}
 // 	public void sendMessage(JSONMessage msg) throws IOException {
 // 		String temp = msg.serialize();
 // 		byte[] msgBytes = msg.stringToByte(temp);
@@ -221,4 +219,4 @@ public class KVStore implements KVCommInterface {
 // 				+ json.getJSON().trim() + "'");
 // 		return json;
 //     }
-}
+
