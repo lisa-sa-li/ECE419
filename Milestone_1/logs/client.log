@@ -1,16 +1,5 @@
-2022-01-26 01:06:07,380 WARN  [main] root: Not connected to any store.
-2022-01-26 01:06:10,286 ERROR [main] root: Unknown command.
-2022-01-26 01:06:12,691 INFO  [main] root: Application exit.
-<<<<<<< HEAD
-2022-01-26 23:35:47,216 WARN  [main] root: Not connected to any store.
-2022-01-26 23:36:06,612 INFO  [main] root: Connected to localhost on port 8080
-2022-01-26 23:36:06,613 INFO  [main] root: Connection established.
-2022-01-26 23:36:49,191 INFO  [main] root: Connected to localhost on port 8080
-2022-01-26 23:36:49,196 INFO  [main] root: Connection established.
-=======
-2022-01-26 23:02:36,506 ERROR [main] root: Unknown command.
-2022-01-26 23:02:44,720 ERROR [main] root: Error! Unable to establish connection. 
 
+<<<<<<< HEAD
 java.net.ConnectException: Connection refused (Connection refused)
 	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
 	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
@@ -414,3 +403,5 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-27 15:22:40,405 INFO  [main] root: Connection established.
 2022-01-27 15:22:43,371 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","sandra":"hi",}'
 2022-01-27 15:22:43,371 ERROR [main] root: java.lang.NullPointerException
+=======
+>>>>>>> 9c762937efafe34de4d0c409e757d1cbae217e23
