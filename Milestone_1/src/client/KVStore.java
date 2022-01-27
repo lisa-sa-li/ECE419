@@ -52,6 +52,7 @@ public class KVStore implements KVCommInterface {
 					+ " on port " + clientSocket.getPort());
 		} catch (IOException e) {
 			logger.error("Error! Unable to establish connection. \n", e);
+			throw e;
 		}
 	}
 

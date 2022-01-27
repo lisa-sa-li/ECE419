@@ -4,14 +4,15 @@ import client.KVStore;
 
 public class PerformanceTest {
 
-    private KVStore kvStore;
+    private KVServer kvServer;
     private static final int numRequests = 2000;
 
     public PerformanceTest() {
         try {
-            kvStore = new KVStore("localhost", 50000);
+            this.kvServer = new KVServer("localhost", 50000);
+            this.kvServer.connect();
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Couldn't connect to server. ", e);
         }
     }
 
@@ -21,6 +22,7 @@ public class PerformanceTest {
         for (int i = 0; i < ratioListPUT.length; i++) {
             for (int j = 0; j < numRequests; j++) {
                 System.out.println("IN loop");
+
             }
         }
     }
