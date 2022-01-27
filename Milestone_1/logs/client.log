@@ -57,3 +57,14 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-26 23:32:29,891 ERROR [main] root: java.lang.NullPointerException
 2022-01-26 23:37:51,983 INFO  [main] root: Tearing down the connection ...
 2022-01-26 23:37:51,983 INFO  [main] root: Application exit.
+2022-01-26 23:57:18,134 INFO  [main] root: Connected to localhost on port 8008
+2022-01-26 23:57:18,135 INFO  [main] root: Connection established.
+2022-01-26 23:57:27,283 ERROR [main] root: java.lang.NullPointerException
+2022-01-27 00:05:38,037 ERROR [main] root: Unknown command.
+2022-01-27 00:12:39,809 INFO  [main] root: Tearing down the connection ...
+2022-01-27 00:12:39,810 INFO  [main] root: Application exit.
+2022-01-27 00:13:08,152 INFO  [main] root: Connected to localhost on port 8008
+2022-01-27 00:13:08,153 INFO  [main] root: Connection established.
+2022-01-27 00:13:12,414 ERROR [main] root: java.lang.NullPointerException
+2022-01-27 00:14:56,103 INFO  [main] root: Tearing down the connection ...
+2022-01-27 00:14:56,103 INFO  [main] root: Application exit.

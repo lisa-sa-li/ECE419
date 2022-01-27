@@ -24,3 +24,11 @@
 2022-01-26 23:25:21,146 INFO  [Thread-0] root: Connected to localhost on port 56371
 2022-01-26 23:32:25,615 INFO  [Thread-5] root: SEND 	<127.0.0.1:56645>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8008'
 2022-01-26 23:32:25,616 INFO  [Thread-0] root: Connected to localhost on port 56645
+2022-01-26 23:57:18,122 INFO  [Thread-6] root: SEND 	<127.0.0.1:57336>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8008'
+2022-01-26 23:57:18,123 INFO  [Thread-0] root: Connected to localhost on port 57336
+2022-01-27 00:12:58,929 INFO  [main] root: Directory already exists.
+2022-01-27 00:12:58,930 INFO  [main] root: File already exists.
+2022-01-27 00:12:58,930 INFO  [Thread-0] root: Initialize server ...
+2022-01-27 00:12:58,944 INFO  [Thread-0] root: Server listening on port: 8008
+2022-01-27 00:13:08,148 INFO  [Thread-1] root: SEND 	<127.0.0.1:57874>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8008'
+2022-01-27 00:13:08,153 INFO  [Thread-0] root: Connected to localhost on port 57874
