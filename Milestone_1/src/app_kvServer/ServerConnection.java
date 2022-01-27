@@ -140,6 +140,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		// bytes to string
 		String jsonStr = json.byteToString(tmp);
 		// deserialize
+		System.out.println("ABOUT TO DESERIALIZE");
 		json.deserialize(jsonStr);
 		logger.info("RECEIVE \t<"
 				+ clientSocket.getInetAddress().getHostAddress() + ":"
@@ -204,10 +205,10 @@ public class ServerConnection implements IServerConnection, Runnable {
 							System.out.println("BEFORE RECEIVED MESSAGE");
 							JSONMessage recievedMesage = receiveJSONMessage();
 							System.out.println("RECEIVED MESSAGE");
-							JSONMessage sendMessage = handleMessage(recievedMesage);
-							System.out.println("HANDLED MESSAGE");
-							sendJSONMessage(sendMessage);
-							System.out.println("SENT MESSAGE");
+							// JSONMessage sendMessage = handleMessage(recievedMesage);
+							// System.out.println("HANDLED MESSAGE");
+							// sendJSONMessage(sendMessage);
+							// System.out.println("SENT MESSAGE");
 
 						} catch (IOException e) {
 							logger.error("Server connection lost: ", e);
