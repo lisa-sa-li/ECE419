@@ -1,5 +1,7 @@
 package app_kvServer;
 
+import shared.messages.KVMessage.StatusType;
+
 public interface IPersistantStorage {
 	/**
 	 * Puts a key-value pair into disk.
@@ -15,7 +17,7 @@ public interface IPersistantStorage {
 	 *                   any
 	 *                   KV server).
 	 */
-	public boolean put(String key, String value) throws Exception;
+	public StatusType put(String key, String value) throws Exception;
 
 	/**
 	 * Retrieves the value for a given key from disk.

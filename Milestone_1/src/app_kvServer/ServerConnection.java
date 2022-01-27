@@ -8,6 +8,8 @@ import java.net.Socket;
 import org.apache.log4j.*;
 
 import shared.messages.JSONMessage;
+// import shared.messages.JSONMessage.StatusType;
+import shared.messages.KVMessage.StatusType;
 import shared.messages.TextMessage;
 
 import client.KVStore;
@@ -73,7 +75,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 
 	@Override
 	public JSONMessage receiveJSONMessage() throws IOException {
-
 		int index = 0;
 		byte[] msgBytes = null, tmp = null;
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
@@ -137,14 +138,51 @@ public class ServerConnection implements IServerConnection, Runnable {
 		return json;
 	}
 
+	private JSONMessage handleMessage(JSONMessage msg) throws IOException {
+		String key = msg.getKey();
+		String value = msg.getValue();
+		StatusType status = msg.getStatus();
+
+		String handleMessageValue = "";
+		StatusType handleMessageStatus = StatusType.NO_STATUS;
+		JSONMessage handleMessage = new JSONMessage();
+
+		switch (status) {
+			case PUT:
+				try {
+					handleMessageStatus = this.kvServer.putKV(key, value);
+					logger.info(handleMessageStatus.name() + ": key " + key + " & value " + value);
+				} catch (Exception e) {
+					handleMessageStatus = StatusType.PUT_ERROR;
+					logger.info("PUT_ERROR: key " + key + " & value " + value);
+				}
+				break;
+			case GET:
+				try {
+					handleMessageValue = this.kvServer.getKV(key);
+					handleMessageStatus = StatusType.GET_SUCCESS;
+					logger.info("GET_SUCCESS: key " + key + " & value " + value);
+				} catch (Exception e) {
+					handleMessageStatus = StatusType.GET_ERROR;
+					logger.info("GET_ERROR: key " + key + " & value " + value);
+				}
+				break;
+			default:
+				logger.error("Unknown command.");
+				break;
+		}
+
+		handleMessage.setMessage(handleMessageStatus.name(), key, handleMessageValue);
+		return handleMessage;
+	}
+
 	public void run() {
 		// while connection is open, listen for messages
 		while (this.isOpen) {
 			try {
-				JSONMessage jsonMsg = receiveJSONMessage();
-				// what is going on here?
-				// JSONMessage sendMsg = process(recvMsg);
-				sendJSONMessage(jsonMsg);
+				JSONMessage recievedMesage = receiveJSONMessage();
+				JSONMessage sendMessage = handleMessage(recievedMesage);
+				sendJSONMessage(sendMessage);
 			} catch (IOException e) {
 				logger.error("Server connection lost: ", e);
 				this.isOpen = false;

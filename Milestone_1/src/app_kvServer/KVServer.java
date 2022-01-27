@@ -10,6 +10,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import shared.messages.TextMessage;
+import shared.messages.KVMessage.StatusType;
+
 import logger.LogSetup;
 import app_kvServer.PersistantStorage;
 import app_kvServer.ServerConnection;
@@ -90,12 +92,13 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	@Override
-	public void putKV(String key, String value) throws Exception {
-		boolean success = this.persistantStorage.put(key, value);
-		if (success == false) {
-			logger.warn("Unable to put " + key + ": " + value + ")");
-			throw new Exception("Unable to put (" + key + ": " + value + ")");
-		}
+	public StatusType putKV(String key, String value) throws Exception {
+		StatusType putStatus = this.persistantStorage.put(key, value);
+		// if (putStatus.equals(StatusType.DELETE_ERROR) ||
+		// putStatus.equals(StatusType.PUT_ERROR)) {
+		// throw new Exception("Unable to put (" + key + ": " + value + ")");
+		// }
+		return putStatus;
 	}
 
 	@Override
@@ -127,7 +130,6 @@ public class KVServer implements IKVServer, Runnable {
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		running = initializeServer();
 
 		if (serverSocket != null) {
@@ -175,7 +177,6 @@ public class KVServer implements IKVServer, Runnable {
 
 	public static void main(String[] args) {
 		try {
-			// TODO: param for log level
 			new LogSetup("logs/server.log", Level.ALL);
 			if (args.length != 1) {
 				System.out.println("Error! Invalid number of arguments!");

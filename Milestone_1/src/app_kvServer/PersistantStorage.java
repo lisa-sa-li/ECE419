@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import shared.messages.JSONMessage;
 import shared.messages.TextMessage;
 import java.io.File;
+import shared.messages.KVMessage.StatusType;
 
 public class PersistantStorage implements IPersistantStorage {
     private static Logger logger = Logger.getRootLogger();
@@ -35,7 +36,7 @@ public class PersistantStorage implements IPersistantStorage {
                 logger.info("Directory already exists.");
             }
         } catch (Exception e) {
-            System.err.println(e);
+            // System.err.println(e);
         }
 
         // Create file if it does not exist
@@ -47,13 +48,13 @@ public class PersistantStorage implements IPersistantStorage {
                 logger.info("File already exists.");
             }
         } catch (Exception e) {
-            System.err.println(e);
+            // System.err.println(e);
         }
 
     }
 
     @Override
-    public boolean put(String key, String value) throws Exception {
+    public StatusType put(String key, String value) throws Exception {
         try {
             // Below is slightly modified logic from
             // https://stackoverflow.com/questions/20039980/java-replace-line-in-text-file
@@ -63,6 +64,7 @@ public class PersistantStorage implements IPersistantStorage {
             String keyFromFile;
             boolean foundKey = false;
             JSONMessage json;
+            StatusType putStatus = null;
 
             while ((line = file.readLine()) != null) {
                 // Covert each line to a JSON so we can read the key and value
@@ -76,30 +78,33 @@ public class PersistantStorage implements IPersistantStorage {
 
                     // If value == "null", that means to delete so we will skip appending the line
                     // Otherwise, update the value and append to file
-                    if (!value.equals("null")) {
+                    if (value.equals("null")) {
+                        putStatus = StatusType.DELETE_SUCCESS;
+                    } else {
                         json.setValue(value);
                         line = json.serialize();
                         inputBuffer.append(line);
                         inputBuffer.append('\n');
+                        putStatus = StatusType.PUT_UPDATE;
                     }
                     break;
                 }
             }
 
-            // If key does not exist in the file///
+            // If key does not exist in the file
             if (foundKey == false) {
                 if (value.equals("null")) {
                     logger.info("Key does not exist and cannot 'delete'");
+                    putStatus = StatusType.DELETE_ERROR;
                 } else {
                     json = new JSONMessage();
                     json.setMessage("", key, value); // We don't care about status here
                     line = json.serialize();
                     inputBuffer.append(line);
                     inputBuffer.append('\n');
+                    putStatus = StatusType.PUT_SUCCESS;
                 }
-
             }
-
             file.close();
 
             // Overwrite file with the data
@@ -108,11 +113,11 @@ public class PersistantStorage implements IPersistantStorage {
             fileOut.close();
 
             logger.info("Completed 'put' operation into storage server");
-            return true;
+            return putStatus;
         } catch (Exception e) {
             System.out.println("Problem reading file.");
         }
-        return false;
+        return StatusType.PUT_ERROR;
     }
 
     @Override

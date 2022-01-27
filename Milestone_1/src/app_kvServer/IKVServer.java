@@ -1,5 +1,7 @@
 package app_kvServer;
 
+import shared.messages.KVMessage.StatusType;
+
 public interface IKVServer {
     public enum CacheStrategy {
         None,
@@ -67,7 +69,7 @@ public interface IKVServer {
      * @throws Exception
      *                   when key not in the key range of the server
      */
-    public void putKV(String key, String value) throws Exception;
+    public StatusType putKV(String key, String value) throws Exception;
 
     /**
      * Clear the local cache of the server
