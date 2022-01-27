@@ -1,6 +1,6 @@
 package testing;
 
-import client.KVStore;
+import app_kvServer.KVServer;
 
 public class PerformanceTest {
 
@@ -9,10 +9,9 @@ public class PerformanceTest {
 
     public PerformanceTest() {
         try {
-            this.kvServer = new KVServer("localhost", 50000);
-            this.kvServer.connect();
+            this.kvServer = new KVServer(8080, 0, "");
         } catch (Exception e) {
-            System.out.println("Couldn't connect to server. ", e);
+            System.out.println("Couldn't connect to server. " + e);
         }
     }
 
@@ -22,7 +21,7 @@ public class PerformanceTest {
         for (int i = 0; i < ratioListPUT.length; i++) {
             for (int j = 0; j < numRequests; j++) {
                 System.out.println("IN loop");
-
+                
             }
         }
     }
