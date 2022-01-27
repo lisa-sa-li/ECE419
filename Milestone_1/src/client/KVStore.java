@@ -85,7 +85,6 @@ public class KVStore implements KVCommInterface {
 	public void sendMessage(JSONMessage msg) throws IOException {
 		String temp = msg.serialize();
 		byte[] msgBytes = msg.stringToByte(temp);
-		// byte[] msgBytes = msg.getMsgBytes();
 		output.write(msgBytes, 0, msgBytes.length);
 		output.flush();
 		logger.info("Send message:\t '" + clientSocket.getInetAddress().getHostAddress() + ":"

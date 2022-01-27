@@ -3,6 +3,7 @@ package app_kvClient;
 import client.KVCommInterface;
 import client.KVStore;
 import shared.messages.KVMessage;
+import shared.messages.TextMessage;
 import logger.LogSetup;
 import java.net.UnknownHostException;
 import java.io.IOException;
@@ -91,7 +92,7 @@ public class KVClient implements IKVClient, Runnable {
                                 String valStr = val.toString();
                                 if (valStr.length() <= 120000) {
                                     try {
-                                        KVMessage msg = this.commInterfaceClient.put(tokens[1], valStr);
+                                        TextMessage msg = this.commInterfaceClient.put(tokens[1], valStr);
                                         // PLACE status message here
                                         logger.info(msg);
                                     } catch (Exception e) {
@@ -103,7 +104,7 @@ public class KVClient implements IKVClient, Runnable {
                             } else if (tokens.length == 2) {
                                 // DELETE key,value pair
                                 try {
-                                    KVMessage msg = this.commInterfaceClient.put(tokens[1], "null");
+                                    TextMessage msg = this.commInterfaceClient.put(tokens[1], "null");
                                     // PLACE status message here
                                     logger.info(msg);
                                 } catch (Exception e) {
@@ -125,7 +126,7 @@ public class KVClient implements IKVClient, Runnable {
                         String key = tokens[1];
                         if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes idk
                             try {
-                                KVMessage msg = this.commInterfaceClient.get(key);
+                                TextMessage msg = this.commInterfaceClient.get(key);
                                 // PLACE status message here
                                 logger.info(msg);
                             } catch (Exception e) {
