@@ -54,7 +54,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 			logger.info("Connected to " + this.clientSocket.getInetAddress().getHostName() + " on port "
 					+ this.clientSocket.getPort());
 		} catch (IOException e) {
-			logger.error("Error! Unable to establish connection. \n", e);
+			logger.error("Error! Unable to establish server connection. \n", e);
 		}
 	}
 

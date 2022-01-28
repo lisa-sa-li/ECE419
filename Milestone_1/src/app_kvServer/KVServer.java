@@ -143,7 +143,7 @@ public class KVServer implements IKVServer, Runnable {
 							"Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
 									+ clientSocket.getPort());
 				} catch (IOException e) {
-					logger.error("Error! " + "Unable to establish connection. \n", e);
+					logger.error("Error! " + "Unable to establish connection to server. \n", e);
 				} catch (Exception e) {
 					logger.error("Error! \n", e);
 				}
