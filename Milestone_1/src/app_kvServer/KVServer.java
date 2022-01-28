@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-import shared.messages.TextMessage;
 import shared.messages.KVMessage.StatusType;
 
 import logger.LogSetup;
@@ -41,7 +40,6 @@ public class KVServer implements IKVServer, Runnable {
 	 *                  and "LFU".
 	 */
 	public KVServer(int port, int cacheSize, String strategy) {
-		// TODO Auto-generated method stub
 		this.port = port;
 		this.cacheSize = cacheSize;
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
@@ -185,7 +183,6 @@ public class KVServer implements IKVServer, Runnable {
 				int port = Integer.parseInt(args[0]);
 				// TODO: set params for cache size and strategy
 				new KVServer(port, 1, "").run();
-				// .start();
 			}
 		} catch (IOException e) {
 			System.out.println("Error! Unable to initialize logger!");

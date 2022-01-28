@@ -8,11 +8,8 @@ import java.net.Socket;
 import org.apache.log4j.*;
 
 import shared.messages.JSONMessage;
-// import shared.messages.JSONMessage.StatusType;
 import shared.messages.KVMessage.StatusType;
 import shared.messages.TextMessage;
-
-import client.KVStore;
 
 import app_kvServer.KVServer;
 
@@ -138,11 +135,9 @@ public class ServerConnection implements IServerConnection, Runnable {
 		/* build final Object */
 		JSONMessage json = new JSONMessage();
 		// bytes to string
-		// String jsonStr = json.byteToString(tmp);
 		String jsonStr = json.byteToString(msgBytes);
 		if (jsonStr == null || jsonStr.trim().isEmpty()) {
-			// TODO?? null message
-			logger.debug("jsonStr is null :/");
+			logger.debug("jsonStr is null in ServerConnection");
 			return null;
 		}
 		// deserialize
@@ -151,8 +146,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 				+ clientSocket.getInetAddress().getHostAddress() + ":"
 				+ clientSocket.getPort() + ">: '"
 				+ json.getJSON().trim() + "'");
-		System.out.println("RETURN FROM RECEIVE ");
-
 		return json;
 	}
 
@@ -161,7 +154,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		String value = msg.getValue();
 		StatusType status = msg.getStatus();
 
-		String handleMessageValue = value; // Send back the value in a PUT
+		String handleMessageValue = value.isEmpty() ? "null" : value; // For PUT or DELETE, send the original value back
 		StatusType handleMessageStatus = StatusType.NO_STATUS;
 		JSONMessage handleMessage = new JSONMessage();
 

@@ -1,17 +1,14 @@
 package app_kvServer;
 
 import shared.messages.KVMessage;
+import shared.messages.KVMessage.StatusType;
 import org.apache.log4j.*;
-import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.lang.StringBuffer;
 import java.io.FileOutputStream;
 import shared.messages.JSONMessage;
-import shared.messages.TextMessage;
 import java.io.File;
-import shared.messages.KVMessage.StatusType;
 
 public class PersistantStorage implements IPersistantStorage {
     private static Logger logger = Logger.getRootLogger();
@@ -21,9 +18,7 @@ public class PersistantStorage implements IPersistantStorage {
 
     public PersistantStorage(String name) {
         this.fileName = name.trim() + "_storage.txt";
-        // System.out.println("The filename is supposed to be: " + this.fileName);
         this.pathToFile = dir + "/" + this.fileName;
-        // System.out.println("The pathToFile is supposed to be: " + this.pathToFile);
         try {
             initFile();
         } catch (Exception e) {
@@ -37,25 +32,22 @@ public class PersistantStorage implements IPersistantStorage {
         try {
             if (directory.mkdirs()) {
                 logger.info("Directory created: " + directory.getName());
-                // System.out.println("Folder created HERE");
             } else {
                 logger.info("Directory already exists.");
-                // System.out.println("Folder created THERE");
             }
         } catch (Exception e) {
-            // System.err.println(e);
+            logger.error("Error when creating directory " + directory.getName() + ": " + e);
         }
         // Create file if it does not exist
         File f = new File(this.pathToFile);
         try {
             if (f.createNewFile()) {
-                // System.out.println("file created at: " + f.getAbsolutePath());
                 logger.info("File created: " + f.getName());
             } else {
                 logger.info("File already exists.");
             }
         } catch (Exception e) {
-            System.out.println("Exception: " + e);
+            logger.error("Error when creating file " + f.getName() + ": " + e);
         }
 
     }
@@ -80,7 +72,7 @@ public class PersistantStorage implements IPersistantStorage {
                 keyFromFile = json.getKey();
 
                 // The key already exists in the file, update the old value with the new value
-                if (keyFromFile.equals(key)) {
+                if (keyFromFile.equals(key) && foundKey == false) {
                     foundKey = true;
 
                     // If value == "null", that means to delete so we will skip appending the line
@@ -94,7 +86,13 @@ public class PersistantStorage implements IPersistantStorage {
                         inputBuffer.append('\n');
                         putStatus = StatusType.PUT_UPDATE;
                     }
-                    break;
+                } else if (keyFromFile.equals(key) && foundKey == true) {
+                    // This should never happen, but if there are more than 1 instances of a
+                    // key in a file, remove the subsequent keys
+                    continue;
+                } else {
+                    inputBuffer.append(line);
+                    inputBuffer.append('\n');
                 }
             }
 

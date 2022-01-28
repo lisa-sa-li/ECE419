@@ -10,10 +10,6 @@ import org.apache.log4j.*;
 import shared.messages.JSONMessage;
 import shared.messages.TextMessage;
 
-import client.KVStore;
-
-import app_kvServer.KVServer;
-
 /**
  * Represents a connection end point for a particular client that is
  * connected to the server. This class is responsible for message reception
@@ -43,8 +39,6 @@ public class ClientConnection implements IClientConnection {
 		this.isOpen = true;
 		output = clientSocket.getOutputStream();
 		input = clientSocket.getInputStream();
-
-		// this.kvServer = new KVServer(this.clientSocket.getPort(), -1, "");
 	}
 
 	@Override
@@ -121,10 +115,9 @@ public class ClientConnection implements IClientConnection {
 		/* build final Object */
 		JSONMessage json = new JSONMessage();
 		// bytes to string
-		String jsonStr = json.byteToString(tmp);
+		String jsonStr = json.byteToString(msgBytes);
 		if (jsonStr == null || jsonStr.trim().isEmpty()) {
-			// TODO?? null message
-			logger.debug("jsonStr is null :/");
+			logger.debug("jsonStr is null in ClientConnection");
 			return null;
 		}
 		// deserialize

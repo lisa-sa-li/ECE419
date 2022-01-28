@@ -9,7 +9,6 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import logger.LogSetup;
 
-
 public class AllTests {
 
 	static {
@@ -20,14 +19,13 @@ public class AllTests {
 			e.printStackTrace();
 		}
 	}
-	
-	
+
 	public static Test suite() {
 		TestSuite clientSuite = new TestSuite("Basic Storage ServerTest-Suite");
 		clientSuite.addTestSuite(ConnectionTest.class);
-		clientSuite.addTestSuite(InteractionTest.class); 
-		clientSuite.addTestSuite(AdditionalTest.class); 
+		clientSuite.addTestSuite(InteractionTest.class);
+		clientSuite.addTestSuite(AdditionalTest.class);
 		return clientSuite;
 	}
-	
+
 }

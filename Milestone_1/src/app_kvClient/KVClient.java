@@ -1,8 +1,6 @@
 package app_kvClient;
 
-// import client.KVCommInterface;
 import client.KVStore;
-import shared.messages.KVMessage;
 import shared.messages.JSONMessage;
 import logger.LogSetup;
 import java.net.UnknownHostException;
@@ -11,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.ConnectException;
 
 public class KVClient implements IKVClient, Runnable {
     private static Logger logger = Logger.getRootLogger();
@@ -21,7 +18,6 @@ public class KVClient implements IKVClient, Runnable {
 
     @Override
     public void newConnection(String hostname, int port) throws Exception {
-        // TODO Auto-generated method stub
         if (this.kvStore != null) {
             throw new IOException("Connection is already established");
         }
@@ -79,7 +75,6 @@ public class KVClient implements IKVClient, Runnable {
                     }
                     break;
                 case "put":
-                    System.out.println("YOU ARE PUTTING");
                     if (this.kvStore != null) { // && this.kvStore.isRunning()) {
                         String key = tokens[1];
                         if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes idk
@@ -107,7 +102,6 @@ public class KVClient implements IKVClient, Runnable {
                             } else if (tokens.length == 2) {
                                 // DELETE key,value pair
                                 try {
-                                    System.out.println("u are about to null");
                                     JSONMessage msg = this.kvStore.put(tokens[1], "null");
                                     // PLACE status message here
                                     logger.info(msg);

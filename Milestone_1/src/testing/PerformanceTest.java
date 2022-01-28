@@ -18,7 +18,6 @@ public class PerformanceTest {
     int numGETRequests;
     Random randomNumber = new Random();
 
-
     public PerformanceTest() {
         try {
             this.kvServer = new KVServer(8082, 0, "");
@@ -54,7 +53,7 @@ public class PerformanceTest {
     public String generateKey() {
         String key = "";
         for (int i = 0; i < 10; i++) {
-            char c1 = (char)(randomNumber.nextInt(26) + 'a'); // https://stackoverflow.com/questions/2626835/is-there-functionality-to-generate-a-random-character-in-java
+            char c1 = (char) (randomNumber.nextInt(26) + 'a'); // https://stackoverflow.com/questions/2626835/is-there-functionality-to-generate-a-random-character-in-java
             key = key + c1;
         }
         return key;
@@ -62,7 +61,7 @@ public class PerformanceTest {
 
     public void runTests() {
         // Iterate to test different ratios of PUT and GET requests to the server
-        double[] ratioListPUT = {0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2};
+        double[] ratioListPUT = { 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2 };
         for (int i = 0; i < ratioListPUT.length; i++) {
             double ratioPUT = ratioListPUT[i];
             totalDurationPUT = 0;
@@ -83,7 +82,8 @@ public class PerformanceTest {
             double percentagePUT = ratioPUT * 100.0;
             double percentageGET = 100.0 - percentagePUT;
             double latency = 1000.0 * (totalDurationPUT + totalDurationGET) / numRequests;
-            System.out.println("The latency of " + percentagePUT + "% PUT requests and " + percentageGET + "% GET requests is: " + latency);
+            System.out.println("The latency of " + percentagePUT + "% PUT requests and " + percentageGET
+                    + "% GET requests is: " + latency);
             try {
                 this.kvServer.clearStorage();
             } catch (Exception e) {
@@ -98,4 +98,3 @@ public class PerformanceTest {
     }
 
 }
-
