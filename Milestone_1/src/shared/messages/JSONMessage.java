@@ -145,20 +145,20 @@ public class JSONMessage implements KVMessage, Serializable {
 
         String status = tokens[1];
         String key = tokens[2];
+        String value;
         try{
             // for deletion
-            String value = tokens[3];
-        } catch (IndexOutOfBoundsException iobe) {
+            value = tokens[3];
+        } catch (Exception iobe) {
             // do nothing
-            System.out.println("NULL VALUE?");
-            String value = null;
+            value = "null";
         }
-
+        
         setStatus(status);
         setKey(key);
         setValue(value);
 
-        System.out.println("Status:key:value -> " + status +":"+ key +":"+ value);
+        // System.out.println("Status:key:value -> " + status +":"+ key +":"+ value);
     }
 
 }
