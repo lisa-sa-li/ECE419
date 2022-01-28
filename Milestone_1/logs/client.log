@@ -1297,3 +1297,40 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-28 12:52:28,788 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"kjkjkjlkjlk",}'
 2022-01-28 12:52:28,788 DEBUG [main] root: jsonStr is null in ClientConnection
 >>>>>>> 8004dd19dc57c59425959e1f98b03702faa86692
+2022-01-28 13:19:51,611 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 13:19:51,612 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 13:19:58,188 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hi":"cutie",}'
+2022-01-28 13:19:58,194 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","hi":"cutie",}'
+2022-01-28 13:20:03,994 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hlj":"sdfjh",}'
+2022-01-28 13:20:03,997 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","hlj":"sdfjh",}'
+2022-01-28 13:20:11,992 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","hlj":""}'
+2022-01-28 13:20:11,994 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","hlj":"sdfjh",}'
+2022-01-28 13:20:16,735 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","hi":""}'
+2022-01-28 13:20:16,737 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","hi":"cutie",}'
+2022-01-28 13:26:50,015 INFO  [main] root: Tearing down the connection ...
+2022-01-28 13:26:50,016 INFO  [main] root: Application exit.
+2022-01-28 13:27:28,076 WARN  [main] root: Not connected to any store.
+2022-01-28 13:27:30,793 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 13:27:30,793 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 13:27:37,866 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","flower":"bloom",}'
+2022-01-28 13:27:37,872 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","flower":"bloom",}'
+2022-01-28 13:27:45,394 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","grow":"man",}'
+2022-01-28 13:27:45,401 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","grow":"man",}'
+2022-01-28 13:27:53,670 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","come":"town",}'
+2022-01-28 13:27:53,672 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","come":"town",}'
+2022-01-28 13:27:56,882 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","come":""}'
+2022-01-28 13:27:56,885 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","come":""}'
+2022-01-28 13:28:35,147 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","come":""}'
+2022-01-28 13:28:35,148 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","come":""}'
+2022-01-28 13:28:40,362 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","grow":""}'
+2022-01-28 13:28:40,363 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","grow":"man",}'
+2022-01-28 13:28:56,551 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","i":"love my doggie",}'
+2022-01-28 13:28:56,553 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","i":"love my doggie",}'
+2022-01-28 13:29:01,181 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","i":""}'
+2022-01-28 13:29:01,183 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","i":"love my doggie",}'
+2022-01-28 13:29:07,459 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","i":"am so cute",}'
+2022-01-28 13:29:07,462 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","i":"am so cute",}'
+2022-01-28 13:29:10,103 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","i":""}'
+2022-01-28 13:29:10,104 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","i":"am so cute",}'
+2022-01-28 13:29:14,224 INFO  [main] root: Tearing down the connection ...
+2022-01-28 13:29:14,224 INFO  [main] root: Application exit.
