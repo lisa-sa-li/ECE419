@@ -161,6 +161,8 @@ public class ServerConnection implements IServerConnection, Runnable {
 		String value = msg.getValue();
 		StatusType status = msg.getStatus();
 
+		System.out.println("STATUS IN HANDLE MESSAGE: "+ status);
+
 		String handleMessageValue = value; // Send back the value in a PUT
 		StatusType handleMessageStatus = StatusType.NO_STATUS;
 		JSONMessage handleMessage = new JSONMessage();

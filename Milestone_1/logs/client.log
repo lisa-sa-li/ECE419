@@ -1011,3 +1011,57 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-27 21:46:32,949 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"b",}'
 2022-01-27 21:46:32,972 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_ERROR","a":""}'
 2022-01-27 21:46:32,973 INFO  [main] root: shared.messages.JSONMessage@2b9627bc
+2022-01-27 21:49:37,969 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 21:49:37,970 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 21:49:40,097 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"b",}'
+2022-01-27 21:49:40,115 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_ERROR","a":""}'
+2022-01-27 21:49:40,115 INFO  [main] root: shared.messages.JSONMessage@2b9627bc
+2022-01-27 21:50:31,073 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"b",}'
+2022-01-27 21:50:31,073 DEBUG [main] root: jsonStr is null :/
+2022-01-27 21:50:31,074 INFO  [main] root: 
+2022-01-27 21:52:23,236 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 21:52:23,237 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 21:52:27,626 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"b",}'
+2022-01-27 21:52:27,638 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_ERROR","a":""}'
+2022-01-27 21:52:27,638 INFO  [main] root: shared.messages.JSONMessage@2b9627bc
+2022-01-27 21:54:19,022 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 21:54:19,025 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 21:54:20,629 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"b",}'
+2022-01-27 21:54:20,647 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_ERROR","a":""}'
+2022-01-27 21:54:20,647 INFO  [main] root: shared.messages.JSONMessage@2b9627bc
+2022-01-27 21:55:41,691 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 21:55:41,695 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 21:55:43,010 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"b",}'
+2022-01-27 21:55:43,069 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_ERROR","a":""}'
+2022-01-27 21:55:43,069 INFO  [main] root: shared.messages.JSONMessage@2b9627bc
+2022-01-27 22:01:13,402 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 22:01:13,407 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 22:01:14,806 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"b",}'
+2022-01-27 22:01:14,821 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_ERROR","a":""}'
+2022-01-27 22:01:14,821 INFO  [main] root: shared.messages.JSONMessage@2b9627bc
+2022-01-27 22:01:49,098 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 22:01:49,101 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 22:01:50,170 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"b",}'
+2022-01-27 22:01:50,195 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_ERROR","a":""}'
+2022-01-27 22:01:50,195 INFO  [main] root: shared.messages.JSONMessage@2b9627bc
+2022-01-27 22:03:07,886 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 22:03:07,888 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 22:03:09,994 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"b",}'
+2022-01-27 22:03:10,014 ERROR [main] root: java.lang.ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3
+2022-01-27 22:06:05,815 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 22:06:05,817 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 22:06:07,245 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"b",}'
+2022-01-27 22:06:07,277 ERROR [main] root: java.lang.ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3
+2022-01-27 22:07:25,840 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 22:07:25,841 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 22:07:27,476 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"b",}'
+2022-01-27 22:07:27,509 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","a":"b",}'
+2022-01-27 22:07:27,510 INFO  [main] root: shared.messages.JSONMessage@1d16f93d
+2022-01-27 22:09:21,158 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 22:09:21,160 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 22:09:22,662 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"b",}'
+2022-01-27 22:09:22,673 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","a":"b",}'
+2022-01-27 22:09:22,674 INFO  [main] root: shared.messages.JSONMessage@1d16f93d
+2022-01-27 22:09:33,207 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
+2022-01-27 22:09:33,207 DEBUG [main] root: jsonStr is null :/
+2022-01-27 22:09:33,207 INFO  [main] root: 
