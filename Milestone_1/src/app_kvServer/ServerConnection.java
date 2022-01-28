@@ -138,17 +138,22 @@ public class ServerConnection implements IServerConnection, Runnable {
 		/* build final Object */
 		JSONMessage json = new JSONMessage();
 		// bytes to string
-		String jsonStr = json.byteToString(tmp);
+		// String jsonStr = json.byteToString(tmp);
+		String jsonStr = json.byteToString(msgBytes);
 		if (jsonStr == null || jsonStr.trim().isEmpty()) {
 			// TODO?? null message
 			return null;
 		}
 		// deserialize
+		System.out.println("ARE WE ABOVE?");
 		json.deserialize(jsonStr);
+		System.out.println("ARE WE BELOW?");
 		logger.info("RECEIVE \t<"
 				+ clientSocket.getInetAddress().getHostAddress() + ":"
 				+ clientSocket.getPort() + ">: '"
 				+ json.getJSON().trim() + "'");
+		System.out.println("RETURN FROM RECEIVE ");
+	
 		return json;
 	}
 
@@ -207,6 +212,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 
 					System.out.println("ABOUT TO RECEIVE MESSAGE");
 					JSONMessage recievedMesage = receiveJSONMessage();
+					System.out.println("RECEIVED");
 					if (recievedMesage != null) {
 						System.out.println("ABOUT TO HANDLE MESSAGE");
 						JSONMessage sendMessage = handleMessage(recievedMesage);
