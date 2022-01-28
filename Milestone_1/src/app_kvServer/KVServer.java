@@ -23,6 +23,7 @@ public class KVServer implements IKVServer, Runnable {
 	private int cacheSize;
 	private PersistantStorage persistantStorage;
 	private ServerSocket serverSocket;
+	private Socket clientSocket;
 	private boolean running;
 	private String hostName;
 	private ArrayList<Thread> threads;
@@ -53,9 +54,7 @@ public class KVServer implements IKVServer, Runnable {
 
 	@Override
 	public String getHostname() {
-		// TODO Auto-generated method stub
-		// this.clientSocket.getInetAddress().getHostName()
-		return null;
+		return serverSocket.getInetAddress().getHostName();
 	}
 
 	@Override
@@ -114,8 +113,7 @@ public class KVServer implements IKVServer, Runnable {
 		logger.info("Initialize server ...");
 		try {
 			serverSocket = new ServerSocket(port);
-			logger.info("Server listening on port: "
-					+ serverSocket.getLocalPort());
+			logger.info("Server listening on port: " + serverSocket.getLocalPort());
 			return true;
 
 		} catch (IOException e) {
@@ -134,16 +132,16 @@ public class KVServer implements IKVServer, Runnable {
 		if (serverSocket != null) {
 			while (isRunning()) {
 				try {
-					Socket client = serverSocket.accept();
-					ServerConnection serverConnection = new ServerConnection(client, this);
+					clientSocket = serverSocket.accept();
+					ServerConnection serverConnection = new ServerConnection(clientSocket, this);
 					// ????
 					Thread newThread = new Thread(serverConnection);
 					newThread.start();
 					this.threads.add(newThread);
 
-					logger.info("Connected to "
-							+ client.getInetAddress().getHostName()
-							+ " on port " + client.getPort());
+					logger.info(
+							"Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
+									+ clientSocket.getPort());
 				} catch (IOException e) {
 					logger.error("Error! " + "Unable to establish connection. \n", e);
 				} catch (Exception e) {

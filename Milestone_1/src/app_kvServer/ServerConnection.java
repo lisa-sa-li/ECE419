@@ -77,6 +77,10 @@ public class ServerConnection implements IServerConnection, Runnable {
 		byte read = (byte) input.read();
 		boolean reading = true;
 
+		System.out.println(">>>>>read|" + read + "|");
+
+		// while (read != 13 && read != 10 && read != -1 && reading) {/* CR, LF, error
+		// */
 		while (/* read != 13 && */ read != 10 && read != -1 && reading) {/* CR, LF, error */
 			/* if buffer filled, copy to msg array */
 			if (index == BUFFER_SIZE) {

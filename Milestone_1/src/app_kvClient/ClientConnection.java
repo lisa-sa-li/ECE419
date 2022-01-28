@@ -44,7 +44,6 @@ public class ClientConnection implements IClientConnection {
 	@Override
 	public void sendJSONMessage(JSONMessage json) throws IOException {
 		byte[] jsonBytes = json.getJSONByte();
-
 		output.write(jsonBytes, 0, jsonBytes.length);
 		output.flush();
 		logger.info("SEND \t<" + clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort() + ">: '"
@@ -68,7 +67,9 @@ public class ClientConnection implements IClientConnection {
 		// return msg;
 		// }
 
-		while (/* read != 13 && */ read != 10 && read != -1 && reading) {/* CR, LF, error */
+		// while (/* read != 13 && */ read != 10 && read != -1 && reading) {/* CR, LF,
+		// error */
+		while (read != 13 && reading) {/* carriage return */
 			/* if buffer filled, copy to msg array */
 			if (index == BUFFER_SIZE) {
 				if (msgBytes == null) {
