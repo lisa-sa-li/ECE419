@@ -43,3 +43,13 @@
 2022-01-27 17:18:32,091 INFO  [Thread-0] root: SEND 	<127.0.0.1:58425>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8080'
 2022-01-27 17:18:35,196 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:58425>: '{"status":"PUT","hi":"sandra love",}'
 2022-01-27 17:18:35,197 ERROR [Thread-0] root: java.lang.ArrayIndexOutOfBoundsException: Index 1 out of bounds for length 1
+2022-01-27 17:26:23,220 INFO  [main] root: Directory already exists.
+2022-01-27 17:26:23,221 INFO  [main] root: File already exists.
+2022-01-27 17:26:23,222 INFO  [main] root: Initialize server ...
+2022-01-27 17:26:23,265 INFO  [main] root: Server listening on port: 8080
+2022-01-27 17:26:35,081 INFO  [main] root: Connected to localhost on port 58776
+2022-01-27 17:26:35,082 INFO  [main] root: Connected to localhost on port 58776
+2022-01-27 17:26:35,089 INFO  [Thread-0] root: SEND 	<127.0.0.1:58776>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8080'
+2022-01-27 17:26:38,824 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:58776>: '{"status":"PUT","hi":"sandra love",}'
+2022-01-27 17:26:38,826 INFO  [Thread-0] root: PUT_ERROR: key hi & value sandra love
+2022-01-27 17:26:38,826 INFO  [Thread-0] root: SEND 	<127.0.0.1:58776>: '{"status":"PUT_ERROR","hi":""}'

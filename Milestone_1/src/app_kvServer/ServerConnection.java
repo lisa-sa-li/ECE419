@@ -139,15 +139,16 @@ public class ServerConnection implements IServerConnection, Runnable {
 		JSONMessage json = new JSONMessage();
 		// bytes to string
 		String jsonStr = json.byteToString(tmp);
+		if (jsonStr == null || jsonStr.trim().isEmpty()) {
+			// TODO?? null message
+			return null;
+		}
 		// deserialize
-		System.out.println("ABOUT TO DESERIALIZE");
 		json.deserialize(jsonStr);
-		System.out.println("DESERIALIZED: " + json.getJSON());
 		logger.info("RECEIVE \t<"
 				+ clientSocket.getInetAddress().getHostAddress() + ":"
 				+ clientSocket.getPort() + ">: '"
 				+ json.getJSON().trim() + "'");
-		System.out.println("RETURNING");
 		return json;
 	}
 
@@ -194,47 +195,47 @@ public class ServerConnection implements IServerConnection, Runnable {
 		try {
 			output = clientSocket.getOutputStream();
 			input = clientSocket.getInputStream();
-		
-			sendTextMessage(new TextMessage(
-					"Connection to MSRG Echo server established: " 
-					+ clientSocket.getLocalAddress() + " / "
-					+ clientSocket.getLocalPort()));
-					while (this.isOpen) {
-						try {
-							input = clientSocket.getInputStream();
-							output = clientSocket.getOutputStream();
-			
-							System.out.println("BEFORE RECEIVED MESSAGE");
-							JSONMessage recievedMesage = receiveJSONMessage();
-							System.out.println("RECEIVED MESSAGE");
-							// JSONMessage sendMessage = handleMessage(recievedMesage);
-							// System.out.println("HANDLED MESSAGE");
-							// sendJSONMessage(sendMessage);
-							// System.out.println("SENT MESSAGE");
 
-						} catch (IOException e) {
-							logger.error("Server connection lost: ", e);
-							this.isOpen = false;
-						} catch (Exception e) {
-							logger.error(e);
-						}
+			sendTextMessage(new TextMessage(
+					"Connection to MSRG Echo server established: "
+							+ clientSocket.getLocalAddress() + " / "
+							+ clientSocket.getLocalPort()));
+			while (this.isOpen) {
+				try {
+					input = clientSocket.getInputStream();
+					output = clientSocket.getOutputStream();
+
+					JSONMessage recievedMesage = receiveJSONMessage();
+					if (recievedMesage != null) {
+						JSONMessage sendMessage = handleMessage(recievedMesage);
+						System.out.println("HANDLED MESSAGE");
+						sendJSONMessage(sendMessage);
+						System.out.println("SENT MESSAGE");
 					}
+
+				} catch (IOException e) {
+					logger.error("Server connection lost: ", e);
+					this.isOpen = false;
+				} catch (Exception e) {
+					logger.error(e);
+				}
+			}
 		} catch (IOException ioe) {
 			logger.error("Error! Connection could not be established!", ioe);
-		
+
 		} finally {
-			try{
+			try {
 				// close connection
 				if (clientSocket != null) {
-						input.close();
-						output.close();
-						clientSocket.close();
-					}
-				} catch (IOException ioe) {
-					logger.error("Error! Unable to tear down connection!", ioe);
+					input.close();
+					output.close();
+					clientSocket.close();
 				}
+			} catch (IOException ioe) {
+				logger.error("Error! Unable to tear down connection!", ioe);
+			}
 		}
-		
+
 	}
 
 }

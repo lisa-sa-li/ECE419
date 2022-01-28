@@ -808,3 +808,7 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-27 17:18:32,080 INFO  [main] root: Connection established to 127.0.0.1:8080
 2022-01-27 17:18:35,192 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hi":"sandra love",}'
 2022-01-27 17:18:35,192 ERROR [main] root: java.lang.NullPointerException
+2022-01-27 17:26:35,084 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 17:26:35,085 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 17:26:38,820 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hi":"sandra love",}'
+2022-01-27 17:26:38,820 ERROR [main] root: java.lang.NullPointerException
