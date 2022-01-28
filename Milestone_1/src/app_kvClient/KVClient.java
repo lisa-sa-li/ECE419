@@ -47,7 +47,11 @@ public class KVClient implements IKVClient, Runnable {
     }
 
     private void handleCommand(String cmdLine) {
-        String[] tokens = cmdLine.split("\\s+");
+        // Shorthand to connect (easter egg)
+        if (cmdLine.equals("-1")) {
+            cmdLine = "connect 127.0.0.1 8080\n";
+        }
+        String[] tokens = cmdLine.trim().split("\\s+");
         try {
             switch (tokens[0]) {
                 case "quit":
@@ -63,7 +67,8 @@ public class KVClient implements IKVClient, Runnable {
                             int serverPort = Integer.parseInt(tokens[2]);
                             newConnection(serverHostName, serverPort);
                             // System.out
-                            //        .println(PROMPT + "Connection established to " + serverHostName + ":" + tokens[2]);
+                            // .println(PROMPT + "Connection established to " + serverHostName + ":" +
+                            // tokens[2]);
                             logger.info("Connection established to " + serverHostName + ":" + tokens[2]);
                         } catch (NumberFormatException nfe) {
                             logger.error("No valid address. Port must be a number! ", nfe);
@@ -77,8 +82,6 @@ public class KVClient implements IKVClient, Runnable {
                     }
                     break;
                 case "put":
-                    // System
-                    // logger.info("Swag")
                     if (this.kvStore != null) { // && this.kvStore.isRunning()) {
                         String key = tokens[1];
                         if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes idk
