@@ -8,7 +8,7 @@ import org.apache.log4j.*;
 
 public class JSONMessage implements KVMessage, Serializable {
 
-	private static Logger logger = Logger.getRootLogger();
+    private static Logger logger = Logger.getRootLogger();
 
     private static final long serialVersionUID = 5549512212003782618L;
     private static final char LINE_FEED = 0x0A;
@@ -56,18 +56,16 @@ public class JSONMessage implements KVMessage, Serializable {
     }
 
     public byte[] getJSONByte() {
-        if(this.byteJSON == null){
+        if (this.byteJSON == null) {
             this.stringToByte(this.json);
         }
         return this.byteJSON;
     }
 
     public void setMessage(String inStatus, String inKey, String inValue) {
-        System.out.println("THIS IS THE STATUS TO SET THE MESSAGE: " + inStatus);
         setStatus(inStatus);
         setKey(inKey);
         setValue(inValue);
-
         this.json = this.serialize();
     }
 
@@ -132,20 +130,20 @@ public class JSONMessage implements KVMessage, Serializable {
 
         // create Array object
         String[] tokens = null;
-        tokens = new String[ messageTokens.countTokens() ];
- 
+        tokens = new String[messageTokens.countTokens()];
+
         // iterate through StringTokenizer tokens
         int count = 0;
-        while(messageTokens.hasMoreTokens()) {
+        while (messageTokens.hasMoreTokens()) {
             // add tokens to Array
             String nextTok = messageTokens.nextToken();
             System.out.println(nextTok);
-            tokens[count++]= nextTok;
+            tokens[count++] = nextTok;
         }
 
         String status = tokens[1];
         String key = tokens[2];
-        try{
+        try {
             // for deletion
             String value = tokens[3];
         } catch (IndexOutOfBoundsException iobe) {
@@ -158,7 +156,7 @@ public class JSONMessage implements KVMessage, Serializable {
         setKey(key);
         setValue(value);
 
-        System.out.println("Status:key:value -> " + status +":"+ key +":"+ value);
+        System.out.println("Status:key:value -> " + status + ":" + key + ":" + value);
     }
 
 }

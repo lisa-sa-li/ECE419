@@ -152,7 +152,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 				+ clientSocket.getPort() + ">: '"
 				+ json.getJSON().trim() + "'");
 		System.out.println("RETURN FROM RECEIVE ");
-	
+
 		return json;
 	}
 
@@ -200,10 +200,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 			output = clientSocket.getOutputStream();
 			input = clientSocket.getInputStream();
 
-			// sendTextMessage(new TextMessage(
-			// "Connection to MSRG Echo server established: "
-			// + clientSocket.getLocalAddress() + " / "
-			// + clientSocket.getLocalPort()));
 			while (this.isOpen) {
 				try {
 					input = clientSocket.getInputStream();
@@ -242,7 +238,5 @@ public class ServerConnection implements IServerConnection, Runnable {
 				logger.error("Error! Unable to tear down connection!", ioe);
 			}
 		}
-
 	}
-
 }
