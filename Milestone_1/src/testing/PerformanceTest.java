@@ -7,9 +7,11 @@ public class PerformanceTest {
 
     private KVServer kvServer;
     private static final int numRequests = 2000;
-    private long totalDurationPUT;
-    private int numPutInsertRequests;
-    private int numPutUpdateRequests;
+    private long totalDurationPUT = 0;
+    private long totalDurationGET = 0;
+    private int numPUTInsertRequests = 0;
+    private int numPUTUpdateRequests = 0;
+    private int numGETRequests = 0;
 
 
     public PerformanceTest() {
@@ -21,19 +23,31 @@ public class PerformanceTest {
     }
 
     public void computeDurationPUT(String key, String val) {
-        long startTime = System.nanoTime();
+        long startTime = System.currentTimeMillis();
         try {
             StatusType outputStatus = this.kvServer.putKV(key, val);
         } catch (Exception e) {
             System.out.println("Error when doing PUT request. " + e);
         }
-        long endTime = System.nanoTime();
+        long endTime = System.currentTimeMillis();
         totalDurationPUT += (endTime - startTime) / 1000;
         if (val != "null") {
-            numPutInsertRequests++;
+            numPUTInsertRequests++;
         } else {
-            numPutUpdateRequests++;
+            numPUTUpdateRequests++;
         }
+    }
+
+    public void computeDurationGET(String key) {
+        long startTime = System.currentTimeMillis();
+        try {
+            String getOutput = this.kvServer.getKV(key);
+        } catch (Exception e) {
+            System.out.println("Error when doing GET request. " + e);
+        }
+        long endTime = System.currentTimeMillis();
+        totalDurationGET += (endTime - startTime) / 1000;
+        numGETRequests++;
     }
 
     public void runTests() {

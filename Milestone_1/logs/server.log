@@ -124,3 +124,50 @@ java.net.SocketException: Connection reset
 	at app_kvServer.ServerConnection.receiveJSONMessage(ServerConnection.java:124)
 	at app_kvServer.ServerConnection.run(ServerConnection.java:208)
 	at java.base/java.lang.Thread.run(Thread.java:834)
+2022-01-27 20:20:29,342 INFO  [main] root: Directory already exists.
+2022-01-27 20:20:29,389 INFO  [main] root: File already exists.
+2022-01-27 20:20:29,389 INFO  [main] root: Initialize server ...
+2022-01-27 20:20:29,468 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:20:33,817 INFO  [main] root: Connected to localhost on port 64530
+2022-01-27 20:20:33,824 INFO  [main] root: Connected to localhost on port 64530
+2022-01-27 20:20:33,843 INFO  [Thread-0] root: SEND 	<127.0.0.1:64530>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8080'
+2022-01-27 20:20:50,387 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:64530>: '{"status":"PUT","hello":"sandra love",}'
+2022-01-27 20:20:50,392 INFO  [Thread-0] root: PUT_ERROR: key hello & value sandra love
+2022-01-27 20:20:50,392 INFO  [Thread-0] root: SEND 	<127.0.0.1:64530>: '{"status":"PUT_ERROR","hello":""}'
+2022-01-27 20:22:27,797 INFO  [main] root: Directory already exists.
+2022-01-27 20:22:27,798 INFO  [main] root: File already exists.
+2022-01-27 20:22:27,883 INFO  [main] root: Initialize server ...
+2022-01-27 20:22:27,968 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:22:31,724 INFO  [main] root: Connected to localhost on port 64696
+2022-01-27 20:22:31,725 INFO  [main] root: Connected to localhost on port 64696
+2022-01-27 20:22:31,727 INFO  [Thread-0] root: SEND 	<127.0.0.1:64696>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8080'
+2022-01-27 20:22:35,552 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:64696>: '{"status":"PUT","hello":"sandra love",}'
+2022-01-27 20:22:35,561 INFO  [Thread-0] root: PUT_ERROR: key hello & value sandra love
+2022-01-27 20:22:35,561 INFO  [Thread-0] root: SEND 	<127.0.0.1:64696>: '{"status":"PUT_ERROR","hello":""}'
+2022-01-27 20:23:50,504 ERROR [Thread-0] root: Server connection lost: 
+java.net.SocketException: Connection reset
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:186)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:140)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:200)
+	at app_kvServer.ServerConnection.receiveJSONMessage(ServerConnection.java:124)
+	at app_kvServer.ServerConnection.run(ServerConnection.java:208)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+2022-01-27 20:24:01,617 INFO  [main] root: Directory already exists.
+2022-01-27 20:24:01,618 INFO  [main] root: File already exists.
+2022-01-27 20:24:01,622 INFO  [main] root: Initialize server ...
+2022-01-27 20:24:01,822 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:24:04,480 INFO  [main] root: Connected to localhost on port 64752
+2022-01-27 20:24:04,482 INFO  [main] root: Connected to localhost on port 64752
+2022-01-27 20:24:04,484 INFO  [Thread-0] root: SEND 	<127.0.0.1:64752>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8080'
+2022-01-27 20:24:08,897 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:64752>: '{"status":"PUT","hello":"sandra love",}'
+2022-01-27 20:24:08,898 INFO  [Thread-0] root: PUT_ERROR: key hello & value sandra love
+2022-01-27 20:24:08,899 INFO  [Thread-0] root: SEND 	<127.0.0.1:64752>: '{"status":"PUT_ERROR","hello":""}'
+2022-01-27 20:26:00,299 INFO  [main] root: Directory already exists.
+2022-01-27 20:26:00,316 INFO  [main] root: File already exists.
+2022-01-27 20:26:00,317 INFO  [main] root: Initialize server ...
+2022-01-27 20:26:00,498 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:26:02,866 INFO  [main] root: Connected to localhost on port 64879
+2022-01-27 20:26:02,867 INFO  [main] root: Connected to localhost on port 64879
+2022-01-27 20:26:06,372 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:64879>: '{"status":"PUT","hello":"sandra love",}'
+2022-01-27 20:26:06,375 INFO  [Thread-0] root: PUT_ERROR: key hello & value sandra love
+2022-01-27 20:26:06,376 INFO  [Thread-0] root: SEND 	<127.0.0.1:64879>: '{"status":"PUT_ERROR","hello":""}'

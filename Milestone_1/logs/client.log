@@ -834,3 +834,22 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-27 20:10:59,556 ERROR [main] root: java.lang.ArrayIndexOutOfBoundsException: Index 2 out of bounds for length 2
 2022-01-27 20:13:20,461 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","heu":"u",}'
 2022-01-27 20:13:20,464 ERROR [main] root: java.lang.IllegalArgumentException: No enum constant shared.messages.KVMessage.StatusType.status
+2022-01-27 20:18:19,805 ERROR [main] root: Unknown command.
+2022-01-27 20:18:26,707 INFO  [main] root: Application exit.
+2022-01-27 20:20:33,819 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 20:20:33,820 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 20:20:50,377 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hello":"sandra love",}'
+2022-01-27 20:20:50,378 ERROR [main] root: java.lang.ArrayIndexOutOfBoundsException: Index 2 out of bounds for length 2
+2022-01-27 20:22:31,741 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 20:22:31,741 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 20:22:35,535 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hello":"sandra love",}'
+2022-01-27 20:22:35,537 ERROR [main] root: java.lang.ArrayIndexOutOfBoundsException: Index 2 out of bounds for length 2
+2022-01-27 20:24:04,545 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 20:24:04,546 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 20:24:08,893 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hello":"sandra love",}'
+2022-01-27 20:24:08,895 ERROR [main] root: java.lang.ArrayIndexOutOfBoundsException: Index 2 out of bounds for length 2
+2022-01-27 20:26:02,873 INFO  [main] root: Connected to localhost on port 8080
+2022-01-27 20:26:02,874 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-27 20:26:06,365 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hello":"sandra love",}'
+2022-01-27 20:26:06,377 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_ERROR","hello":""}'
+2022-01-27 20:26:06,377 INFO  [main] root: shared.messages.JSONMessage@1d16f93d
