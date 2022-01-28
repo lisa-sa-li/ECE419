@@ -1510,3 +1510,23 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-28 16:48:44,123 INFO  [main] root: Connection established to 127.0.0.1:8080
 2022-01-28 16:48:45,715 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":""}'
 2022-01-28 16:48:45,724 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"DELETE_SUCCESS","a":""}'
+2022-01-28 17:16:21,585 ERROR [main] root: Something went wrong! 
+java.io.IOException: Connection is already established
+	at app_kvClient.KVClient.newConnection(KVClient.java:25)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:69)
+	at app_kvClient.KVClient.run(KVClient.java:275)
+	at app_kvClient.KVClient.main(KVClient.java:288)
+2022-01-28 17:16:25,916 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 17:16:25,917 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 17:16:36,577 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","ou":""}'
+2022-01-28 17:16:36,585 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_ERROR","ou":""}'
+2022-01-28 17:16:58,918 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
+2022-01-28 17:16:58,920 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_ERROR","a":""}'
+2022-01-28 17:17:10,557 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","hey":""}'
+2022-01-28 17:17:10,559 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","hey":"queen",}'
+2022-01-28 17:17:15,175 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","hey":""}'
+2022-01-28 17:17:15,178 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","hey":"queen",}'
+2022-01-28 17:19:18,681 ERROR [main] root: Key length must be between 1 and 20.
+2022-01-28 17:30:24,594 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 17:30:24,595 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 17:30:27,631 ERROR [main] root: Key length must be between 1 and 20.

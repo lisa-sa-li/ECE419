@@ -7,6 +7,7 @@ import java.net.Socket;
 
 import org.apache.log4j.*;
 
+import shared.exceptions.KeyValueTooLongException;
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
 import shared.messages.TextMessage;
@@ -159,6 +160,13 @@ public class ServerConnection implements IServerConnection, Runnable {
 		switch (status) {
 			case PUT:
 				try {
+					// check key, value length
+					if (key.length() > 20) {
+						throw new KeyValueTooLongException("Key too long : " + key);
+					}
+					if (value.length() > 120000) {
+						throw new KeyValueTooLongException("Value too long : " + value);
+					}
 					handleMessageStatus = this.kvServer.putKV(key, value);
 					logger.info(handleMessageStatus.name() + ": key " + key + " & value " + value);
 				} catch (Exception e) {

@@ -45,6 +45,38 @@ public class InteractionTest extends TestCase {
 	}
 
 	@Test
+	public void testPutManyTerms() {
+		String key = "foo3";
+		String value = "bar2 with spaces!";
+		JSONMessage response = null;
+		Exception ex = null;
+
+		try {
+			response = kvClient.put(key, value);
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && response.getStatus() == StatusType.PUT_SUCCESS);
+	}
+
+	@Test
+	public void testPutLongKey() {
+		String key = "tooooloooooooooooooong";
+		String value = "bar2";
+		JSONMessage response = null;
+		Exception ex = null;
+
+		try {
+			response = kvClient.put(key, value);
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && response.getStatus() == StatusType.PUT_ERROR);
+	}
+
+	@Test
 	public void testPutDisconnected() {
 		kvClient.disconnect();
 		String key = "foo";
