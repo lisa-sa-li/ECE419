@@ -64,7 +64,6 @@ public class ClientConnection implements IClientConnection {
 		int index = 0;
 		byte[] msgBytes = null, tmp = null;
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
-		System.out.println("RECEIVING");
 
 		/* read first char from stream */
 		byte read = (byte) input.read();
@@ -129,13 +128,11 @@ public class ClientConnection implements IClientConnection {
 			return null;
 		}
 		// deserialize
-		System.out.println("ABOUT TO DESERIALIZE");
 		json.deserialize(jsonStr);
 		logger.info("RECEIVE \t<"
 				+ clientSocket.getInetAddress().getHostAddress() + ":"
 				+ clientSocket.getPort() + ">: '"
 				+ json.getJSON().trim() + "'");
-		System.out.println("RETURN JSON: " + json);
 
 		return json;
 	}
