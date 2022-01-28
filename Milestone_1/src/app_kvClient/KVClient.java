@@ -9,12 +9,15 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.SocketException;
 
 public class KVClient implements IKVClient, Runnable {
     private static Logger logger = Logger.getRootLogger();
     private static final String PROMPT = "KVClient> ";
     private KVStore kvStore;
     private boolean stop = false;
+    String hostname;
+    int port;
 
     @Override
     public void newConnection(String hostname, int port) throws Exception {
@@ -28,6 +31,8 @@ public class KVClient implements IKVClient, Runnable {
             this.kvStore = null;
             throw e;
         }
+        this.hostname = hostname;
+        this.port = port;
     }
 
     @Override
@@ -91,10 +96,21 @@ public class KVClient implements IKVClient, Runnable {
                                 if (valStr.length() <= 120000) {
                                     try {
                                         JSONMessage msg = this.kvStore.put(tokens[1], valStr);
-                                        // PLACE status message here
-                                        // logger.info(msg);
+                                        System.out.println(
+                                                msg.getStatus() + "\t key: " + msg.getKey() + " & value: "
+                                                        + msg.getValue());
+                                    } catch (SocketException se) {
+                                        try {
+                                            this.kvStore.connect();
+                                            JSONMessage msg = this.kvStore.put(tokens[1], valStr);
+                                            System.out.println(
+                                                    msg.getStatus() + "\t key: " + msg.getKey() + " & value: "
+                                                            + msg.getValue());
+                                        } catch (Exception e) {
+                                            System.out.println("Socket connection to server is closed.");
+                                        }
                                     } catch (Exception e) {
-                                        logger.error("Error putting key: " + e);
+                                        System.out.println("Error putting key: " + e);
                                     }
                                 } else {
                                     logger.error("Value length must be max 120000."); // Exact size of val bytes idk
@@ -103,11 +119,19 @@ public class KVClient implements IKVClient, Runnable {
                                 // DELETE key,value pair
                                 try {
                                     JSONMessage msg = this.kvStore.put(tokens[1], "null");
-                                    // PLACE status message here
-                                    // logger.info(msg);
+                                    System.out.println(msg.getStatus() + "\t key: " + msg.getKey());
+                                } catch (SocketException se) {
+                                    try {
+                                        this.kvStore.connect();
+                                        JSONMessage msg = this.kvStore.put(tokens[1], "null");
+                                        System.out.println(msg.getStatus() + "\t key: " + msg.getKey());
+                                    } catch (Exception e) {
+                                        System.out.println("Socket connection to server is closed.");
+                                    }
                                 } catch (Exception e) {
-                                    logger.error("Error deleteing key: " + e);
+                                    System.out.println("Error deleting key: " + e);
                                 }
+
                             } else {
                                 logger.error("No message is passed!");
                             }

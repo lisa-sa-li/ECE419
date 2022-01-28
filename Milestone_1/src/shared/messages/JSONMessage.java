@@ -137,7 +137,8 @@ public class JSONMessage implements KVMessage, Serializable {
         while (messageTokens.hasMoreTokens()) {
             // add tokens to Array
             String nextTok = messageTokens.nextToken();
-            tokens[count++]= nextTok;
+            // System.out.println(nextTok);
+            tokens[count++] = nextTok;
         }
 
         String status = tokens[1];
