@@ -1,12 +1,7 @@
 Manifest-Version: 1.0
 Ant-Version: Apache Ant 1.10.12
-<<<<<<< HEAD
 Created-By: 17.0.1+1 (Homebrew)
 built-by: irenapetkovic
-=======
-Created-By: 1.8.0_321-b07 (Oracle Corporation)
-built-by: lisali
->>>>>>> 8004dd19dc57c59425959e1f98b03702faa86692
 Main-Class: app_kvServer.KVServer
 Class-Path: ${project.classpath}
 

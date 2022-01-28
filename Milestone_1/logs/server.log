@@ -1033,3 +1033,53 @@ java.net.SocketException: Connection reset
 2022-01-28 12:52:28,792 INFO  [Thread-0] root: SEND 	<127.0.0.1:53696>: '{"status":"PUT_UPDATE","a":"kjkjkjlkjlk",}'
 2022-01-28 12:52:28,793 DEBUG [Thread-0] root: jsonStr is null in ServerConnection
 >>>>>>> 8004dd19dc57c59425959e1f98b03702faa86692
+2022-01-28 13:16:55,675 INFO  [main] root: Directory already exists.
+2022-01-28 13:16:55,675 INFO  [main] root: File already exists.
+2022-01-28 13:16:55,676 INFO  [main] root: Initialize server ...
+2022-01-28 13:16:55,699 INFO  [main] root: Server listening on port: 8080
+2022-01-28 13:16:59,074 INFO  [main] root: Connected to localhost on port 55288
+2022-01-28 13:16:59,075 INFO  [main] root: Connected to localhost on port 55288
+2022-01-28 13:17:06,238 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:55288>: '{"status":"PUT","flower":"ditch",}'
+2022-01-28 13:17:06,247 INFO  [Thread-0] root: Completed 'put' operation into storage server
+2022-01-28 13:17:06,247 INFO  [Thread-0] root: PUT_SUCCESS: key flower & value ditch
+2022-01-28 13:17:06,247 INFO  [Thread-0] root: SEND 	<127.0.0.1:55288>: '{"status":"PUT_SUCCESS","flower":"ditch",}'
+2022-01-28 13:17:12,789 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:55288>: '{"status":"GET","flower":""}'
+2022-01-28 13:17:12,792 INFO  [Thread-0] root: Completed 'get' operation into storage server
+2022-01-28 13:17:12,792 INFO  [Thread-0] root: GET_SUCCESS: key flower & value ditch
+2022-01-28 13:17:12,793 INFO  [Thread-0] root: SEND 	<127.0.0.1:55288>: '{"status":"GET_SUCCESS","flower":"ditch",}'
+2022-01-28 13:17:20,463 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:55288>: '{"status":"PUT","honey":"smuggler",}'
+2022-01-28 13:17:20,464 INFO  [Thread-0] root: Completed 'put' operation into storage server
+2022-01-28 13:17:20,465 INFO  [Thread-0] root: PUT_SUCCESS: key honey & value smuggler
+2022-01-28 13:17:20,467 INFO  [Thread-0] root: SEND 	<127.0.0.1:55288>: '{"status":"PUT_SUCCESS","honey":"smuggler",}'
+2022-01-28 13:17:25,887 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:55288>: '{"status":"PUT","honey":""}'
+2022-01-28 13:17:25,888 INFO  [Thread-0] root: Completed 'put' operation into storage server
+2022-01-28 13:17:25,888 INFO  [Thread-0] root: DELETE_SUCCESS: key honey & value null
+2022-01-28 13:17:25,888 INFO  [Thread-0] root: SEND 	<127.0.0.1:55288>: '{"status":"DELETE_SUCCESS","honey":""}'
+2022-01-28 13:17:29,722 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:55288>: '{"status":"PUT","honey":"drops",}'
+2022-01-28 13:17:29,723 INFO  [Thread-0] root: Completed 'put' operation into storage server
+2022-01-28 13:17:29,723 INFO  [Thread-0] root: PUT_SUCCESS: key honey & value drops
+2022-01-28 13:17:29,723 INFO  [Thread-0] root: SEND 	<127.0.0.1:55288>: '{"status":"PUT_SUCCESS","honey":"drops",}'
+2022-01-28 13:17:34,071 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:55288>: '{"status":"PUT","honey":"smuggler",}'
+2022-01-28 13:17:34,072 INFO  [Thread-0] root: Completed 'put' operation into storage server
+2022-01-28 13:17:34,072 INFO  [Thread-0] root: PUT_UPDATE: key honey & value smuggler
+2022-01-28 13:17:34,075 INFO  [Thread-0] root: SEND 	<127.0.0.1:55288>: '{"status":"PUT_UPDATE","honey":"smuggler",}'
+2022-01-28 13:17:54,519 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:55288>: '{"status":"PUT","angel":"flaps",}'
+2022-01-28 13:17:54,520 INFO  [Thread-0] root: Completed 'put' operation into storage server
+2022-01-28 13:17:54,520 INFO  [Thread-0] root: PUT_SUCCESS: key angel & value flaps
+2022-01-28 13:17:54,520 INFO  [Thread-0] root: SEND 	<127.0.0.1:55288>: '{"status":"PUT_SUCCESS","angel":"flaps",}'
+2022-01-28 13:26:22,902 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:55288>: '{"status":"PUT","angle":"scorne ha",}'
+2022-01-28 13:26:22,904 INFO  [Thread-0] root: Completed 'put' operation into storage server
+2022-01-28 13:26:22,905 INFO  [Thread-0] root: PUT_SUCCESS: key angle & value scorne ha
+2022-01-28 13:26:22,905 INFO  [Thread-0] root: SEND 	<127.0.0.1:55288>: '{"status":"PUT_SUCCESS","angle":"scorne ha",}'
+2022-01-28 13:26:29,791 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:55288>: '{"status":"PUT","angel":"scornkfjghdkfjhgd",}'
+2022-01-28 13:26:29,792 INFO  [Thread-0] root: Completed 'put' operation into storage server
+2022-01-28 13:26:29,792 INFO  [Thread-0] root: PUT_UPDATE: key angel & value scornkfjghdkfjhgd
+2022-01-28 13:26:29,793 INFO  [Thread-0] root: SEND 	<127.0.0.1:55288>: '{"status":"PUT_UPDATE","angel":"scornkfjghdkfjhgd",}'
+2022-01-28 13:26:39,495 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:55288>: '{"status":"PUT","angel":"skjd kdjfgh",}'
+2022-01-28 13:26:39,499 INFO  [Thread-0] root: Completed 'put' operation into storage server
+2022-01-28 13:26:39,499 INFO  [Thread-0] root: PUT_UPDATE: key angel & value skjd kdjfgh
+2022-01-28 13:26:39,501 INFO  [Thread-0] root: SEND 	<127.0.0.1:55288>: '{"status":"PUT_UPDATE","angel":"skjd kdjfgh",}'
+2022-01-28 13:26:51,458 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:55288>: '{"status":"PUT","angel":"flaps",}'
+2022-01-28 13:26:51,459 INFO  [Thread-0] root: Completed 'put' operation into storage server
+2022-01-28 13:26:51,459 INFO  [Thread-0] root: PUT_UPDATE: key angel & value flaps
+2022-01-28 13:26:51,460 INFO  [Thread-0] root: SEND 	<127.0.0.1:55288>: '{"status":"PUT_UPDATE","angel":"flaps",}'

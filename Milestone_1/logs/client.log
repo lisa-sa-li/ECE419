@@ -1253,3 +1253,28 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-28 12:52:28,788 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"kjkjkjlkjlk",}'
 2022-01-28 12:52:28,788 DEBUG [main] root: jsonStr is null in ClientConnection
 >>>>>>> 8004dd19dc57c59425959e1f98b03702faa86692
+2022-01-28 13:16:59,073 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 13:16:59,074 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 13:17:06,222 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","flower":"ditch",}'
+2022-01-28 13:17:06,248 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","flower":"ditch",}'
+2022-01-28 13:17:12,787 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","flower":""}'
+2022-01-28 13:17:12,795 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","flower":"ditch",}'
+2022-01-28 13:17:20,462 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","honey":"smuggler",}'
+2022-01-28 13:17:20,469 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","honey":"smuggler",}'
+2022-01-28 13:17:25,886 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","honey":""}'
+2022-01-28 13:17:25,889 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"DELETE_SUCCESS","honey":""}'
+2022-01-28 13:17:29,721 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","honey":"drops",}'
+2022-01-28 13:17:29,725 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","honey":"drops",}'
+2022-01-28 13:17:34,070 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","honey":"smuggler",}'
+2022-01-28 13:17:34,076 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","honey":"smuggler",}'
+2022-01-28 13:17:54,519 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","angel":"flaps",}'
+2022-01-28 13:17:54,521 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","angel":"flaps",}'
+2022-01-28 13:26:22,900 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","angle":"scorne ha",}'
+2022-01-28 13:26:22,906 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","angle":"scorne ha",}'
+2022-01-28 13:26:29,787 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","angel":"scornkfjghdkfjhgd",}'
+2022-01-28 13:26:29,794 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","angel":"scornkfjghdkfjhgd",}'
+2022-01-28 13:26:34,451 ERROR [main] root: Unknown command.
+2022-01-28 13:26:39,494 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","angel":"skjd kdjfgh",}'
+2022-01-28 13:26:39,504 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","angel":"skjd kdjfgh",}'
+2022-01-28 13:26:51,457 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","angel":"flaps",}'
+2022-01-28 13:26:51,460 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","angel":"flaps",}'
