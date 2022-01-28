@@ -3,7 +3,9 @@ package client;
 import org.apache.log4j.Logger;
 import java.net.Socket;
 import java.io.IOException;
+
 import shared.messages.JSONMessage;
+import shared.messages.KVMessage.StatusType;
 
 import app_kvClient.ClientConnection;
 
@@ -61,7 +63,7 @@ public class KVStore implements KVCommInterface {
 	@Override
 	public JSONMessage put(String key, String value) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
-		jsonMessage.setMessage("PUT", key, value);
+		jsonMessage.setMessage(StatusType.PUT.name(), key, value);
 		this.clientConnection.sendJSONMessage(jsonMessage);
 		return this.clientConnection.receiveJSONMessage();
 	}
@@ -69,7 +71,7 @@ public class KVStore implements KVCommInterface {
 	@Override
 	public JSONMessage get(String key) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
-		jsonMessage.setMessage("GET", key, "");
+		jsonMessage.setMessage(StatusType.GET.name(), key, "");
 		this.clientConnection.sendJSONMessage(jsonMessage);
 		return this.clientConnection.receiveJSONMessage();
 	}
