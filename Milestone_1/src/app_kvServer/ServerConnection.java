@@ -142,6 +142,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		String jsonStr = json.byteToString(msgBytes);
 		if (jsonStr == null || jsonStr.trim().isEmpty()) {
 			// TODO?? null message
+			logger.debug("jsonStr is null :/");
 			return null;
 		}
 		// deserialize
@@ -202,9 +203,9 @@ public class ServerConnection implements IServerConnection, Runnable {
 			input = clientSocket.getInputStream();
 
 			// sendTextMessage(new TextMessage(
-			// 		"Connection to MSRG Echo server established: "
-			// 				+ clientSocket.getLocalAddress() + " / "
-			// 				+ clientSocket.getLocalPort()));
+			// "Connection to MSRG Echo server established: "
+			// + clientSocket.getLocalAddress() + " / "
+			// + clientSocket.getLocalPort()));
 			while (this.isOpen) {
 				try {
 					input = clientSocket.getInputStream();
