@@ -54,6 +54,7 @@ public class KVServer implements IKVServer, Runnable {
 	@Override
 	public String getHostname() {
 		// TODO Auto-generated method stub
+		// this.clientSocket.getInetAddress().getHostName()
 		return null;
 	}
 
@@ -83,7 +84,7 @@ public class KVServer implements IKVServer, Runnable {
 	public String getKV(String key) throws Exception {
 		String value = this.persistantStorage.get(key);
 		if (value == null) {
-			logger.warn(key + " is not found");
+			logger.warn("Key " + key + " is not found");
 			throw new Exception("Key is not found");
 		}
 		return value;

@@ -51,9 +51,8 @@ public class ServerConnection implements IServerConnection, Runnable {
 			output = this.clientSocket.getOutputStream();
 			input = this.clientSocket.getInputStream();
 
-			logger.info("Connected to "
-					+ this.clientSocket.getInetAddress().getHostName()
-					+ " on port " + this.clientSocket.getPort());
+			logger.info("Connected to " + this.clientSocket.getInetAddress().getHostName() + " on port "
+					+ this.clientSocket.getPort());
 		} catch (IOException e) {
 			logger.error("Error! Unable to establish connection. \n", e);
 		}
@@ -64,20 +63,8 @@ public class ServerConnection implements IServerConnection, Runnable {
 		byte[] jsonBytes = json.getJSONByte();
 		output.write(jsonBytes, 0, jsonBytes.length);
 		output.flush();
-		logger.info("SEND \t<"
-				+ clientSocket.getInetAddress().getHostAddress() + ":"
-				+ clientSocket.getPort() + ">: '"
+		logger.info("SEND \t<" + clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort() + ">: '"
 				+ json.getJSON() + "'");
-	}
-
-	public void sendTextMessage(TextMessage msg) throws IOException {
-		byte[] msgBytes = msg.getMsgBytes();
-		output.write(msgBytes, 0, msgBytes.length);
-		output.flush();
-		logger.info("SEND \t<"
-				+ clientSocket.getInetAddress().getHostAddress() + ":"
-				+ clientSocket.getPort() + ">: '"
-				+ msg.getMsg() + "'");
 	}
 
 	@Override
@@ -142,10 +129,8 @@ public class ServerConnection implements IServerConnection, Runnable {
 		}
 		// deserialize
 		json.deserialize(jsonStr);
-		logger.info("RECEIVE \t<"
-				+ clientSocket.getInetAddress().getHostAddress() + ":"
-				+ clientSocket.getPort() + ">: '"
-				+ json.getJSON().trim() + "'");
+		logger.info("RECEIVE \t<" + clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort()
+				+ ">: '" + json.getJSON().trim() + "'");
 		return json;
 	}
 
@@ -190,20 +175,13 @@ public class ServerConnection implements IServerConnection, Runnable {
 	public void run() {
 		// while connection is open, listen for messages
 		try {
-			output = clientSocket.getOutputStream();
-			input = clientSocket.getInputStream();
-
 			while (this.isOpen) {
 				try {
-					input = clientSocket.getInputStream();
-					output = clientSocket.getOutputStream();
-
 					JSONMessage recievedMesage = receiveJSONMessage();
 					if (recievedMesage != null) {
 						JSONMessage sendMessage = handleMessage(recievedMesage);
 						sendJSONMessage(sendMessage);
 					}
-
 				} catch (IOException e) {
 					logger.error("Server connection lost: ", e);
 					this.isOpen = false;
@@ -211,9 +189,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 					logger.error(e);
 				}
 			}
-		} catch (IOException ioe) {
-			logger.error("Error! Connection could not be established!", ioe);
-
 		} finally {
 			try {
 				// close connection

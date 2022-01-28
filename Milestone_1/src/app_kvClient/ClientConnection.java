@@ -47,9 +47,7 @@ public class ClientConnection implements IClientConnection {
 
 		output.write(jsonBytes, 0, jsonBytes.length);
 		output.flush();
-		logger.info("SEND \t<"
-				+ clientSocket.getInetAddress().getHostAddress() + ":"
-				+ clientSocket.getPort() + ">: '"
+		logger.info("SEND \t<" + clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort() + ">: '"
 				+ json.getJSON() + "'");
 	}
 
@@ -122,10 +120,8 @@ public class ClientConnection implements IClientConnection {
 		}
 		// deserialize
 		json.deserialize(jsonStr);
-		logger.info("RECEIVE \t<"
-				+ clientSocket.getInetAddress().getHostAddress() + ":"
-				+ clientSocket.getPort() + ">: '"
-				+ json.getJSON().trim() + "'");
+		logger.info("RECEIVE \t<" + clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort()
+				+ ">: '" + json.getJSON().trim() + "'");
 
 		return json;
 	}

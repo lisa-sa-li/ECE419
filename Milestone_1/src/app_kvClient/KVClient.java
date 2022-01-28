@@ -92,9 +92,9 @@ public class KVClient implements IKVClient, Runnable {
                                     try {
                                         JSONMessage msg = this.kvStore.put(tokens[1], valStr);
                                         // PLACE status message here
-                                        logger.info(msg);
+                                        // logger.info(msg);
                                     } catch (Exception e) {
-                                        logger.error(e);
+                                        logger.error("Error putting key: " + e);
                                     }
                                 } else {
                                     logger.error("Value length must be max 120000."); // Exact size of val bytes idk
@@ -104,9 +104,9 @@ public class KVClient implements IKVClient, Runnable {
                                 try {
                                     JSONMessage msg = this.kvStore.put(tokens[1], "null");
                                     // PLACE status message here
-                                    logger.info(msg);
+                                    // logger.info(msg);
                                 } catch (Exception e) {
-                                    logger.error(e);
+                                    logger.error("Error deleteing key: " + e);
                                 }
                             } else {
                                 logger.error("No message is passed!");
@@ -126,9 +126,9 @@ public class KVClient implements IKVClient, Runnable {
                             try {
                                 JSONMessage msg = this.kvStore.get(key);
                                 // PLACE status message here
-                                logger.info(msg);
+                                // logger.info(msg);
                             } catch (Exception e) {
-                                logger.error(e);
+                                logger.error("Error getting key: " + e);
                             }
                         } else {
                             logger.error("Key length must be between 1 and 20.");
