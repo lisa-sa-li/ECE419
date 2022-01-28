@@ -66,7 +66,6 @@ public class ClientConnection implements IClientConnection {
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
 		System.out.println("RECEIVING");
 
-
 		/* read first char from stream */
 		byte read = (byte) input.read();
 		boolean reading = true;
@@ -77,7 +76,6 @@ public class ClientConnection implements IClientConnection {
 		// TextMessage msg = new TextMessage("");
 		// return msg;
 		// }
-		System.out.println("swag");
 
 		while (/* read != 13 && */ read != 10 && read != -1 && reading) {/* CR, LF, error */
 			/* if buffer filled, copy to msg array */
@@ -132,13 +130,19 @@ public class ClientConnection implements IClientConnection {
 		}
 		// deserialize
 		System.out.println("ABOUT TO DESERIALIZE");
+
+		if (jsonStr == null || jsonStr.trim().isEmpty()) {
+			// TODO?? null message
+			return null;
+		}
+
 		json.deserialize(jsonStr);
 		logger.info("RECEIVE \t<"
 				+ clientSocket.getInetAddress().getHostAddress() + ":"
 				+ clientSocket.getPort() + ">: '"
 				+ json.getJSON().trim() + "'");
 		System.out.println("RETURN JSON: " + json);
-		
+
 		return json;
 	}
 
