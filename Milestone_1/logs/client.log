@@ -1085,3 +1085,124 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-27 22:22:24,933 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
 2022-01-27 22:22:24,948 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","a":"b",}'
 2022-01-27 22:22:24,952 INFO  [main] root: shared.messages.JSONMessage@1d16f93d
+2022-01-28 12:12:19,941 ERROR [main] root: Invalid number of parameters!
+2022-01-28 12:12:23,013 ERROR [main] root: Unknown command.
+2022-01-28 12:12:24,334 ERROR [main] root: Error! Unable to establish connection. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:255)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:237)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+	at client.KVStore.connect(KVStore.java:33)
+	at app_kvClient.KVClient.newConnection(KVClient.java:26)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:64)
+	at app_kvClient.KVClient.run(KVClient.java:251)
+	at app_kvClient.KVClient.main(KVClient.java:264)
+2022-01-28 12:12:24,336 ERROR [main] root: Something went wrong! 
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:255)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:237)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+	at client.KVStore.connect(KVStore.java:33)
+	at app_kvClient.KVClient.newConnection(KVClient.java:26)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:64)
+	at app_kvClient.KVClient.run(KVClient.java:251)
+	at app_kvClient.KVClient.main(KVClient.java:264)
+2022-01-28 12:12:43,719 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 12:12:43,719 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 12:12:58,887 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hello":"world",}'
+2022-01-28 12:12:58,894 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","hello":"world",}'
+2022-01-28 12:12:58,894 INFO  [main] root: shared.messages.JSONMessage@369f73a2
+2022-01-28 12:13:05,325 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","hello":""}'
+2022-01-28 12:13:05,325 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:13:05,325 INFO  [main] root: 
+2022-01-28 12:13:14,296 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hello":"world",}'
+2022-01-28 12:13:14,296 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","hello":"world",}'
+2022-01-28 12:13:14,296 INFO  [main] root: shared.messages.JSONMessage@1f28c152
+2022-01-28 12:13:19,382 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","hello":""}'
+2022-01-28 12:13:19,383 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:13:19,383 INFO  [main] root: 
+2022-01-28 12:20:44,703 INFO  [main] root: Tearing down the connection ...
+2022-01-28 12:20:44,704 INFO  [main] root: Application exit.
+2022-01-28 12:21:30,076 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 12:21:30,077 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 12:21:36,996 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","lskdfj":"oirewjflk",}'
+2022-01-28 12:21:37,001 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","lskdfj":"oirewjflk",}'
+2022-01-28 12:21:44,632 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","lskdfj":""}'
+2022-01-28 12:21:44,632 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:21:54,797 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","lskdfj":""}'
+2022-01-28 12:21:54,797 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","lskdfj":"oirewjflk",}'
+2022-01-28 12:22:25,020 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hello":"world",}'
+2022-01-28 12:22:25,020 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:22:34,950 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hello":"hi you",}'
+2022-01-28 12:22:34,950 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","lskdfj":""}'
+2022-01-28 12:22:55,227 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","yo":"man",}'
+2022-01-28 12:22:55,228 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:23:05,200 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","yo":""}'
+2022-01-28 12:23:05,201 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","hello":"world",}'
+2022-01-28 12:23:16,394 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","yo":""}'
+2022-01-28 12:23:16,395 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:23:22,570 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","hello":""}'
+2022-01-28 12:23:22,571 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","hello":"hi you",}'
+2022-01-28 12:23:37,513 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","hello":""}'
+2022-01-28 12:23:37,514 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:26:08,923 INFO  [main] root: Tearing down the connection ...
+2022-01-28 12:26:08,923 INFO  [main] root: Application exit.
+2022-01-28 12:26:19,698 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 12:26:19,698 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 12:26:25,661 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hello":"auntie",}'
+2022-01-28 12:26:25,668 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","hello":"auntie",}'
+2022-01-28 12:27:02,813 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","it":"nice day",}'
+2022-01-28 12:27:02,814 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:28:35,901 INFO  [main] root: Tearing down the connection ...
+2022-01-28 12:28:35,901 INFO  [main] root: Application exit.
+2022-01-28 12:28:48,733 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 12:28:48,733 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 12:28:52,100 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hello":"world",}'
+2022-01-28 12:28:52,109 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","hello":"world",}'
+2022-01-28 12:32:25,091 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","mewo":"car",}'
+2022-01-28 12:32:25,091 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:32:43,717 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","ok":"man",}'
+2022-01-28 12:32:43,718 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","mewo":"car",}'
+2022-01-28 12:33:06,447 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","mewo":""}'
+2022-01-28 12:33:06,447 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:40:16,265 INFO  [main] root: Tearing down the connection ...
+2022-01-28 12:40:16,265 INFO  [main] root: Application exit.
+2022-01-28 12:40:26,370 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 12:40:26,371 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 12:40:31,855 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hi":"there",}'
+2022-01-28 12:40:31,861 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","hi":"there",}'
+2022-01-28 12:40:38,613 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","i":"am",}'
+2022-01-28 12:40:38,614 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:41:27,327 INFO  [main] root: Tearing down the connection ...
+2022-01-28 12:41:27,327 INFO  [main] root: Application exit.
+2022-01-28 12:41:35,970 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 12:41:35,971 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 12:41:40,001 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","me":"good",}'
+2022-01-28 12:41:40,006 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","me":"good",}'
+2022-01-28 12:41:44,726 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","you":"bad",}'
+2022-01-28 12:41:44,727 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:45:19,166 INFO  [main] root: Tearing down the connection ...
+2022-01-28 12:45:19,166 INFO  [main] root: Application exit.
+2022-01-28 12:45:27,084 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 12:45:27,085 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 12:45:35,093 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","nice":"cat",}'
+2022-01-28 12:45:35,101 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","nice":"cat",}'
+2022-01-28 12:45:41,498 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","cute":"dog",}'
+2022-01-28 12:45:41,498 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:46:30,772 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","sup":"hi",}'
+2022-01-28 12:46:30,772 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","cute":"dog",}'
+2022-01-28 13:16:07,344 INFO  [main] root: Tearing down the connection ...
+2022-01-28 13:16:07,344 INFO  [main] root: Application exit.
