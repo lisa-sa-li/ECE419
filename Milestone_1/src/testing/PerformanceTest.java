@@ -84,11 +84,13 @@ public class PerformanceTest {
             double percentageGET = 100.0 - percentagePUT;
             double latency = 1000.0 * (totalDurationPUT + totalDurationGET) / numRequests;
             System.out.println("The latency of " + percentagePUT + "% PUT requests and " + percentageGET + "% GET requests is: " + latency);
+            /*
             try {
                 this.kvServer.clearStorage();
             } catch (Exception e) {
                 System.out.println(e);
             }
+            */
             break;
         }
     }
