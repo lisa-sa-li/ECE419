@@ -125,16 +125,11 @@ public class ClientConnection implements IClientConnection {
 		String jsonStr = json.byteToString(tmp);
 		if (jsonStr == null || jsonStr.trim().isEmpty()) {
 			// TODO?? null message
+			logger.debug("jsonStr is null :/");
 			return null;
 		}
 		// deserialize
 		System.out.println("ABOUT TO DESERIALIZE");
-
-		if (jsonStr == null || jsonStr.trim().isEmpty()) {
-			// TODO?? null message
-			return null;
-		}
-
 		json.deserialize(jsonStr);
 		logger.info("RECEIVE \t<"
 				+ clientSocket.getInetAddress().getHostAddress() + ":"
