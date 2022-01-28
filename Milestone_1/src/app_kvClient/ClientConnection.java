@@ -64,7 +64,6 @@ public class ClientConnection implements IClientConnection {
 
 		// Check if stream is closed (read returns -1)
 		if (read == -1) {
-			System.out.println("HERE");
 			JSONMessage json = new JSONMessage();
 			json.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "disconnected");
 			return json;

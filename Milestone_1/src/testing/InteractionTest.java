@@ -12,30 +12,34 @@ import shared.messages.KVMessage.StatusType;
 public class InteractionTest extends TestCase {
 
 	private KVStore kvClient;
-	private KVServer kvServer;
 
 	public void setUp() {
-		kvServer = new KVServer(50000, 10, "NONE");
-		Thread testThread = new Thread(kvServer);
-		testThread.start();
 		kvClient = new KVStore("localhost", 50000);
 		try {
 			kvClient.connect();
 		} catch (Exception e) {
+			System.out.println("FAILED TO CONNECT CLIENT");
 			System.out.println(e);
 
 		}
 	}
 
 	public void tearDown() {
+		System.out.println("DISCONNECT CLIENT");
 		kvClient.disconnect();
-		kvServer.clearCache();
-		kvServer.clearStorage();
-		kvServer.close();
+		// System.out.println("CLEAR CACHE");
+		// kvServer.clearCache();
+		// System.out.println("CLEAR STORAGE");
+		// kvServer.clearStorage();
+		// System.out.println("CLOSE");
+		// kvServer.close();
+		// System.out.println("DONE");
 	}
 
 	@Test
 	public void testPut() {
+		System.out.println("TEST PUT");
+
 		String key = "foo2";
 		String value = "bar2";
 		JSONMessage response = null;
@@ -44,10 +48,8 @@ public class InteractionTest extends TestCase {
 		try {
 			response = kvClient.put(key, value);
 		} catch (Exception e) {
-			System.out.println(e);
 			ex = e;
 		}
-		System.out.println("STATUS :" + response.getStatus());
 
 		assertTrue(ex == null && response.getStatus() == StatusType.PUT_SUCCESS);
 	}
@@ -70,6 +72,8 @@ public class InteractionTest extends TestCase {
 
 	@Test
 	public void testUpdate() {
+		System.out.println("TEST UPDATE");
+
 		String key = "updateTestValue";
 		String initialValue = "initial";
 		String updatedValue = "updated";
@@ -91,6 +95,8 @@ public class InteractionTest extends TestCase {
 
 	@Test
 	public void testDelete() {
+		System.out.println("TEST DELETE");
+
 		String key = "deleteTestValue";
 		String value = "toDelete";
 
@@ -103,12 +109,15 @@ public class InteractionTest extends TestCase {
 		} catch (Exception e) {
 			ex = e;
 		}
+		System.out.println("TEST DELETE STATUS: " + response.getStatus());
 
 		assertTrue(ex == null && response.getStatus() == StatusType.DELETE_SUCCESS);
 	}
 
 	@Test
 	public void testGet() {
+		System.out.println("TEST GET");
+
 		String key = "foo";
 		String value = "bar";
 		KVMessage response = null;
@@ -126,6 +135,8 @@ public class InteractionTest extends TestCase {
 
 	@Test
 	public void testGetUnsetValue() {
+		System.out.println("TEST GET UNSET VALUE");
+
 		String key = "an unset value";
 		KVMessage response = null;
 		Exception ex = null;

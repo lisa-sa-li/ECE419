@@ -9,25 +9,10 @@ import junit.framework.TestCase;
 public class ConnectionTest extends TestCase {
 
 	private KVServer kvServer;
-
-	public void setUp() {
-		kvServer = new KVServer(50000, 10, "NONE");
-		Thread testThread = new Thread(kvServer);
-		testThread.start();
-	}
-
-	public void tearDown(){
-		kvServer.clearCache();
-		kvServer.clearStorage();
-		try{
-			kvServer.close();
-		} catch (NullPointerException e){
-			// raises error when tearing down after illegal port
-			int tmp = 0;
-		}
-	}
+	private Thread testThread;
 
 	public void testConnectionSuccess() {
+		System.out.println("TEST CONNECTION SUCCESS");
 
 		Exception ex = null;
 
@@ -38,8 +23,6 @@ public class ConnectionTest extends TestCase {
 			ex = e;
 		}
 
-		// kill client to avoid ServerSocket null error
-		kvClient.disconnect();
 		assertNull(ex);
 	}
 
@@ -53,8 +36,6 @@ public class ConnectionTest extends TestCase {
 			ex = e;
 		}
 
-		// kill client to avoid ServerSocket null error
-		kvClient.disconnect();
 		assertTrue(ex instanceof UnknownHostException);
 	}
 
@@ -68,8 +49,6 @@ public class ConnectionTest extends TestCase {
 			ex = e;
 		}
 
-		// kill client to avoid ServerSocker null error
-		kvClient.disconnect();
 		assertTrue(ex instanceof IllegalArgumentException);
 	}
 
