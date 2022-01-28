@@ -161,8 +161,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 		String value = msg.getValue();
 		StatusType status = msg.getStatus();
 
-		System.out.println("STATUS IN HANDLE MESSAGE: "+ status);
-
 		String handleMessageValue = value; // Send back the value in a PUT
 		StatusType handleMessageStatus = StatusType.NO_STATUS;
 		JSONMessage handleMessage = new JSONMessage();
@@ -181,10 +179,10 @@ public class ServerConnection implements IServerConnection, Runnable {
 				try {
 					handleMessageValue = this.kvServer.getKV(key);
 					handleMessageStatus = StatusType.GET_SUCCESS;
-					logger.info("GET_SUCCESS: key " + key + " & value " + value);
+					logger.info("GET_SUCCESS: key " + key + " & value " + handleMessageValue);
 				} catch (Exception e) {
 					handleMessageStatus = StatusType.GET_ERROR;
-					logger.info("GET_ERROR: key " + key + " & value " + value);
+					logger.info("GET_ERROR: key " + key + " & value " + handleMessageValue);
 				}
 				break;
 			default:
@@ -211,15 +209,10 @@ public class ServerConnection implements IServerConnection, Runnable {
 					input = clientSocket.getInputStream();
 					output = clientSocket.getOutputStream();
 
-					System.out.println("ABOUT TO RECEIVE MESSAGE");
 					JSONMessage recievedMesage = receiveJSONMessage();
-					System.out.println("RECEIVED");
 					if (recievedMesage != null) {
-						System.out.println("ABOUT TO HANDLE MESSAGE");
 						JSONMessage sendMessage = handleMessage(recievedMesage);
-						System.out.println("HANDLED MESSAGE");
 						sendJSONMessage(sendMessage);
-						System.out.println("SENT MESSAGE");
 					}
 
 				} catch (IOException e) {

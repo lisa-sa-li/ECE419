@@ -558,3 +558,47 @@ java.net.SocketException: Connection reset
 2022-01-27 22:09:33,208 INFO  [Thread-0] root: GET_SUCCESS: key a & value null
 2022-01-27 22:09:33,209 INFO  [Thread-0] root: SEND 	<127.0.0.1:53618>: '{"status":"GET_SUCCESS","a":"b",}'
 2022-01-27 22:09:33,209 DEBUG [Thread-0] root: jsonStr is null :/
+2022-01-27 22:15:38,981 INFO  [main] root: Directory already exists.
+2022-01-27 22:15:38,984 INFO  [main] root: File already exists.
+2022-01-27 22:15:38,986 INFO  [main] root: Initialize server ...
+2022-01-27 22:15:39,090 INFO  [main] root: Server listening on port: 8080
+2022-01-27 22:15:42,657 INFO  [main] root: Connected to localhost on port 53918
+2022-01-27 22:15:42,658 INFO  [main] root: Connected to localhost on port 53918
+2022-01-27 22:15:45,127 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:53918>: '{"status":"GET","a":""}'
+2022-01-27 22:15:45,149 INFO  [Thread-0] root: Completed 'get' operation into storage server
+2022-01-27 22:15:45,149 INFO  [Thread-0] root: GET_SUCCESS: key a & value null
+2022-01-27 22:15:45,150 INFO  [Thread-0] root: SEND 	<127.0.0.1:53918>: '{"status":"GET_SUCCESS","a":"b",}'
+2022-01-27 22:15:45,150 DEBUG [Thread-0] root: jsonStr is null :/
+2022-01-27 22:17:41,110 INFO  [main] root: Directory already exists.
+2022-01-27 22:17:41,157 INFO  [main] root: File already exists.
+2022-01-27 22:17:41,159 INFO  [main] root: Initialize server ...
+2022-01-27 22:17:41,371 INFO  [main] root: Server listening on port: 8080
+2022-01-27 22:17:45,081 INFO  [main] root: Connected to localhost on port 54024
+2022-01-27 22:17:45,085 INFO  [main] root: Connected to localhost on port 54024
+2022-01-27 22:17:47,585 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:54024>: '{"status":"GET","a":""}'
+2022-01-27 22:17:47,596 INFO  [Thread-0] root: Completed 'get' operation into storage server
+2022-01-27 22:17:47,596 INFO  [Thread-0] root: GET_SUCCESS: key a & value b
+2022-01-27 22:17:47,597 INFO  [Thread-0] root: SEND 	<127.0.0.1:54024>: '{"status":"GET_SUCCESS","a":"b",}'
+2022-01-27 22:17:47,597 DEBUG [Thread-0] root: jsonStr is null :/
+2022-01-27 22:19:39,971 INFO  [main] root: Directory already exists.
+2022-01-27 22:19:39,975 INFO  [main] root: File already exists.
+2022-01-27 22:19:39,978 INFO  [main] root: Initialize server ...
+2022-01-27 22:19:40,022 INFO  [main] root: Server listening on port: 8080
+2022-01-27 22:19:41,840 INFO  [main] root: Connected to localhost on port 54138
+2022-01-27 22:19:41,840 INFO  [main] root: Connected to localhost on port 54138
+2022-01-27 22:19:43,287 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:54138>: '{"status":"GET","a":""}'
+2022-01-27 22:19:43,292 INFO  [Thread-0] root: Completed 'get' operation into storage server
+2022-01-27 22:19:43,292 INFO  [Thread-0] root: GET_SUCCESS: key a & value b
+2022-01-27 22:19:43,293 INFO  [Thread-0] root: SEND 	<127.0.0.1:54138>: '{"status":"GET_SUCCESS","a":"b",}'
+2022-01-27 22:19:43,293 DEBUG [Thread-0] root: jsonStr is null :/
+2022-01-27 22:22:17,826 INFO  [main] root: Directory already exists.
+2022-01-27 22:22:17,830 INFO  [main] root: File already exists.
+2022-01-27 22:22:17,831 INFO  [main] root: Initialize server ...
+2022-01-27 22:22:17,953 INFO  [main] root: Server listening on port: 8080
+2022-01-27 22:22:23,051 INFO  [main] root: Connected to localhost on port 54244
+2022-01-27 22:22:23,056 INFO  [main] root: Connected to localhost on port 54244
+2022-01-27 22:22:24,941 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:54244>: '{"status":"GET","a":""}'
+2022-01-27 22:22:24,946 INFO  [Thread-0] root: Completed 'get' operation into storage server
+2022-01-27 22:22:24,946 INFO  [Thread-0] root: GET_SUCCESS: key a & value b
+2022-01-27 22:22:24,946 INFO  [Thread-0] root: SEND 	<127.0.0.1:54244>: '{"status":"GET_SUCCESS","a":"b",}'
+2022-01-27 22:22:24,947 DEBUG [Thread-0] root: jsonStr is null :/
