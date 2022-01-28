@@ -4,6 +4,9 @@ import app_kvServer.KVServer;
 import shared.messages.KVMessage.StatusType;
 import java.util.Random;
 import java.lang.Math;
+import logger.LogSetup;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 public class PerformanceTest {
 
@@ -75,6 +78,7 @@ public class PerformanceTest {
                 } else {
                     totalDurationGET += computeTimeDurationGET(key);
                 }
+                break;
             }
             double percentagePUT = ratioPUT * 100.0;
             double percentageGET = 100.0 - percentagePUT;
@@ -85,6 +89,7 @@ public class PerformanceTest {
             } catch (Exception e) {
                 System.out.println(e);
             }
+            break;
         }
     }
 
