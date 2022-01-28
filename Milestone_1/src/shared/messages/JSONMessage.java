@@ -60,6 +60,7 @@ public class JSONMessage implements KVMessage, Serializable {
     }
 
     public void setMessage(String inStatus, String inKey, String inValue) {
+        System.out.println("THIS IS THE STATUS TO SET THE MESSAGE: " + inStatus);
         setStatus(inStatus);
         setKey(inKey);
         setValue(inValue);
@@ -101,6 +102,8 @@ public class JSONMessage implements KVMessage, Serializable {
         // initialize string builder to create mutable string
         StringBuilder strMessage = new StringBuilder();
 
+        System.out.println("SERIALZING");
+
         // Beginning chars
         strMessage.append("{");
         String statusEntry = ("\"status\":\"" + this.status.name() + "\",");
@@ -121,11 +124,10 @@ public class JSONMessage implements KVMessage, Serializable {
 
     public void deserialize(String json) {
         this.json = json;
-        
+
         StringTokenizer messageTokens = new StringTokenizer(json, "{}:,\"");
 
-        System.out.println("JSON");
-        System.out.println(json);
+        System.out.println("JSON in deserialize method: " + json);
 
         // create Array object
         String[] tokens = null;
@@ -143,7 +145,9 @@ public class JSONMessage implements KVMessage, Serializable {
         String key = tokens[2];
         String value = tokens[3];
 
+        System.out.println("SETIING STATUS: " + status);
         setStatus(status);
+        System.out.println("SET STATUS: " + getStatus());
         setKey(key);
         setValue(value);
 

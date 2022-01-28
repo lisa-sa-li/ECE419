@@ -66,9 +66,6 @@ public class KVClient implements IKVClient, Runnable {
                             String serverHostName = tokens[1];
                             int serverPort = Integer.parseInt(tokens[2]);
                             newConnection(serverHostName, serverPort);
-                            // System.out
-                            // .println(PROMPT + "Connection established to " + serverHostName + ":" +
-                            // tokens[2]);
                             logger.info("Connection established to " + serverHostName + ":" + tokens[2]);
                         } catch (NumberFormatException nfe) {
                             logger.error("No valid address. Port must be a number! ", nfe);
@@ -82,6 +79,7 @@ public class KVClient implements IKVClient, Runnable {
                     }
                     break;
                 case "put":
+                    System.out.println("YOU ARE PUTTING");
                     if (this.kvStore != null) { // && this.kvStore.isRunning()) {
                         String key = tokens[1];
                         if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes idk

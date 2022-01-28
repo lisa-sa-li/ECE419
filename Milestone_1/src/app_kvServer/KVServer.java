@@ -182,8 +182,6 @@ public class KVServer implements IKVServer, Runnable {
 				System.out.println("Error! Invalid number of arguments!");
 				System.out.println("Usage: Server <port>!");
 			} else {
-				System.out.println("swag");
-
 				int port = Integer.parseInt(args[0]);
 				// TODO: set params for cache size and strategy
 				new KVServer(port, 1, "").run();
