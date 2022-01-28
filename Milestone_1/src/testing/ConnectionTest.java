@@ -12,11 +12,9 @@ public class ConnectionTest extends TestCase {
 	private Thread testThread;
 
 	public void testConnectionSuccess() {
-		System.out.println("TEST CONNECTION SUCCESS");
-
 		Exception ex = null;
-
 		KVStore kvClient = new KVStore("localhost", 50000);
+		
 		try {
 			kvClient.connect();
 		} catch (Exception e) {

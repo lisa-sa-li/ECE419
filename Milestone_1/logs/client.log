@@ -1442,3 +1442,71 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-28 13:29:14,224 INFO  [main] root: Tearing down the connection ...
 2022-01-28 13:29:14,224 INFO  [main] root: Application exit.
 >>>>>>> 8622d75234576a480fd4b6112d4caf03e59db4bb
+2022-01-28 16:39:10,650 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 16:39:10,651 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 16:39:16,876 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","sandra":"ghey",}'
+2022-01-28 16:39:16,883 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","sandra":"ghey",}'
+2022-01-28 16:39:27,662 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","sandra":""}'
+2022-01-28 16:39:27,666 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"DELETE_SUCCESS","sandra":""}'
+2022-01-28 16:39:53,071 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 16:39:53,071 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 16:39:56,224 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","sandra":"hit",}'
+2022-01-28 16:39:56,236 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","sandra":"hit",}'
+2022-01-28 16:40:16,952 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","sandra":"t",}'
+2022-01-28 16:40:16,955 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","sandra":"t",}'
+2022-01-28 16:40:25,344 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","sandra":""}'
+2022-01-28 16:40:25,348 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","sandra":""}'
+2022-01-28 16:41:09,429 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","sandra":""}'
+2022-01-28 16:41:09,434 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","sandra":""}'
+2022-01-28 16:41:14,458 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","sandra":""}'
+2022-01-28 16:41:14,462 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","sandra":""}'
+2022-01-28 16:41:21,594 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","ger":"j",}'
+2022-01-28 16:41:21,596 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","ger":"j",}'
+2022-01-28 16:41:24,764 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","ger":""}'
+2022-01-28 16:41:24,768 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","ger":""}'
+2022-01-28 16:41:35,487 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 16:41:35,488 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 16:41:39,759 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","he":""}'
+2022-01-28 16:41:39,762 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","he":""}'
+2022-01-28 16:41:48,148 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","he":"j",}'
+2022-01-28 16:41:48,151 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","he":"j",}'
+2022-01-28 16:41:50,535 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","he":""}'
+2022-01-28 16:41:50,538 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","he":""}'
+2022-01-28 16:42:16,009 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 16:42:16,010 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 16:42:18,786 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","sandra":""}'
+2022-01-28 16:42:18,795 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","sandra":""}'
+2022-01-28 16:42:27,176 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","he":""}'
+2022-01-28 16:42:27,179 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","he":""}'
+2022-01-28 16:43:24,372 WARN  [main] root: Not connected to any store.
+2022-01-28 16:43:26,785 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 16:43:26,786 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 16:43:28,254 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"b",}'
+2022-01-28 16:43:28,262 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","a":"b",}'
+2022-01-28 16:43:30,435 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":""}'
+2022-01-28 16:43:30,438 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","a":""}'
+2022-01-28 16:43:34,244 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
+2022-01-28 16:43:34,246 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","a":""}'
+2022-01-28 16:43:39,921 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","angel":""}'
+2022-01-28 16:43:39,923 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","angel":"flaps",}'
+2022-01-28 16:43:44,716 ERROR [main] root: Unknown command.
+2022-01-28 16:45:36,648 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 16:45:36,650 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 16:45:53,859 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":""}'
+2022-01-28 16:45:53,874 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","a":""}'
+2022-01-28 16:46:37,073 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 16:46:37,075 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 16:46:39,419 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":""}'
+2022-01-28 16:46:39,432 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","a":""}'
+2022-01-28 16:47:06,490 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 16:47:06,491 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 16:47:08,015 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":""}'
+2022-01-28 16:47:08,025 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","a":""}'
+2022-01-28 16:47:46,413 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 16:47:46,414 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 16:47:47,370 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":""}'
+2022-01-28 16:47:47,380 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","a":""}'
+2022-01-28 16:48:44,122 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 16:48:44,123 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 16:48:45,715 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":""}'
+2022-01-28 16:48:45,724 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"DELETE_SUCCESS","a":""}'

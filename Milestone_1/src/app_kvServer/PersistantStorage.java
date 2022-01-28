@@ -77,7 +77,7 @@ public class PersistantStorage implements IPersistantStorage {
 
                     // If value == "", that means to delete so we will skip appending the line
                     // Otherwise, update the value and append to file
-                    if (value.equals("")) {
+                    if (value.trim().equals("") || value == null || value.trim().equals("null")) {
                         putStatus = StatusType.DELETE_SUCCESS;
                     } else {
                         json.setValue(value);
