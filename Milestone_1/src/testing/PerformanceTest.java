@@ -2,6 +2,7 @@ package testing;
 
 import app_kvServer.KVServer;
 import shared.messages.KVMessage.StatusType;
+import app_kvServer.PersistantStorage;
 import java.util.Random;
 import java.lang.Math;
 import logger.LogSetup;
@@ -17,10 +18,11 @@ public class PerformanceTest {
     int numPUTRequests;
     int numGETRequests;
     Random randomNumber = new Random();
+    int port = 8082;
 
     public PerformanceTest() {
         try {
-            this.kvServer = new KVServer(8082, 0, "");
+            this.kvServer = new KVServer(this.port, 0, "");
         } catch (Exception e) {
             System.out.println("Couldn't connect to server. " + e);
         }
@@ -59,6 +61,7 @@ public class PerformanceTest {
         // Iterate to test different ratios of PUT and GET requests to the server
         double[] ratioListPUT = { 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2 };
         for (int i = 0; i < ratioListPUT.length; i++) {
+            PersistantStorage p = new PersistantStorage(String.valueOf(this.port));
             double ratioPUT = ratioListPUT[i];
             totalDurationPUT = 0;
             totalDurationGET = 0;
@@ -87,15 +90,15 @@ public class PerformanceTest {
             System.out.println("Total percentage of GET requests: " + percentageGET);
             System.out.println("Total number of PUT requests: " + numPUTRequests);
             System.out.println("Total number of GET requests: " + numGETRequests);
-            System.out.println("The latency of " + percentagePUT + "% PUT requests and " + percentageGET
+            System.out.println("The latency (ms) of " + percentagePUT + "% PUT requests and " + percentageGET
                     + "% GET requests is: " + latency);
-            /*
-             * try {
-             * this.kvServer.clearStorage();
-             * } catch (Exception e) {
-             * System.out.println(e);
-             * }
-             */
+
+            try {
+                this.kvServer.clearStorage();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
         }
     }
 

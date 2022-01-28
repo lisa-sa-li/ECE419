@@ -75,9 +75,9 @@ public class PersistantStorage implements IPersistantStorage {
                 if (keyFromFile.equals(key) && foundKey == false) {
                     foundKey = true;
 
-                    // If value == "null", that means to delete so we will skip appending the line
+                    // If value == "", that means to delete so we will skip appending the line
                     // Otherwise, update the value and append to file
-                    if (value.equals("null")) {
+                    if (value.equals("")) {
                         putStatus = StatusType.DELETE_SUCCESS;
                     } else {
                         json.setValue(value);
@@ -98,7 +98,7 @@ public class PersistantStorage implements IPersistantStorage {
 
             // If key does not exist in the file
             if (foundKey == false) {
-                if (value.equals("null")) {
+                if (value.equals("")) {
                     logger.info("Key does not exist and cannot 'delete'");
                     putStatus = StatusType.DELETE_ERROR;
                 } else {

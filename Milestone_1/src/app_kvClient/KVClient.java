@@ -118,12 +118,12 @@ public class KVClient implements IKVClient, Runnable {
                             } else if (tokens.length == 2) {
                                 // DELETE key,value pair
                                 try {
-                                    JSONMessage msg = this.kvStore.put(tokens[1], "null");
+                                    JSONMessage msg = this.kvStore.put(tokens[1], "");
                                     System.out.println(msg.getStatus() + "\t key: " + msg.getKey());
                                 } catch (SocketException se) {
                                     try {
                                         this.kvStore.connect();
-                                        JSONMessage msg = this.kvStore.put(tokens[1], "null");
+                                        JSONMessage msg = this.kvStore.put(tokens[1], "");
                                         System.out.println(msg.getStatus() + "\t key: " + msg.getKey());
                                     } catch (Exception e) {
                                         System.out.println("Socket connection to server is closed.");
@@ -250,8 +250,8 @@ public class KVClient implements IKVClient, Runnable {
         sb.append(PROMPT).append("put <key> <value>");
         sb.append("\t Inserts a key-value pair into the storage server data structures \n");
         sb.append("\t\t\t\t Overwrites the value with the input if the server already contains the specified key \n");
-        sb.append(PROMPT).append("put <key> null");
-        sb.append("\t Deletes the entry for the given key if <value> equals null \n");
+        sb.append(PROMPT).append("put <key>");
+        sb.append("\t Deletes the entry for the given key if <value> is empty \n");
         sb.append(PROMPT).append("get <key>");
         sb.append("\t\t Retrieves the value for the given key from the storage server \n");
         sb.append(PROMPT).append("logLevel <level>");

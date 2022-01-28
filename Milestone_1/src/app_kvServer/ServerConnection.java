@@ -152,7 +152,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		String value = msg.getValue();
 		StatusType status = msg.getStatus();
 
-		String handleMessageValue = value.isEmpty() ? "null" : value; // For PUT or DELETE, send the original value back
+		String handleMessageValue = value.isEmpty() ? "" : value; // For PUT or DELETE, send the original value back
 		StatusType handleMessageStatus = StatusType.NO_STATUS;
 		JSONMessage handleMessage = new JSONMessage();
 
