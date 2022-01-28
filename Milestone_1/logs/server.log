@@ -53,3 +53,74 @@
 2022-01-27 17:26:38,824 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:58776>: '{"status":"PUT","hi":"sandra love",}'
 2022-01-27 17:26:38,826 INFO  [Thread-0] root: PUT_ERROR: key hi & value sandra love
 2022-01-27 17:26:38,826 INFO  [Thread-0] root: SEND 	<127.0.0.1:58776>: '{"status":"PUT_ERROR","hi":""}'
+2022-01-27 20:01:16,010 INFO  [main] root: Directory already exists.
+2022-01-27 20:01:16,017 INFO  [main] root: File already exists.
+2022-01-27 20:01:16,017 INFO  [main] root: Initialize server ...
+2022-01-27 20:01:16,088 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:02:13,459 INFO  [main] root: Directory already exists.
+2022-01-27 20:02:13,460 INFO  [main] root: File already exists.
+2022-01-27 20:02:13,461 INFO  [main] root: Initialize server ...
+2022-01-27 20:02:13,497 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:02:22,140 INFO  [main] root: Connected to localhost on port 63549
+2022-01-27 20:02:22,145 INFO  [main] root: Connected to localhost on port 63549
+2022-01-27 20:02:22,154 INFO  [Thread-0] root: SEND 	<127.0.0.1:63549>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8080'
+2022-01-27 20:02:27,173 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:63549>: '{"status":"PUT","hi":"sandra love",}'
+2022-01-27 20:02:27,178 INFO  [Thread-0] root: PUT_ERROR: key hi & value sandra love
+2022-01-27 20:02:27,180 INFO  [Thread-0] root: SEND 	<127.0.0.1:63549>: '{"status":"PUT_ERROR","hi":""}'
+2022-01-27 20:03:08,008 ERROR [Thread-0] root: Server connection lost: 
+java.net.SocketException: Connection reset
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:186)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:140)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:200)
+	at app_kvServer.ServerConnection.receiveJSONMessage(ServerConnection.java:124)
+	at app_kvServer.ServerConnection.run(ServerConnection.java:208)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+2022-01-27 20:06:39,158 INFO  [main] root: Directory already exists.
+2022-01-27 20:06:39,162 INFO  [main] root: File already exists.
+2022-01-27 20:06:39,162 INFO  [main] root: Initialize server ...
+2022-01-27 20:06:39,202 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:06:46,380 INFO  [main] root: Connected to localhost on port 63790
+2022-01-27 20:06:46,384 INFO  [main] root: Connected to localhost on port 63790
+2022-01-27 20:06:46,388 INFO  [Thread-0] root: SEND 	<127.0.0.1:63790>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8080'
+2022-01-27 20:06:50,449 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:63790>: '{"status":"PUT","hi":"sandra",}'
+2022-01-27 20:06:50,452 INFO  [Thread-0] root: PUT_ERROR: key hi & value sandra
+2022-01-27 20:06:50,453 INFO  [Thread-0] root: SEND 	<127.0.0.1:63790>: '{"status":"PUT_ERROR","hi":""}'
+2022-01-27 20:08:07,505 INFO  [main] root: Directory already exists.
+2022-01-27 20:08:07,509 INFO  [main] root: File already exists.
+2022-01-27 20:08:07,511 INFO  [main] root: Initialize server ...
+2022-01-27 20:08:07,592 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:08:11,205 INFO  [main] root: Connected to localhost on port 63901
+2022-01-27 20:08:11,209 INFO  [main] root: Connected to localhost on port 63901
+2022-01-27 20:08:11,231 INFO  [Thread-0] root: SEND 	<127.0.0.1:63901>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8080'
+2022-01-27 20:08:14,648 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:63901>: '{"status":"PUT","he":"saner",}'
+2022-01-27 20:08:14,650 INFO  [Thread-0] root: PUT_ERROR: key he & value saner
+2022-01-27 20:08:14,650 INFO  [Thread-0] root: SEND 	<127.0.0.1:63901>: '{"status":"PUT_ERROR","he":""}'
+2022-01-27 20:09:42,263 INFO  [main] root: Directory already exists.
+2022-01-27 20:09:42,267 INFO  [main] root: File already exists.
+2022-01-27 20:09:42,285 INFO  [main] root: Initialize server ...
+2022-01-27 20:09:42,329 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:09:51,014 INFO  [main] root: Connected to localhost on port 63960
+2022-01-27 20:09:51,014 INFO  [main] root: Connected to localhost on port 63960
+2022-01-27 20:09:51,017 INFO  [Thread-0] root: SEND 	<127.0.0.1:63960>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8080'
+2022-01-27 20:09:53,627 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:63960>: '{"status":"PUT","hi":"sandra",}'
+2022-01-27 20:09:53,629 INFO  [Thread-0] root: PUT_ERROR: key hi & value sandra
+2022-01-27 20:09:53,630 INFO  [Thread-0] root: SEND 	<127.0.0.1:63960>: '{"status":"PUT_ERROR","hi":""}'
+2022-01-27 20:10:45,273 INFO  [main] root: Directory already exists.
+2022-01-27 20:10:45,273 INFO  [main] root: File already exists.
+2022-01-27 20:10:45,275 INFO  [main] root: Initialize server ...
+2022-01-27 20:10:45,406 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:10:55,521 INFO  [main] root: Connected to localhost on port 64041
+2022-01-27 20:10:55,522 INFO  [main] root: Connected to localhost on port 64041
+2022-01-27 20:10:55,530 INFO  [Thread-0] root: SEND 	<127.0.0.1:64041>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8080'
+2022-01-27 20:10:59,561 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:64041>: '{"status":"PUT","hey":"sandra",}'
+2022-01-27 20:10:59,566 INFO  [Thread-0] root: PUT_ERROR: key hey & value sandra
+2022-01-27 20:10:59,566 INFO  [Thread-0] root: SEND 	<127.0.0.1:64041>: '{"status":"PUT_ERROR","hey":""}'
+2022-01-27 20:13:20,461 ERROR [Thread-0] root: java.lang.IllegalArgumentException: No enum constant shared.messages.KVMessage.StatusType.status
+2022-01-27 20:14:47,221 ERROR [Thread-0] root: Server connection lost: 
+java.net.SocketException: Connection reset
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:186)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:140)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:200)
+	at app_kvServer.ServerConnection.receiveJSONMessage(ServerConnection.java:124)
+	at app_kvServer.ServerConnection.run(ServerConnection.java:208)
+	at java.base/java.lang.Thread.run(Thread.java:834)

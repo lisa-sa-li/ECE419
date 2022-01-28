@@ -77,7 +77,8 @@ public class KVStore implements KVCommInterface {
 		JSONMessage jsonMessage = new JSONMessage();
 		jsonMessage.setMessage("PUT", key, value);
 		this.clientConnection.sendJSONMessage(jsonMessage);
-
+		
+		System.out.println("About to receive");
 		return this.clientConnection.receiveJSONMessage();
 	}
 

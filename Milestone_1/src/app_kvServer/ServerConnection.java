@@ -139,7 +139,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		JSONMessage json = new JSONMessage();
 		// bytes to string
 		String jsonStr = json.byteToString(tmp);
-		if (jsonStr == null || jsonStr.strip() == ""){
+		if (jsonStr == null || jsonStr.strip().isEmpty()){
 			// TODO?? null message
 			return null;
 		} 
