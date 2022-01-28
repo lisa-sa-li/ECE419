@@ -31,11 +31,9 @@ public class PerformanceTest {
         try {
             StatusType outputStatus = this.kvServer.putKV(key, val);
         } catch (Exception e) {
-            System.out.println("Error when doing PUT request. " + e);
         }
         long endTime = System.currentTimeMillis();
-        numPUTRequests++;
-        return (endTime - startTime) / 1000;
+        return (endTime - startTime);
     }
 
     public double computeTimeDurationGET(String key) {
@@ -43,11 +41,9 @@ public class PerformanceTest {
         try {
             String getOutput = this.kvServer.getKV(key);
         } catch (Exception e) {
-            System.out.println("Error when doing GET request. " + e);
         }
         long endTime = System.currentTimeMillis();
-        numGETRequests++;
-        return (endTime - startTime) / 1000;
+        return (endTime - startTime);
     }
 
     public String generateKey() {
@@ -73,23 +69,33 @@ public class PerformanceTest {
                 double randomRatio = Math.random();
                 String key = generateKey();
                 if (randomRatio <= ratioPUT) {
-                    totalDurationPUT += computeTimeDurationPUT(key, "abcdefghijklmnopqrstuvwxyz");
+                    double outputDurationPUT = computeTimeDurationPUT(key, "abcdefghijklmnopqrstuvwxyz");
+                    totalDurationPUT += outputDurationPUT;
+                    numPUTRequests += 1;
                 } else {
-                    totalDurationGET += computeTimeDurationGET(key);
+                    double outputDurationGET = computeTimeDurationGET(key);
+                    totalDurationGET += outputDurationGET;
+                    numGETRequests += 1;
                 }
-                break;
             }
             double percentagePUT = ratioPUT * 100.0;
             double percentageGET = 100.0 - percentagePUT;
             double latency = 1000.0 * (totalDurationPUT + totalDurationGET) / numRequests;
+            System.out.println("Total duration of PUT requests: " + totalDurationPUT);
+            System.out.println("Total duration of GET requests: " + totalDurationGET);
+            System.out.println("Total percentage of PUT requests: " + percentagePUT);
+            System.out.println("Total percentage of GET requests: " + percentageGET);
+            System.out.println("Total number of PUT requests: " + numPUTRequests);
+            System.out.println("Total number of GET requests: " + numGETRequests);
             System.out.println("The latency of " + percentagePUT + "% PUT requests and " + percentageGET
                     + "% GET requests is: " + latency);
-            try {
-                this.kvServer.clearStorage();
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-            break;
+            /*
+             * try {
+             * this.kvServer.clearStorage();
+             * } catch (Exception e) {
+             * System.out.println(e);
+             * }
+             */
         }
     }
 
