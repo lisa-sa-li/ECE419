@@ -21,7 +21,9 @@ public class PersistantStorage implements IPersistantStorage {
 
     public PersistantStorage(String name) {
         this.fileName = name.trim() + "_storage.txt";
+        // System.out.println("The filename is supposed to be: " + this.fileName);
         this.pathToFile = dir + "/" + this.fileName;
+        // System.out.println("The pathToFile is supposed to be: " + this.pathToFile);
         try {
             initFile();
         } catch (Exception e) {
@@ -35,23 +37,25 @@ public class PersistantStorage implements IPersistantStorage {
         try {
             if (directory.mkdirs()) {
                 logger.info("Directory created: " + directory.getName());
+                // System.out.println("Folder created HERE");
             } else {
                 logger.info("Directory already exists.");
+                // System.out.println("Folder created THERE");
             }
         } catch (Exception e) {
             // System.err.println(e);
         }
-
         // Create file if it does not exist
         File f = new File(this.pathToFile);
         try {
             if (f.createNewFile()) {
+                // System.out.println("file created at: " + f.getAbsolutePath());
                 logger.info("File created: " + f.getName());
             } else {
                 logger.info("File already exists.");
             }
         } catch (Exception e) {
-            // System.err.println(e);
+            System.out.println("Exception: " + e);
         }
 
     }
