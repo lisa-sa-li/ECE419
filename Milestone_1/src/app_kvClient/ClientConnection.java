@@ -123,9 +123,12 @@ public class ClientConnection implements IClientConnection {
 
 		/* build final Object */
 		JSONMessage json = new JSONMessage();
-		System.out.println("JSON: " + json);
 		// bytes to string
 		String jsonStr = json.byteToString(tmp);
+		if (jsonStr == null || jsonStr.trim().isEmpty()) {
+			// TODO?? null message
+			return null;
+		}
 		// deserialize
 		System.out.println("ABOUT TO DESERIALIZE");
 		json.deserialize(jsonStr);

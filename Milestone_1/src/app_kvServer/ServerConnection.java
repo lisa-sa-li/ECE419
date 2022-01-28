@@ -196,10 +196,10 @@ public class ServerConnection implements IServerConnection, Runnable {
 			output = clientSocket.getOutputStream();
 			input = clientSocket.getInputStream();
 
-			sendTextMessage(new TextMessage(
-					"Connection to MSRG Echo server established: "
-							+ clientSocket.getLocalAddress() + " / "
-							+ clientSocket.getLocalPort()));
+			// sendTextMessage(new TextMessage(
+			// 		"Connection to MSRG Echo server established: "
+			// 				+ clientSocket.getLocalAddress() + " / "
+			// 				+ clientSocket.getLocalPort()));
 			while (this.isOpen) {
 				try {
 					input = clientSocket.getInputStream();
