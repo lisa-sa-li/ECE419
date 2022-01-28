@@ -45,6 +45,22 @@ public class InteractionTest extends TestCase {
 	}
 
 	@Test
+	public void testPutNullKey() {
+		String key = null;
+		String value = "bar2";
+		JSONMessage response = null;
+		Exception ex = null;
+
+		try {
+			response = kvClient.put(key, value);
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && response.getStatus() == StatusType.PUT_ERROR);
+	}
+
+	@Test
 	public void testPutManyTerms() {
 		String key = "foo3";
 		String value = "bar2 with spaces!";
@@ -146,6 +162,24 @@ public class InteractionTest extends TestCase {
 		}
 
 		assertTrue(ex == null && response.getValue().equals("bar"));
+	}
+
+	@Test
+	public void testGetNullKey() {
+		String key = "googone";
+		String value = "bar";
+		String nullKey = null;
+		KVMessage response = null;
+		Exception ex = null;
+
+		try {
+			kvClient.put(key, value);
+			response = kvClient.get(nullKey);
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && response.getStatus() == StatusType.GET_ERROR);
 	}
 
 	@Test

@@ -4,10 +4,12 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.security.InvalidKeyException;
 
 import org.apache.log4j.*;
 
 import shared.exceptions.KeyValueTooLongException;
+import shared.exceptions.UnexpectedValueException;
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
 import shared.messages.TextMessage;
@@ -164,6 +166,9 @@ public class ServerConnection implements IServerConnection, Runnable {
 					if (key.length() > 20) {
 						throw new KeyValueTooLongException("Key too long : " + key);
 					}
+					if (key.trim().equals("") || key == null || key.trim().equals("null")) {
+						throw new InvalidKeyException("Invalid key: " + key);
+					}
 					if (value.length() > 120000) {
 						throw new KeyValueTooLongException("Value too long : " + value);
 					}
@@ -176,6 +181,12 @@ public class ServerConnection implements IServerConnection, Runnable {
 				break;
 			case GET:
 				try {
+					if (!handleMessageValue.trim().equals("") && handleMessageValue != null && !handleMessageValue.trim().equals("null")) {
+						throw new UnexpectedValueException("Unexpected value for GET: " + value);
+					}
+					if (key.trim().equals("") || key == null || key.trim().equals("null")) {
+						throw new InvalidKeyException("Invalid key: " + key);
+					}
 					handleMessageValue = this.kvServer.getKV(key);
 					handleMessageStatus = StatusType.GET_SUCCESS;
 					logger.info("GET_SUCCESS: key " + key + " & value " + handleMessageValue);
