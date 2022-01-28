@@ -127,6 +127,7 @@ public class ClientConnection implements IClientConnection {
 		String jsonStr = json.byteToString(tmp);
 		if (jsonStr == null || jsonStr.trim().isEmpty()) {
 			// TODO?? null message
+			System.out.println("NULL: " + jsonStr);
 			return null;
 		}
 		// deserialize
