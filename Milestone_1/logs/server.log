@@ -359,3 +359,82 @@ java.net.SocketException: Connection reset
 2022-01-27 21:27:05,733 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:51484>: '{"status":"PUT","j":"k",}'
 2022-01-27 21:27:05,734 INFO  [Thread-0] root: PUT_ERROR: key j & value k
 2022-01-27 21:27:05,734 INFO  [Thread-0] root: SEND 	<127.0.0.1:51484>: '{"status":"PUT_ERROR","j":""}'
+2022-01-27 21:28:44,641 INFO  [main] root: Directory already exists.
+2022-01-27 21:28:44,647 INFO  [main] root: File already exists.
+2022-01-27 21:28:44,648 INFO  [main] root: Initialize server ...
+2022-01-27 21:28:44,831 INFO  [main] root: Server listening on port: 8080
+2022-01-27 21:28:50,067 INFO  [main] root: Connected to localhost on port 51567
+2022-01-27 21:28:50,068 INFO  [main] root: Connected to localhost on port 51567
+2022-01-27 21:28:51,651 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:51567>: '{"status":"PUT","a":"b",}'
+2022-01-27 21:28:51,658 INFO  [Thread-0] root: Completed 'put' operation into storage server
+2022-01-27 21:28:51,658 INFO  [Thread-0] root: PUT_SUCCESS: key a & value b
+2022-01-27 21:28:51,660 INFO  [Thread-0] root: SEND 	<127.0.0.1:51567>: '{"status":"PUT_SUCCESS","a":""}'
+2022-01-27 21:28:51,660 DEBUG [Thread-0] root: jsonStr is null :/
+2022-01-27 21:32:34,377 INFO  [main] root: Directory already exists.
+2022-01-27 21:32:34,377 INFO  [main] root: File already exists.
+2022-01-27 21:32:34,381 INFO  [main] root: Initialize server ...
+2022-01-27 21:32:34,429 INFO  [main] root: Server listening on port: 8080
+2022-01-27 21:32:38,174 INFO  [main] root: Connected to localhost on port 51837
+2022-01-27 21:32:38,175 INFO  [main] root: Connected to localhost on port 51837
+2022-01-27 21:32:50,235 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:51837>: '{"status":"PUT","a":"b",}'
+2022-01-27 21:32:50,244 INFO  [Thread-0] root: Completed 'put' operation into storage server
+2022-01-27 21:32:50,244 INFO  [Thread-0] root: PUT_UPDATE: key a & value b
+2022-01-27 21:32:50,246 INFO  [Thread-0] root: SEND 	<127.0.0.1:51837>: '{"status":"PUT_UPDATE","a":"b",}'
+2022-01-27 21:32:50,246 DEBUG [Thread-0] root: jsonStr is null :/
+2022-01-27 21:33:16,439 ERROR [Thread-0] root: java.lang.ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3
+2022-01-27 21:33:16,439 DEBUG [Thread-0] root: jsonStr is null :/
+2022-01-27 21:33:36,739 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:51837>: '{"status":"PUT","j":"k",}'
+2022-01-27 21:33:36,742 INFO  [Thread-0] root: Completed 'put' operation into storage server
+2022-01-27 21:33:36,743 INFO  [Thread-0] root: PUT_SUCCESS: key j & value k
+2022-01-27 21:33:36,743 INFO  [Thread-0] root: SEND 	<127.0.0.1:51837>: '{"status":"PUT_SUCCESS","j":"k",}'
+2022-01-27 21:33:36,743 DEBUG [Thread-0] root: jsonStr is null :/
+2022-01-27 21:33:45,729 ERROR [Thread-0] root: java.lang.ArrayIndexOutOfBoundsException: Index 3 out of bounds for length 3
+2022-01-27 21:33:45,730 DEBUG [Thread-0] root: jsonStr is null :/
+2022-01-27 21:40:05,253 INFO  [main] root: Directory already exists.
+2022-01-27 21:40:05,255 INFO  [main] root: File already exists.
+2022-01-27 21:40:05,258 INFO  [main] root: Initialize server ...
+2022-01-27 21:40:05,523 INFO  [main] root: Server listening on port: 8080
+2022-01-27 21:40:08,138 INFO  [main] root: Connected to localhost on port 52264
+2022-01-27 21:40:08,139 INFO  [main] root: Connected to localhost on port 52264
+2022-01-27 21:40:10,930 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:52264>: '{"status":"PUT","j":"k",}'
+2022-01-27 21:40:10,936 ERROR [Thread-0] root: Problem reading file to put.
+2022-01-27 21:40:10,936 INFO  [Thread-0] root: PUT_ERROR: key j & value null
+2022-01-27 21:40:10,937 INFO  [Thread-0] root: SEND 	<127.0.0.1:52264>: '{"status":"PUT_ERROR","j":""}'
+2022-01-27 21:40:10,937 DEBUG [Thread-0] root: jsonStr is null :/
+2022-01-27 21:40:17,619 DEBUG [Thread-0] root: No value given
+2022-01-27 21:40:17,619 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:52264>: '{"status":"GET","j":""}'
+2022-01-27 21:40:17,619 INFO  [Thread-0] root: Completed 'get' operation into storage server
+2022-01-27 21:40:17,620 WARN  [Thread-0] root: j is not found
+2022-01-27 21:40:17,620 INFO  [Thread-0] root: GET_ERROR: key j & value null
+2022-01-27 21:40:17,620 INFO  [Thread-0] root: SEND 	<127.0.0.1:52264>: '{"status":"GET_ERROR","j":""}'
+2022-01-27 21:40:17,620 DEBUG [Thread-0] root: jsonStr is null :/
+2022-01-27 21:42:52,150 INFO  [main] root: Directory already exists.
+2022-01-27 21:42:52,151 INFO  [main] root: File already exists.
+2022-01-27 21:42:52,152 INFO  [main] root: Initialize server ...
+2022-01-27 21:42:52,285 INFO  [main] root: Server listening on port: 8080
+2022-01-27 21:42:54,605 INFO  [main] root: Connected to localhost on port 52393
+2022-01-27 21:42:54,606 INFO  [main] root: Connected to localhost on port 52393
+2022-01-27 21:42:56,393 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:52393>: '{"status":"PUT","a":"b",}'
+2022-01-27 21:42:56,396 ERROR [Thread-0] root: Problem reading file to put.
+2022-01-27 21:42:56,396 INFO  [Thread-0] root: PUT_ERROR: key a & value null
+2022-01-27 21:42:56,397 INFO  [Thread-0] root: SEND 	<127.0.0.1:52393>: '{"status":"PUT_ERROR","a":""}'
+2022-01-27 21:42:56,397 DEBUG [Thread-0] root: jsonStr is null :/
+2022-01-27 21:46:09,134 ERROR [Thread-0] root: Server connection lost: 
+java.net.SocketException: Connection reset
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:186)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:140)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:200)
+	at app_kvServer.ServerConnection.receiveJSONMessage(ServerConnection.java:124)
+	at app_kvServer.ServerConnection.run(ServerConnection.java:213)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+2022-01-27 21:46:27,505 INFO  [main] root: Directory already exists.
+2022-01-27 21:46:27,507 INFO  [main] root: File already exists.
+2022-01-27 21:46:27,512 INFO  [main] root: Initialize server ...
+2022-01-27 21:46:27,679 INFO  [main] root: Server listening on port: 8080
+2022-01-27 21:46:30,481 INFO  [main] root: Connected to localhost on port 52577
+2022-01-27 21:46:30,482 INFO  [main] root: Connected to localhost on port 52577
+2022-01-27 21:46:32,955 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:52577>: '{"status":"PUT","a":"b",}'
+2022-01-27 21:46:32,969 ERROR [Thread-0] root: Problem reading file to put.
+2022-01-27 21:46:32,969 INFO  [Thread-0] root: PUT_ERROR: key a & value null
+2022-01-27 21:46:32,971 INFO  [Thread-0] root: SEND 	<127.0.0.1:52577>: '{"status":"PUT_ERROR","a":""}'
+2022-01-27 21:46:32,972 DEBUG [Thread-0] root: jsonStr is null :/

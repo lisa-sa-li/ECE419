@@ -4,8 +4,11 @@ import java.io.Serializable;
 import java.util.StringTokenizer;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.*;
 
 public class JSONMessage implements KVMessage, Serializable {
+
+	private static Logger logger = Logger.getRootLogger();
 
     private static final long serialVersionUID = 5549512212003782618L;
     private static final char LINE_FEED = 0x0A;
@@ -121,6 +124,7 @@ public class JSONMessage implements KVMessage, Serializable {
     }
 
     public void deserialize(String inJSON) {
+        // trim newlines
         inJSON = inJSON.trim();
         this.json = inJSON;
 
@@ -141,13 +145,20 @@ public class JSONMessage implements KVMessage, Serializable {
 
         String status = tokens[1];
         String key = tokens[2];
-        String value = tokens[3];
+        try{
+            // for deletion
+            String value = tokens[3];
+        } catch (IndexOutOfBoundsException iobe) {
+            // do nothing
+            System.out.println("NULL VALUE?");
+            String value = null;
+        }
 
         setStatus(status);
         setKey(key);
         setValue(value);
 
-        // System.out.println("Status:key:value -> " + status +":"+ key +":"+ value);
+        System.out.println("Status:key:value -> " + status +":"+ key +":"+ value);
     }
 
 }

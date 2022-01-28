@@ -146,9 +146,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 			return null;
 		}
 		// deserialize
-		System.out.println("ARE WE ABOVE?");
 		json.deserialize(jsonStr);
-		System.out.println("ARE WE BELOW?");
 		logger.info("RECEIVE \t<"
 				+ clientSocket.getInetAddress().getHostAddress() + ":"
 				+ clientSocket.getPort() + ">: '"
