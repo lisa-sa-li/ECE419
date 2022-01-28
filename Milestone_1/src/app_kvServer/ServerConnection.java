@@ -141,6 +141,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		String jsonStr = json.byteToString(tmp);
 		if (jsonStr == null || jsonStr.trim().isEmpty()) {
 			// TODO?? null message
+			logger.debug("jsonStr is null :/");
 			return null;
 		}
 		// deserialize
@@ -157,7 +158,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		String value = msg.getValue();
 		StatusType status = msg.getStatus();
 
-		String handleMessageValue = "";
+		String handleMessageValue = value; // Send back the value in a PUT
 		StatusType handleMessageStatus = StatusType.NO_STATUS;
 		JSONMessage handleMessage = new JSONMessage();
 
@@ -196,17 +197,19 @@ public class ServerConnection implements IServerConnection, Runnable {
 			output = clientSocket.getOutputStream();
 			input = clientSocket.getInputStream();
 
-			sendTextMessage(new TextMessage(
-					"Connection to MSRG Echo server established: "
-							+ clientSocket.getLocalAddress() + " / "
-							+ clientSocket.getLocalPort()));
+			// sendTextMessage(new TextMessage(
+			// "Connection to MSRG Echo server established: "
+			// + clientSocket.getLocalAddress() + " / "
+			// + clientSocket.getLocalPort()));
 			while (this.isOpen) {
 				try {
 					input = clientSocket.getInputStream();
 					output = clientSocket.getOutputStream();
 
+					System.out.println("ABOUT TO RECEIVE MESSAGE");
 					JSONMessage recievedMesage = receiveJSONMessage();
 					if (recievedMesage != null) {
+						System.out.println("ABOUT TO HANDLE MESSAGE");
 						JSONMessage sendMessage = handleMessage(recievedMesage);
 						System.out.println("HANDLED MESSAGE");
 						sendJSONMessage(sendMessage);

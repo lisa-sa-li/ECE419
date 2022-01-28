@@ -101,11 +101,12 @@ public class PersistantStorage implements IPersistantStorage {
                     putStatus = StatusType.DELETE_ERROR;
                 } else {
                     json = new JSONMessage();
-                    json.setMessage("", key, value); // We don't care about status here
+                    json.setMessage("NO_STATUS", key, value); // We don't care about status here
                     line = json.serialize();
                     inputBuffer.append(line);
                     inputBuffer.append('\n');
                     putStatus = StatusType.PUT_SUCCESS;
+
                 }
             }
             file.close();
@@ -118,7 +119,7 @@ public class PersistantStorage implements IPersistantStorage {
             logger.info("Completed 'put' operation into storage server");
             return putStatus;
         } catch (Exception e) {
-            System.out.println("Problem reading file.");
+            logger.error("Problem reading file to put.");
         }
         return StatusType.PUT_ERROR;
     }
@@ -147,7 +148,7 @@ public class PersistantStorage implements IPersistantStorage {
             file.close();
             logger.info("Completed 'get' operation into storage server");
         } catch (Exception e) {
-            System.out.println("Problem reading file.");
+            logger.error("Problem reading file to get.");
         }
 
         // The key does not exist in the file

@@ -124,3 +124,128 @@ java.net.SocketException: Connection reset
 	at app_kvServer.ServerConnection.receiveJSONMessage(ServerConnection.java:124)
 	at app_kvServer.ServerConnection.run(ServerConnection.java:208)
 	at java.base/java.lang.Thread.run(Thread.java:834)
+2022-01-27 20:20:29,342 INFO  [main] root: Directory already exists.
+2022-01-27 20:20:29,389 INFO  [main] root: File already exists.
+2022-01-27 20:20:29,389 INFO  [main] root: Initialize server ...
+2022-01-27 20:20:29,468 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:20:33,817 INFO  [main] root: Connected to localhost on port 64530
+2022-01-27 20:20:33,824 INFO  [main] root: Connected to localhost on port 64530
+2022-01-27 20:20:33,843 INFO  [Thread-0] root: SEND 	<127.0.0.1:64530>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8080'
+2022-01-27 20:20:50,387 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:64530>: '{"status":"PUT","hello":"sandra love",}'
+2022-01-27 20:20:50,392 INFO  [Thread-0] root: PUT_ERROR: key hello & value sandra love
+2022-01-27 20:20:50,392 INFO  [Thread-0] root: SEND 	<127.0.0.1:64530>: '{"status":"PUT_ERROR","hello":""}'
+2022-01-27 20:22:27,797 INFO  [main] root: Directory already exists.
+2022-01-27 20:22:27,798 INFO  [main] root: File already exists.
+2022-01-27 20:22:27,883 INFO  [main] root: Initialize server ...
+2022-01-27 20:22:27,968 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:22:31,724 INFO  [main] root: Connected to localhost on port 64696
+2022-01-27 20:22:31,725 INFO  [main] root: Connected to localhost on port 64696
+2022-01-27 20:22:31,727 INFO  [Thread-0] root: SEND 	<127.0.0.1:64696>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8080'
+2022-01-27 20:22:35,552 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:64696>: '{"status":"PUT","hello":"sandra love",}'
+2022-01-27 20:22:35,561 INFO  [Thread-0] root: PUT_ERROR: key hello & value sandra love
+2022-01-27 20:22:35,561 INFO  [Thread-0] root: SEND 	<127.0.0.1:64696>: '{"status":"PUT_ERROR","hello":""}'
+2022-01-27 20:23:50,504 ERROR [Thread-0] root: Server connection lost: 
+java.net.SocketException: Connection reset
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:186)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:140)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:200)
+	at app_kvServer.ServerConnection.receiveJSONMessage(ServerConnection.java:124)
+	at app_kvServer.ServerConnection.run(ServerConnection.java:208)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+2022-01-27 20:24:01,617 INFO  [main] root: Directory already exists.
+2022-01-27 20:24:01,618 INFO  [main] root: File already exists.
+2022-01-27 20:24:01,622 INFO  [main] root: Initialize server ...
+2022-01-27 20:24:01,822 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:24:04,480 INFO  [main] root: Connected to localhost on port 64752
+2022-01-27 20:24:04,482 INFO  [main] root: Connected to localhost on port 64752
+2022-01-27 20:24:04,484 INFO  [Thread-0] root: SEND 	<127.0.0.1:64752>: 'Connection to MSRG Echo server established: /127.0.0.1 / 8080'
+2022-01-27 20:24:08,897 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:64752>: '{"status":"PUT","hello":"sandra love",}'
+2022-01-27 20:24:08,898 INFO  [Thread-0] root: PUT_ERROR: key hello & value sandra love
+2022-01-27 20:24:08,899 INFO  [Thread-0] root: SEND 	<127.0.0.1:64752>: '{"status":"PUT_ERROR","hello":""}'
+2022-01-27 20:26:00,299 INFO  [main] root: Directory already exists.
+2022-01-27 20:26:00,316 INFO  [main] root: File already exists.
+2022-01-27 20:26:00,317 INFO  [main] root: Initialize server ...
+2022-01-27 20:26:00,498 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:26:02,866 INFO  [main] root: Connected to localhost on port 64879
+2022-01-27 20:26:02,867 INFO  [main] root: Connected to localhost on port 64879
+2022-01-27 20:26:06,372 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:64879>: '{"status":"PUT","hello":"sandra love",}'
+2022-01-27 20:26:06,375 INFO  [Thread-0] root: PUT_ERROR: key hello & value sandra love
+2022-01-27 20:26:06,376 INFO  [Thread-0] root: SEND 	<127.0.0.1:64879>: '{"status":"PUT_ERROR","hello":""}'
+2022-01-27 20:30:56,297 INFO  [main] root: Directory already exists.
+2022-01-27 20:30:56,304 INFO  [main] root: File already exists.
+2022-01-27 20:30:56,307 INFO  [main] root: Initialize server ...
+2022-01-27 20:30:56,495 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:31:04,077 INFO  [main] root: Connected to localhost on port 65114
+2022-01-27 20:31:04,079 INFO  [main] root: Connected to localhost on port 65114
+2022-01-27 20:31:06,169 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:65114>: '{"status":"PUT","a":"b",}'
+2022-01-27 20:31:06,178 INFO  [Thread-0] root: PUT_ERROR: key a & value b
+2022-01-27 20:31:06,179 INFO  [Thread-0] root: SEND 	<127.0.0.1:65114>: '{"status":"PUT_ERROR","a":""}'
+2022-01-27 20:31:17,845 ERROR [Thread-0] root: Server connection lost: 
+java.net.SocketException: Connection reset
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:186)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:140)
+	at java.base/java.net.SocketInputStream.read(SocketInputStream.java:200)
+	at app_kvServer.ServerConnection.receiveJSONMessage(ServerConnection.java:124)
+	at app_kvServer.ServerConnection.run(ServerConnection.java:208)
+	at java.base/java.lang.Thread.run(Thread.java:834)
+2022-01-27 20:33:04,182 INFO  [main] root: Directory already exists.
+2022-01-27 20:33:04,192 INFO  [main] root: File already exists.
+2022-01-27 20:33:04,194 INFO  [main] root: Initialize server ...
+2022-01-27 20:33:04,493 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:33:07,559 INFO  [main] root: Connected to localhost on port 65239
+2022-01-27 20:33:07,562 INFO  [main] root: Connected to localhost on port 65239
+2022-01-27 20:33:09,922 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:65239>: '{"status":"PUT","a":"b",}'
+2022-01-27 20:33:09,925 INFO  [Thread-0] root: PUT_ERROR: key a & value b
+2022-01-27 20:33:09,925 INFO  [Thread-0] root: SEND 	<127.0.0.1:65239>: '{"status":"PUT_ERROR","a":""}'
+2022-01-27 20:33:17,420 ERROR [Thread-0] root: java.lang.IllegalArgumentException: No enum constant shared.messages.KVMessage.StatusType.status
+2022-01-27 20:34:57,270 INFO  [main] root: Directory already exists.
+2022-01-27 20:34:57,271 INFO  [main] root: File already exists.
+2022-01-27 20:34:57,274 INFO  [main] root: Initialize server ...
+2022-01-27 20:34:57,402 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:35:02,969 INFO  [main] root: Connected to localhost on port 65316
+2022-01-27 20:35:02,971 INFO  [main] root: Connected to localhost on port 65316
+2022-01-27 20:35:10,602 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:65316>: '{"status":"PUT","a":"b",}'
+2022-01-27 20:35:10,606 INFO  [Thread-0] root: PUT_ERROR: key a & value b
+2022-01-27 20:35:10,607 INFO  [Thread-0] root: SEND 	<127.0.0.1:65316>: '{"status":"PUT_ERROR","a":""}'
+2022-01-27 20:35:27,809 ERROR [Thread-0] root: java.lang.IllegalArgumentException: No enum constant shared.messages.KVMessage.StatusType.status
+2022-01-27 20:48:54,006 INFO  [main] root: Directory already exists.
+2022-01-27 20:48:54,006 INFO  [main] root: File already exists.
+2022-01-27 20:48:54,007 INFO  [main] root: Initialize server ...
+2022-01-27 20:48:54,282 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:48:55,759 INFO  [main] root: Connected to localhost on port 49671
+2022-01-27 20:48:55,764 INFO  [main] root: Connected to localhost on port 49671
+2022-01-27 20:48:57,602 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:49671>: '{"status":"PUT","a":"b",}'
+2022-01-27 20:48:57,605 INFO  [Thread-0] root: PUT_ERROR: key a & value b
+2022-01-27 20:48:57,605 INFO  [Thread-0] root: SEND 	<127.0.0.1:49671>: '{"status":"PUT_ERROR","a":""}'
+2022-01-27 20:49:02,451 ERROR [Thread-0] root: java.lang.IllegalArgumentException: No enum constant shared.messages.KVMessage.StatusType.status
+2022-01-27 20:51:11,102 ERROR [Thread-0] root: java.lang.IllegalArgumentException: No enum constant shared.messages.KVMessage.StatusType.status
+2022-01-27 20:57:20,848 INFO  [main] root: Directory already exists.
+2022-01-27 20:57:20,851 INFO  [main] root: File already exists.
+2022-01-27 20:57:20,852 INFO  [main] root: Initialize server ...
+2022-01-27 20:57:21,197 INFO  [main] root: Server listening on port: 8080
+2022-01-27 20:57:24,232 INFO  [main] root: Connected to localhost on port 50051
+2022-01-27 20:57:24,236 INFO  [main] root: Connected to localhost on port 50051
+2022-01-27 20:57:28,853 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:50051>: '{"status":"PUT","a":"b",}'
+2022-01-27 20:57:28,869 INFO  [Thread-0] root: PUT_ERROR: key a & value b
+2022-01-27 20:57:28,870 INFO  [Thread-0] root: SEND 	<127.0.0.1:50051>: '{"status":"PUT_ERROR","a":""}'
+2022-01-27 20:57:32,594 ERROR [Thread-0] root: java.lang.IllegalArgumentException: No enum constant shared.messages.KVMessage.StatusType.status
+2022-01-27 21:02:00,254 INFO  [main] root: Directory already exists.
+2022-01-27 21:02:00,255 INFO  [main] root: File already exists.
+2022-01-27 21:02:00,261 INFO  [main] root: Initialize server ...
+2022-01-27 21:02:00,496 INFO  [main] root: Server listening on port: 8080
+2022-01-27 21:02:03,232 INFO  [main] root: Connected to localhost on port 50262
+2022-01-27 21:02:03,236 INFO  [main] root: Connected to localhost on port 50262
+2022-01-27 21:02:05,553 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:50262>: '{"status":"PUT","a":"b",}'
+2022-01-27 21:02:05,557 INFO  [Thread-0] root: PUT_ERROR: key a & value b
+2022-01-27 21:02:05,558 INFO  [Thread-0] root: SEND 	<127.0.0.1:50262>: '{"status":"PUT_ERROR","a":""}'
+2022-01-27 21:02:58,795 ERROR [Thread-0] root: java.lang.IllegalArgumentException: No enum constant shared.messages.KVMessage.StatusType.status
+2022-01-27 21:06:26,597 INFO  [main] root: Directory already exists.
+2022-01-27 21:06:26,605 INFO  [main] root: File already exists.
+2022-01-27 21:06:26,605 INFO  [main] root: Initialize server ...
+2022-01-27 21:06:26,753 INFO  [main] root: Server listening on port: 8080
+2022-01-27 21:06:30,659 INFO  [main] root: Connected to localhost on port 50462
+2022-01-27 21:06:30,660 INFO  [main] root: Connected to localhost on port 50462
+2022-01-27 21:06:34,944 INFO  [Thread-0] root: RECEIVE 	<127.0.0.1:50462>: '{"status":"PUT","a":"b",}'
+2022-01-27 21:06:34,963 INFO  [Thread-0] root: PUT_ERROR: key a & value b
+2022-01-27 21:06:34,964 INFO  [Thread-0] root: SEND 	<127.0.0.1:50462>: '{"status":"PUT_ERROR","a":""}'
+2022-01-27 21:06:41,021 ERROR [Thread-0] root: java.lang.IllegalArgumentException: No enum constant shared.messages.KVMessage.StatusType.status
