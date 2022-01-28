@@ -716,6 +716,7 @@ java.net.ConnectException: Connection refused (Connection refused)
 	at org.apache.tools.ant.Main.startAnt(Main.java:223)
 	at org.apache.tools.ant.launch.Launcher.run(Launcher.java:284)
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
+<<<<<<< HEAD
 2022-01-28 13:35:14,517 ERROR [main] root: Error! Unable to establish connection. 
 
 java.net.ConnectException: Connection refused
@@ -780,6 +781,23 @@ java.net.UnknownHostException: unknown
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+=======
+2022-01-28 13:34:05,869 ERROR [main] root: Error! Unable to establish connection. 
+
+java.net.UnknownHostException: unknown
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:229)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+	at client.KVStore.connect(KVStore.java:35)
+	at testing.ConnectionTest.testUnknownHost(ConnectionTest.java:30)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f
 	at junit.framework.TestCase.runTest(TestCase.java:168)
 	at junit.framework.TestCase.runBare(TestCase.java:134)
 	at junit.framework.TestResult$1.protect(TestResult.java:110)
@@ -798,6 +816,7 @@ java.net.UnknownHostException: unknown
 	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:299)
 	at jdk.internal.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+<<<<<<< HEAD
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:99)
 	at org.apache.tools.ant.Task.perform(Task.java:350)
@@ -1063,6 +1082,9 @@ java.net.ConnectException: Connection refused
 	at jdk.internal.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+=======
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f
 	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:99)
 	at org.apache.tools.ant.Task.perform(Task.java:350)
 	at org.apache.tools.ant.Target.execute(Target.java:449)
@@ -1075,6 +1097,7 @@ java.net.ConnectException: Connection refused
 	at org.apache.tools.ant.Main.startAnt(Main.java:223)
 	at org.apache.tools.ant.launch.Launcher.run(Launcher.java:284)
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
+<<<<<<< HEAD
 2022-01-28 13:44:37,204 ERROR [main] root: Error! Unable to establish connection. 
 
 java.net.ConnectException: Connection refused
@@ -1093,6 +1116,26 @@ java.net.ConnectException: Connection refused
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+=======
+2022-01-28 13:34:05,876 ERROR [main] root: Error! Unable to establish connection. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:255)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:237)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+	at client.KVStore.connect(KVStore.java:35)
+	at testing.ConnectionTest.testConnectionSuccess(ConnectionTest.java:17)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f
 	at junit.framework.TestCase.runTest(TestCase.java:168)
 	at junit.framework.TestCase.runBare(TestCase.java:134)
 	at junit.framework.TestResult$1.protect(TestResult.java:110)
@@ -1111,7 +1154,11 @@ java.net.ConnectException: Connection refused
 	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:299)
 	at jdk.internal.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+<<<<<<< HEAD
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+=======
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f
 	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:99)
 	at org.apache.tools.ant.Task.perform(Task.java:350)
 	at org.apache.tools.ant.Target.execute(Target.java:449)
@@ -1124,6 +1171,7 @@ java.net.ConnectException: Connection refused
 	at org.apache.tools.ant.Main.startAnt(Main.java:223)
 	at org.apache.tools.ant.launch.Launcher.run(Launcher.java:284)
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
+<<<<<<< HEAD
 2022-01-28 13:44:37,224 ERROR [main] root: Error! Unable to establish connection. 
 
 java.net.UnknownHostException: unknown
@@ -1141,6 +1189,23 @@ java.net.UnknownHostException: unknown
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
 	at junit.framework.TestCase.runTest(TestCase.java:168)
 	at junit.framework.TestCase.runBare(TestCase.java:134)
+=======
+2022-01-28 13:34:05,880 ERROR [main] root: Error! Unable to establish connection. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:255)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:237)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+	at client.KVStore.connect(KVStore.java:35)
+	at testing.InteractionTest.setUp(InteractionTest.java:17)
+	at junit.framework.TestCase.runBare(TestCase.java:132)
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f
 	at junit.framework.TestResult$1.protect(TestResult.java:110)
 	at junit.framework.TestResult.runProtected(TestResult.java:128)
 	at junit.framework.TestResult.run(TestResult.java:113)
@@ -1157,7 +1222,11 @@ java.net.UnknownHostException: unknown
 	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:299)
 	at jdk.internal.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+<<<<<<< HEAD
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+=======
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f
 	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:99)
 	at org.apache.tools.ant.Task.perform(Task.java:350)
 	at org.apache.tools.ant.Target.execute(Target.java:449)
@@ -1170,6 +1239,7 @@ java.net.UnknownHostException: unknown
 	at org.apache.tools.ant.Main.startAnt(Main.java:223)
 	at org.apache.tools.ant.launch.Launcher.run(Launcher.java:284)
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
+<<<<<<< HEAD
 2022-01-28 13:44:37,227 ERROR [main] root: Error! Unable to establish connection. 
 
 java.net.ConnectException: Connection refused
@@ -1182,6 +1252,20 @@ java.net.ConnectException: Connection refused
 	at java.base/java.net.Socket.connect(Socket.java:583)
 	at java.base/java.net.Socket.<init>(Socket.java:507)
 	at java.base/java.net.Socket.<init>(Socket.java:287)
+=======
+2022-01-28 13:34:05,886 ERROR [main] root: Error! Unable to establish connection. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:255)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:237)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f
 	at client.KVStore.connect(KVStore.java:35)
 	at testing.InteractionTest.setUp(InteractionTest.java:17)
 	at junit.framework.TestCase.runBare(TestCase.java:132)
@@ -1201,7 +1285,11 @@ java.net.ConnectException: Connection refused
 	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:299)
 	at jdk.internal.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+<<<<<<< HEAD
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+=======
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f
 	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:99)
 	at org.apache.tools.ant.Task.perform(Task.java:350)
 	at org.apache.tools.ant.Target.execute(Target.java:449)
@@ -1214,6 +1302,7 @@ java.net.ConnectException: Connection refused
 	at org.apache.tools.ant.Main.startAnt(Main.java:223)
 	at org.apache.tools.ant.launch.Launcher.run(Launcher.java:284)
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
+<<<<<<< HEAD
 2022-01-28 13:44:37,234 ERROR [main] root: Error! Unable to establish connection. 
 
 java.net.ConnectException: Connection refused
@@ -1226,6 +1315,20 @@ java.net.ConnectException: Connection refused
 	at java.base/java.net.Socket.connect(Socket.java:583)
 	at java.base/java.net.Socket.<init>(Socket.java:507)
 	at java.base/java.net.Socket.<init>(Socket.java:287)
+=======
+2022-01-28 13:34:05,888 ERROR [main] root: Error! Unable to establish connection. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:255)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:237)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f
 	at client.KVStore.connect(KVStore.java:35)
 	at testing.InteractionTest.setUp(InteractionTest.java:17)
 	at junit.framework.TestCase.runBare(TestCase.java:132)
@@ -1245,7 +1348,11 @@ java.net.ConnectException: Connection refused
 	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:299)
 	at jdk.internal.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+<<<<<<< HEAD
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+=======
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f
 	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:99)
 	at org.apache.tools.ant.Task.perform(Task.java:350)
 	at org.apache.tools.ant.Target.execute(Target.java:449)
@@ -1258,6 +1365,7 @@ java.net.ConnectException: Connection refused
 	at org.apache.tools.ant.Main.startAnt(Main.java:223)
 	at org.apache.tools.ant.launch.Launcher.run(Launcher.java:284)
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
+<<<<<<< HEAD
 2022-01-28 13:44:37,239 ERROR [main] root: Error! Unable to establish connection. 
 
 java.net.ConnectException: Connection refused
@@ -1270,6 +1378,20 @@ java.net.ConnectException: Connection refused
 	at java.base/java.net.Socket.connect(Socket.java:583)
 	at java.base/java.net.Socket.<init>(Socket.java:507)
 	at java.base/java.net.Socket.<init>(Socket.java:287)
+=======
+2022-01-28 13:34:05,890 ERROR [main] root: Error! Unable to establish connection. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:255)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:237)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f
 	at client.KVStore.connect(KVStore.java:35)
 	at testing.InteractionTest.setUp(InteractionTest.java:17)
 	at junit.framework.TestCase.runBare(TestCase.java:132)
@@ -1289,7 +1411,11 @@ java.net.ConnectException: Connection refused
 	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:299)
 	at jdk.internal.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+<<<<<<< HEAD
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+=======
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f
 	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:99)
 	at org.apache.tools.ant.Task.perform(Task.java:350)
 	at org.apache.tools.ant.Target.execute(Target.java:449)
@@ -1302,6 +1428,7 @@ java.net.ConnectException: Connection refused
 	at org.apache.tools.ant.Main.startAnt(Main.java:223)
 	at org.apache.tools.ant.launch.Launcher.run(Launcher.java:284)
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
+<<<<<<< HEAD
 2022-01-28 13:44:37,243 ERROR [main] root: Error! Unable to establish connection. 
 
 java.net.ConnectException: Connection refused
@@ -1314,6 +1441,20 @@ java.net.ConnectException: Connection refused
 	at java.base/java.net.Socket.connect(Socket.java:583)
 	at java.base/java.net.Socket.<init>(Socket.java:507)
 	at java.base/java.net.Socket.<init>(Socket.java:287)
+=======
+2022-01-28 13:34:05,891 ERROR [main] root: Error! Unable to establish connection. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:255)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:237)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f
 	at client.KVStore.connect(KVStore.java:35)
 	at testing.InteractionTest.setUp(InteractionTest.java:17)
 	at junit.framework.TestCase.runBare(TestCase.java:132)
@@ -1333,7 +1474,11 @@ java.net.ConnectException: Connection refused
 	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:299)
 	at jdk.internal.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+<<<<<<< HEAD
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+=======
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f
 	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:99)
 	at org.apache.tools.ant.Task.perform(Task.java:350)
 	at org.apache.tools.ant.Target.execute(Target.java:449)
@@ -1346,6 +1491,7 @@ java.net.ConnectException: Connection refused
 	at org.apache.tools.ant.Main.startAnt(Main.java:223)
 	at org.apache.tools.ant.launch.Launcher.run(Launcher.java:284)
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
+<<<<<<< HEAD
 2022-01-28 13:44:37,252 ERROR [main] root: Error! Unable to establish connection. 
 
 java.net.ConnectException: Connection refused
@@ -1358,6 +1504,20 @@ java.net.ConnectException: Connection refused
 	at java.base/java.net.Socket.connect(Socket.java:583)
 	at java.base/java.net.Socket.<init>(Socket.java:507)
 	at java.base/java.net.Socket.<init>(Socket.java:287)
+=======
+2022-01-28 13:34:05,893 ERROR [main] root: Error! Unable to establish connection. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:255)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:237)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f
 	at client.KVStore.connect(KVStore.java:35)
 	at testing.InteractionTest.setUp(InteractionTest.java:17)
 	at junit.framework.TestCase.runBare(TestCase.java:132)
@@ -1377,7 +1537,11 @@ java.net.ConnectException: Connection refused
 	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:299)
 	at jdk.internal.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+<<<<<<< HEAD
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+=======
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f
 	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:99)
 	at org.apache.tools.ant.Task.perform(Task.java:350)
 	at org.apache.tools.ant.Target.execute(Target.java:449)
@@ -1390,6 +1554,7 @@ java.net.ConnectException: Connection refused
 	at org.apache.tools.ant.Main.startAnt(Main.java:223)
 	at org.apache.tools.ant.launch.Launcher.run(Launcher.java:284)
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
+<<<<<<< HEAD
 2022-01-28 13:44:37,255 ERROR [main] root: Error! Unable to establish connection. 
 
 java.net.ConnectException: Connection refused
@@ -5562,3 +5727,5 @@ java.net.SocketException: Socket closed
 2022-01-28 15:20:51,294 ERROR [Thread-10] root: Port 50000 is already bound!
 2022-01-28 15:20:51,298 ERROR [Thread-12] root: Error! Cannot open server socket:
 2022-01-28 15:20:51,299 ERROR [Thread-12] root: Port 50000 is already bound!
+=======
+>>>>>>> 1bded6b98285b063cc283a89fa9f76727eb2303f

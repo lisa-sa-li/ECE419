@@ -7,4 +7,6 @@ public interface IClientConnection {
     public JSONMessage receiveJSONMessage() throws IOException;
 
     public void sendJSONMessage(JSONMessage json) throws IOException;
+
+    public void close() throws IOException;
 }

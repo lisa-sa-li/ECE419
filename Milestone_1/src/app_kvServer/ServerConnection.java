@@ -77,10 +77,17 @@ public class ServerConnection implements IServerConnection, Runnable {
 		byte read = (byte) input.read();
 		boolean reading = true;
 
+		// Check if stream is closed (read returns -1)
+		if (read == -1) {
+			JSONMessage json = new JSONMessage();
+			json.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "disconnected");
+			return json;
+		}
+
 		int endChar = 0;
 		while (reading && endChar < 3 && read != -1) {
-
 			// Keep a count of EOMs to know when to stop reading
+			// 13 = CR, 10 = LF/NL
 			if (read == 13 || read == 10) {
 				endChar++;
 			}
@@ -93,8 +100,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 				} else {
 					tmp = new byte[msgBytes.length + BUFFER_SIZE];
 					System.arraycopy(msgBytes, 0, tmp, 0, msgBytes.length);
-					System.arraycopy(bufferBytes, 0, tmp, msgBytes.length,
-							BUFFER_SIZE);
+					System.arraycopy(bufferBytes, 0, tmp, msgBytes.length, BUFFER_SIZE);
 				}
 
 				msgBytes = tmp;
@@ -170,6 +176,11 @@ public class ServerConnection implements IServerConnection, Runnable {
 					logger.info("GET_ERROR: key " + key + " & value " + handleMessageValue);
 				}
 				break;
+			case DISCONNECTED:
+				this.isOpen = false;
+				handleMessageStatus = StatusType.DISCONNECTED;
+				logger.info("Client is disconnected");
+				break;
 			default:
 				logger.error("Unknown command.");
 				break;
@@ -200,6 +211,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 			try {
 				// close connection
 				if (clientSocket != null) {
+					// Send message????
 					input.close();
 					output.close();
 					clientSocket.close();
