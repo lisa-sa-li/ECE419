@@ -1085,6 +1085,7 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-27 22:22:24,933 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
 2022-01-27 22:22:24,948 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","a":"b",}'
 2022-01-27 22:22:24,952 INFO  [main] root: shared.messages.JSONMessage@1d16f93d
+<<<<<<< HEAD
 2022-01-27 22:27:43,423 INFO  [main] root: Connected to localhost on port 8080
 2022-01-27 22:27:43,424 INFO  [main] root: Connection established to 127.0.0.1:8080
 2022-01-27 22:28:03,531 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","girth":"wide",}'
@@ -1162,3 +1163,93 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-28 13:03:12,335 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","girls":"rule",}'
 2022-01-28 13:03:16,864 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","girls":""}'
 2022-01-28 13:03:16,864 DEBUG [main] root: jsonStr is null in ClientConnection
+=======
+2022-01-28 11:13:51,024 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 11:13:51,025 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 11:16:21,542 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","patrick":"li",}'
+2022-01-28 11:16:21,564 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","patrick":"li",}'
+2022-01-28 11:16:21,564 INFO  [main] root: shared.messages.JSONMessage@6acbcfc0
+2022-01-28 11:16:47,987 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 11:16:47,988 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 11:16:50,320 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","lisa":"li",}'
+2022-01-28 11:16:50,333 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","lisa":"li",}'
+2022-01-28 11:16:50,333 INFO  [main] root: shared.messages.JSONMessage@6acbcfc0
+2022-01-28 11:16:54,709 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","grace":"liu",}'
+2022-01-28 11:16:54,710 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 11:16:54,710 INFO  [main] root: 
+2022-01-28 11:16:58,189 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","quinlan":"sykora",}'
+2022-01-28 11:16:58,191 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","grace":"liu",}'
+2022-01-28 11:16:58,191 INFO  [main] root: shared.messages.JSONMessage@5f184fc6
+2022-01-28 11:17:15,006 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","lisa":""}'
+2022-01-28 11:17:15,007 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 11:17:15,007 INFO  [main] root: 
+2022-01-28 11:29:56,975 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","s":"f",}'
+2022-01-28 11:29:56,977 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","quinlan":"sykora",}'
+2022-01-28 11:29:56,977 INFO  [main] root: shared.messages.JSONMessage@3feba861
+2022-01-28 11:29:59,927 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","alkjlk":"vlsdkvjslkfjslkfj",}'
+2022-01-28 11:29:59,929 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 11:29:59,930 INFO  [main] root: 
+2022-01-28 11:30:02,833 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","lakd":"kfdj",}'
+2022-01-28 11:30:02,836 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"DELETE_SUCCESS","lisa":""}'
+2022-01-28 11:30:02,837 INFO  [main] root: shared.messages.JSONMessage@5b480cf9
+2022-01-28 11:33:45,476 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 11:33:45,477 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 11:33:51,259 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","f":"w",}'
+2022-01-28 11:33:51,271 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","f":"w",}'
+2022-01-28 11:36:20,282 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","e":"lllll",}'
+2022-01-28 11:36:20,284 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 11:44:20,848 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 11:44:20,849 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 11:44:28,748 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","eeeefdwedds":"lklkjlk",}'
+2022-01-28 11:46:22,874 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 11:46:32,332 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 11:46:32,333 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 11:46:34,942 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","lsfkdslk":"sfldskfjs",}'
+2022-01-28 11:46:34,956 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","lsfkdslk":"sfldskfjs",}'
+2022-01-28 11:49:43,704 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 11:49:43,705 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 11:49:46,921 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","alkjflkdjflk":"slfkdsjflksj",}'
+2022-01-28 11:49:46,930 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","alkjflkdjflk":"slfkdsjflksj",}'
+2022-01-28 11:50:00,478 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","lkjdf":"lksfkv",}'
+2022-01-28 11:50:00,480 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 11:51:47,577 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","lkjdf":""}'
+2022-01-28 11:51:47,580 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","lkjdf":"lksfkv",}'
+2022-01-28 11:52:01,799 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","alkjflkdjflk":""}'
+2022-01-28 11:52:01,801 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 11:52:10,077 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","alkjflkdjflk":""}'
+2022-01-28 11:52:10,078 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","lkjdf":"lksfkv",}'
+2022-01-28 12:18:13,303 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 12:18:13,304 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 12:18:16,062 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","s":"k",}'
+2022-01-28 12:18:16,071 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","s":"k",}'
+2022-01-28 12:18:19,212 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","s":"k",}'
+2022-01-28 12:18:19,212 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:18:24,489 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","s":"ldfkdk",}'
+2022-01-28 12:18:24,491 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","s":"k",}'
+2022-01-28 12:35:38,582 ERROR [main] root: Unknown command.
+2022-01-28 12:35:40,125 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 12:35:40,126 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 12:35:44,178 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","gfsdfds":"lf",}'
+2022-01-28 12:35:44,189 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","gfsdfds":"lf",}'
+2022-01-28 12:35:47,502 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","sdlkf":"w",}'
+2022-01-28 12:35:47,503 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:47:14,840 ERROR [main] root: Unknown command.
+2022-01-28 12:47:15,958 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 12:47:15,958 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 12:47:19,558 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"slkgdjskf",}'
+2022-01-28 12:47:19,570 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","a":"slkgdjskf",}'
+2022-01-28 12:47:31,839 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","asd":"qqwdwqdq",}'
+2022-01-28 12:47:31,841 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:47:38,367 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","kdkfdfkd":"lkdjkjgk",}'
+2022-01-28 12:47:38,368 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:47:45,012 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","lkdfjk":"lkdnkfkndknf",}'
+2022-01-28 12:47:45,012 DEBUG [main] root: jsonStr is null in ClientConnection
+2022-01-28 12:47:59,132 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","akdfknkn":"skfslkdfsldkjfs",}'
+2022-01-28 12:47:59,134 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","asd":"qqwdwqdq",}'
+2022-01-28 12:52:22,247 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 12:52:22,247 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 12:52:23,756 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"b",}'
+2022-01-28 12:52:23,764 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","a":"b",}'
+2022-01-28 12:52:28,788 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"kjkjkjlkjlk",}'
+2022-01-28 12:52:28,788 DEBUG [main] root: jsonStr is null in ClientConnection
+>>>>>>> 8004dd19dc57c59425959e1f98b03702faa86692
