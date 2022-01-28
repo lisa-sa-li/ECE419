@@ -138,7 +138,8 @@ public class ServerConnection implements IServerConnection, Runnable {
 		/* build final Object */
 		JSONMessage json = new JSONMessage();
 		// bytes to string
-		String jsonStr = json.byteToString(tmp);
+		// String jsonStr = json.byteToString(tmp);
+		String jsonStr = json.byteToString(msgBytes);
 		if (jsonStr == null || jsonStr.trim().isEmpty()) {
 			// TODO?? null message
 			logger.debug("jsonStr is null :/");
@@ -150,6 +151,8 @@ public class ServerConnection implements IServerConnection, Runnable {
 				+ clientSocket.getInetAddress().getHostAddress() + ":"
 				+ clientSocket.getPort() + ">: '"
 				+ json.getJSON().trim() + "'");
+		System.out.println("RETURN FROM RECEIVE ");
+	
 		return json;
 	}
 
@@ -208,6 +211,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 
 					System.out.println("ABOUT TO RECEIVE MESSAGE");
 					JSONMessage recievedMesage = receiveJSONMessage();
+					System.out.println("RECEIVED");
 					if (recievedMesage != null) {
 						System.out.println("ABOUT TO HANDLE MESSAGE");
 						JSONMessage sendMessage = handleMessage(recievedMesage);

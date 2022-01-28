@@ -4,8 +4,11 @@ import java.io.Serializable;
 import java.util.StringTokenizer;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.*;
 
 public class JSONMessage implements KVMessage, Serializable {
+
+	private static Logger logger = Logger.getRootLogger();
 
     private static final long serialVersionUID = 5549512212003782618L;
     private static final char LINE_FEED = 0x0A;
@@ -102,8 +105,6 @@ public class JSONMessage implements KVMessage, Serializable {
         // initialize string builder to create mutable string
         StringBuilder strMessage = new StringBuilder();
 
-        System.out.println("SERIALZING");
-
         // Beginning chars
         strMessage.append("{");
         String statusEntry = ("\"status\":\"" + this.status.name() + "\",");
@@ -122,12 +123,12 @@ public class JSONMessage implements KVMessage, Serializable {
         return strMessage.toString();
     }
 
-    public void deserialize(String json) {
-        this.json = json;
+    public void deserialize(String inJSON) {
+        // trim newlines
+        inJSON = inJSON.trim();
+        this.json = inJSON;
 
-        StringTokenizer messageTokens = new StringTokenizer(json, "{}:,\"");
-
-        System.out.println("JSON in deserialize method: " + json);
+        StringTokenizer messageTokens = new StringTokenizer(inJSON, "{}:,\"");
 
         // create Array object
         String[] tokens = null;
@@ -138,16 +139,22 @@ public class JSONMessage implements KVMessage, Serializable {
         while(messageTokens.hasMoreTokens()) {
             // add tokens to Array
             String nextTok = messageTokens.nextToken();
+            System.out.println(nextTok);
             tokens[count++]= nextTok;
         }
 
         String status = tokens[1];
         String key = tokens[2];
-        String value = tokens[3];
+        try{
+            // for deletion
+            String value = tokens[3];
+        } catch (IndexOutOfBoundsException iobe) {
+            // do nothing
+            System.out.println("NULL VALUE?");
+            String value = null;
+        }
 
-        System.out.println("SETIING STATUS: " + status);
         setStatus(status);
-        System.out.println("SET STATUS: " + getStatus());
         setKey(key);
         setValue(value);
 
