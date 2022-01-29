@@ -96,16 +96,14 @@ public class KVClient implements IKVClient, Runnable {
                                 if (valStr.length() <= 120000) {
                                     try {
                                         JSONMessage msg = this.kvStore.put(tokens[1], valStr);
-                                        System.out.println(
-                                                msg.getStatus() + "\t key: " + msg.getKey() + " & value: "
-                                                        + msg.getValue());
+                                        System.out.println(msg.getStatus() + "\t key: " + msg.getKey() + " & value: "
+                                                + msg.getValue());
                                     } catch (SocketException se) {
                                         try {
                                             this.kvStore.connect();
                                             JSONMessage msg = this.kvStore.put(tokens[1], valStr);
-                                            System.out.println(
-                                                    msg.getStatus() + "\t key: " + msg.getKey() + " & value: "
-                                                            + msg.getValue());
+                                            System.out.println(msg.getStatus() + "\t key: " + msg.getKey()
+                                                    + " & value: " + msg.getValue());
                                         } catch (Exception e) {
                                             System.out.println("Socket connection to server is closed.");
                                         }
@@ -113,7 +111,7 @@ public class KVClient implements IKVClient, Runnable {
                                         System.out.println("Error putting key: " + e);
                                     }
                                 } else {
-                                    logger.error("Value length must be max 120000."); // Exact size of val bytes idk
+                                    logger.error("Value length must be max 120000."); // Exact size of val bytes
                                 }
                             } else if (tokens.length == 2) {
                                 // DELETE key,value pair
@@ -131,7 +129,6 @@ public class KVClient implements IKVClient, Runnable {
                                 } catch (Exception e) {
                                     System.out.println("Error deleting key: " + e);
                                 }
-
                             } else {
                                 logger.error("No message is passed!");
                             }
@@ -147,15 +144,24 @@ public class KVClient implements IKVClient, Runnable {
                     if (tokens.length > 2) {
                         logger.error("Invalid number of parameters!");
                     } else {
-                        if (this.kvStore != null) { // && this.kvStore.isRunning()) {
+                        if (this.kvStore != null) {
                             String key = tokens[1];
-                            if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes idk
+                            if (key.length() <= 20 && key.length() > 0) {
                                 try {
                                     JSONMessage msg = this.kvStore.get(key);
-                                    // PLACE status message here
-                                    // logger.info(msg);
+                                    System.out.println(msg.getStatus() + "\t key: " + msg.getKey() + " & value: "
+                                            + msg.getValue());
+                                } catch (SocketException se) {
+                                    try {
+                                        this.kvStore.connect();
+                                        JSONMessage msg = this.kvStore.get(key);
+                                        System.out.println(msg.getStatus() + "\t key: " + msg.getKey() + " & value: "
+                                                + msg.getValue());
+                                    } catch (Exception e) {
+                                        System.out.println("Socket connection to server is closed.");
+                                    }
                                 } catch (Exception e) {
-                                    logger.error("Error getting key: " + e);
+                                    System.out.println("Error getting key: " + e);
                                 }
                             } else {
                                 logger.error("Key length must be between 1 and 20.");
@@ -165,7 +171,7 @@ public class KVClient implements IKVClient, Runnable {
                             logger.warn("Not connected to any store.");
                         }
                     }
-                        break;
+                    break;
                 case "disconnect":
                     if (this.kvStore != null) {
                         disconnect();
