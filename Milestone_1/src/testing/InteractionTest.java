@@ -188,4 +188,19 @@ public class InteractionTest extends TestCase {
 		assertTrue(ex == null && response.getStatus() == StatusType.GET_ERROR);
 	}
 
+	@Test
+	public void testDeleteUnsavedValue() {
+		String key = "tryDeletingValueDoesNotExist";
+		JSONMessage response = null;
+		Exception ex = null;
+
+		try {
+			response = kvClient.put(key, "");
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && response.getStatus() == StatusType.DELETE_ERROR);
+	}
+
 }
