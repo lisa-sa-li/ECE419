@@ -82,7 +82,7 @@ public class KVClient implements IKVClient, Runnable {
                 case "put":
                     if (this.kvStore != null) { // && this.kvStore.isRunning()) {
                         String key = tokens[1];
-                        if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes idk
+                        if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes
                             if (tokens.length >= 3) {
                                 // CREATE or UPDATE key,value
                                 StringBuilder val = new StringBuilder();

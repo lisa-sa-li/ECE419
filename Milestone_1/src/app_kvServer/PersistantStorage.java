@@ -97,6 +97,8 @@ public class PersistantStorage implements IPersistantStorage {
             }
 
             // If key does not exist in the file
+            // If delete: return DELETE_ERROR
+            // If put: append to end of file and return PUT_SUCCESS
             if (foundKey == false) {
                 if (value.equals("")) {
                     logger.info("Key does not exist and cannot 'delete'");
@@ -108,7 +110,6 @@ public class PersistantStorage implements IPersistantStorage {
                     inputBuffer.append(line);
                     inputBuffer.append('\n');
                     putStatus = StatusType.PUT_SUCCESS;
-
                 }
             }
             file.close();
