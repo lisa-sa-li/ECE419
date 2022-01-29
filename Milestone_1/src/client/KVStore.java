@@ -9,7 +9,7 @@ import shared.messages.KVMessage.StatusType;
 
 import app_kvClient.ClientConnection;
 
-public class KVStore implements KVCommInterface {
+public class KVStore implements KVCommInterface, Runnable {
 	/**
 	 * Initialize KVStore with address and port of KVServer
 	 * 
@@ -18,6 +18,8 @@ public class KVStore implements KVCommInterface {
 	 */
 	String address;
 	int port;
+	private int clientID;
+	private int maxUsers;
 	private Socket clientSocket;
 	private static Logger logger = Logger.getRootLogger();
 	private static final int BUFFER_SIZE = 1024;
@@ -27,13 +29,25 @@ public class KVStore implements KVCommInterface {
 	public KVStore(String address, int port) {
 		this.address = address;
 		this.port = port;
+		this.clientID = -1;
+	}
+
+	// class for testing
+	public KVStore(String address, int port, int maxUsers, int clientID) {
+		this.address = address;
+		this.port = port;
+		this.maxUsers = maxUsers;
+		this.clientID = clientID;
 	}
 
 	@Override
 	public void connect() throws Exception {
 		try {
+			System.out.println("IN CONNECT: "+ address + port);
 			Socket clientSocket = new Socket(address, port);
+			System.out.println("IN after socket");
 			clientConnection = new ClientConnection(clientSocket);
+			System.out.println("IN after client connects");
 
 			logger.info("Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
 					+ clientSocket.getPort());
@@ -64,6 +78,49 @@ public class KVStore implements KVCommInterface {
 		jsonMessage.setMessage(StatusType.PUT.name(), key, value);
 		this.clientConnection.sendJSONMessage(jsonMessage);
 		return this.clientConnection.receiveJSONMessage();
+	}
+
+	// for testing
+	public void run() {
+		int totalUsers = clientID + maxUsers;
+		try {
+			// connect to socket
+			connect();
+
+			System.out.println("umpteenth: ");
+
+
+			// put request per thread
+			for (int i = clientID; i < totalUsers; i ++){
+				System.out.println("loop 1: ");
+				put("cake" + i, "icing" + i);
+				System.out.println("loop 11: ");
+			}
+
+			// update previous entry per thread (test persistent storage)
+			for (int i = clientID; i < totalUsers; i ++){
+				System.out.println("loop 2: ");
+				put("cake" + (i-1), "icing" + (i-1));
+				System.out.println("loop 22: ");
+
+			}
+
+			// get entry per thread
+			String value;
+			for (int i = clientID; i < totalUsers; i ++){
+				System.out.println("loop 3: ");
+				value = get("cake" + i).getValue();
+				System.out.println("GET TEST THREAD VALUE: "+value);
+
+				// if (!value.equals("icing" + (i-1))){
+				// 	testSuccess = false;
+				// }
+			} 
+			disconnect();
+		}
+		catch (Exception e){
+			System.out.println("ERROR: " + e);
+		}
 	}
 
 	@Override
