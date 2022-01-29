@@ -39,6 +39,18 @@ public class ThreadTest {
                 threads[i].interrupt();
             }
         }
+
+        for (int i = 0; i < NUM_THREADS; i ++){
+			try {
+                
+                System.out.println("JOININ 1: ");
+                threads[i].join();
+                System.out.println("JOININ: ");
+			} 
+			catch (Exception e) {
+                System.out.println("HERHE: " + e);
+            }
+		}
         kvServer.close();
     }
 
