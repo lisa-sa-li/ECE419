@@ -42,6 +42,5 @@ public class ThreadTest {
 
     public static void main(String[] args) {
         new ThreadTest().testThreads();
-        // System.exit(0);
     }
 }
