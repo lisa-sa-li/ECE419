@@ -19,8 +19,6 @@ import app_kvServer.KVServer;
  * Represents a connection end point for a particular client that is
  * connected to the server. This class is responsible for message reception
  * and sending.
- * The class also implements the echo functionality. Thus whenever a message
- * is received it is going to be echoed back to the client.
  */
 public class ServerConnection implements IServerConnection, Runnable {
 
