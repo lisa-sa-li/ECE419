@@ -23,7 +23,7 @@ public class KVServer implements IKVServer, Runnable {
 	private int cacheSize;
 	private PersistantStorage persistantStorage;
 	private ServerSocket serverSocket;
-	private Socket clientSocket;
+	private Socket client;
 	private boolean running;
 	private String hostName;
 	private ArrayList<Thread> threads;
@@ -37,8 +37,7 @@ public class KVServer implements IKVServer, Runnable {
 	 * @param strategy  specifies the cache replacement strategy in case the cache
 	 *                  is full and there is a GET- or PUT-request on a key that is
 	 *                  currently not contained in the cache. Options are "FIFO",
-	 *                  "LRU",
-	 *                  and "LFU".
+	 *                  "LRU", and "LFU".
 	 */
 	public KVServer(int port, int cacheSize, String strategy) {
 		this.port = port;
@@ -53,7 +52,7 @@ public class KVServer implements IKVServer, Runnable {
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
 		this.threads = new ArrayList<Thread>();
 
-		if(test){
+		if (test) {
 			Thread testThread = new Thread(this);
 			testThread.start();
 		}
@@ -103,12 +102,7 @@ public class KVServer implements IKVServer, Runnable {
 
 	@Override
 	public StatusType putKV(String key, String value) throws Exception {
-		StatusType putStatus = this.persistantStorage.put(key, value);
-		// if (putStatus.equals(StatusType.DELETE_ERROR) ||
-		// putStatus.equals(StatusType.PUT_ERROR)) {
-		// throw new Exception("Unable to put (" + key + ": " + value + ")");
-		// }
-		return putStatus;
+		return this.persistantStorage.put(key, value);
 	}
 
 	@Override
@@ -144,22 +138,20 @@ public class KVServer implements IKVServer, Runnable {
 		if (serverSocket != null) {
 			while (isRunning()) {
 				try {
-					clientSocket = serverSocket.accept();
-					ServerConnection serverConnection = new ServerConnection(clientSocket, this);
-					// ????
+					client = serverSocket.accept();
+					ServerConnection serverConnection = new ServerConnection(client, this);
 					Thread newThread = new Thread(serverConnection);
 					newThread.start();
 					this.threads.add(newThread);
 
 					logger.info(
-							"Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
-									+ clientSocket.getPort());
+							"Connected to " + client.getInetAddress().getHostName() + " on port "
+									+ client.getPort());
 				} catch (IOException e) {
-					logger.error("Error! " + "Unable to establish connection to server. \n", e);
+					logger.error("Error! Unable to establish connection to server. \n", e);
 				} catch (Exception e) {
 					logger.error("Error! \n", e);
 				}
-
 			}
 		}
 		logger.info("Server stopped.");
@@ -171,6 +163,12 @@ public class KVServer implements IKVServer, Runnable {
 
 	@Override
 	public void kill() {
+		running = false;
+		try {
+			serverSocket.close();
+		} catch (IOException e) {
+			logger.error("Error! Unable to close socket on port: " + port, e);
+		}
 	}
 
 	@Override
@@ -178,14 +176,13 @@ public class KVServer implements IKVServer, Runnable {
 		running = false;
 		try {
 			// find + stop all threads
-			for (int i = 0; i < threads.size(); i++){
+			for (int i = 0; i < threads.size(); i++) {
 				threads.get(i).interrupt();
 			}
-			serverSocket.close();
-		} catch (IOException e) {
-			logger.error("Error! " +
-					"Unable to close socket on port: " + port, e);
+		} catch (Exception e) {
+			logger.error("Error! Unable to interrupt threads: " + e);
 		}
+		kill();
 	}
 
 	public static void main(String[] args) {

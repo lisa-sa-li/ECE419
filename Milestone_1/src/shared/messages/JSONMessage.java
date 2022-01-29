@@ -107,7 +107,10 @@ public class JSONMessage implements KVMessage, Serializable {
         strMessage.append("{");
         String statusEntry = ("\"status\":\"" + this.status.name() + "\",");
         strMessage.append(statusEntry);
-        if (this.value != null && this.value != "null" && !this.value.trim().isEmpty()) {
+        if (this.value == null) {
+            this.value = "";
+        }
+        if (!this.value.trim().isEmpty()) {
             String KVEntry = ("\"" + this.key + "\":\"" + this.value + "\",");
             strMessage.append(KVEntry);
         } else {
@@ -137,27 +140,22 @@ public class JSONMessage implements KVMessage, Serializable {
         while (messageTokens.hasMoreTokens()) {
             // add tokens to Array
             String nextTok = messageTokens.nextToken();
-            // System.out.println(nextTok);
             tokens[count++] = nextTok;
         }
 
         String status = tokens[1];
         String key = tokens[2];
         String value;
+        // In a DELETE or GET, there is no tokens[3], so we set it to ""
         try {
-            // for deletion
             value = tokens[3];
         } catch (Exception iobe) {
-            // do nothing
-            value = "null";
+            value = "";
         }
 
         setStatus(status);
         setKey(key);
         setValue(value);
-
-        // System.out.println("Status:key:value -> " + status + ":" + key + ":" +
-        // value);
     }
 
 }

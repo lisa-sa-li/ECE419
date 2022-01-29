@@ -1682,3 +1682,56 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-28 18:10:03,580 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","a":"b",}'
 2022-01-28 18:10:05,599 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
 2022-01-28 18:10:05,601 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","a":"b",}'
+2022-01-29 12:42:05,910 ERROR [main] root: Error! Unable to establish connection to store. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:255)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:237)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+	at client.KVStore.connect(KVStore.java:48)
+	at app_kvClient.KVClient.newConnection(KVClient.java:29)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:69)
+	at app_kvClient.KVClient.run(KVClient.java:285)
+	at app_kvClient.KVClient.main(KVClient.java:298)
+2022-01-29 12:42:05,914 ERROR [main] root: Something went wrong! 
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:412)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:255)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:237)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+	at client.KVStore.connect(KVStore.java:48)
+	at app_kvClient.KVClient.newConnection(KVClient.java:29)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:69)
+	at app_kvClient.KVClient.run(KVClient.java:285)
+	at app_kvClient.KVClient.main(KVClient.java:298)
+2022-01-29 12:42:14,671 ERROR [main] root: Unknown command.
+2022-01-29 12:42:17,386 INFO  [main] root: Connected to localhost on port 8080
+2022-01-29 12:42:17,386 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-29 12:42:21,471 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hey":""}'
+2022-01-29 12:42:21,482 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","hey":""}'
+2022-01-29 12:44:46,499 ERROR [main] root: Unknown command.
+2022-01-29 12:44:49,055 INFO  [main] root: Tearing down the connection ...
+2022-01-29 12:44:49,056 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"DISCONNECTED","disconnected":"disconnected",}'
+2022-01-29 12:44:49,058 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"DISCONNECTED","disconnected":"disconnected",}'
+2022-01-29 12:44:49,058 INFO  [main] root: Client connection closed!
+2022-01-29 12:44:49,058 INFO  [main] root: Application exit.
+2022-01-29 12:44:59,936 INFO  [main] root: Connected to localhost on port 8080
+2022-01-29 12:44:59,937 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-29 12:45:19,495 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hey":""}'
+2022-01-29 12:45:19,505 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","hey":""}'
+2022-01-29 12:48:05,424 INFO  [main] root: Tearing down the connection ...
+2022-01-29 12:48:05,425 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"DISCONNECTED","disconnected":"disconnected",}'
+2022-01-29 12:48:05,427 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"DISCONNECTED","disconnected":"disconnected",}'
+2022-01-29 12:48:05,428 INFO  [main] root: Client connection closed!
+2022-01-29 12:48:05,428 INFO  [main] root: Application exit.
