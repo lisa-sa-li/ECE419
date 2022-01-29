@@ -6,6 +6,7 @@ import app_kvServer.PersistantStorage;
 import junit.framework.TestCase;
 import shared.messages.KVMessage.StatusType;
 import java.nio.file.*;
+import java.io.File;
 
 public class AdditionalTest extends TestCase {
 

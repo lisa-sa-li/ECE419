@@ -155,7 +155,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		String value = msg.getValue();
 		StatusType status = msg.getStatus();
 
-		String handleMessageValue = value.isEmpty() ? "" : value; // For PUT or DELETE, send the original value back
+		String handleMessageValue = value; // For PUT or DELETE, send the original value back
 		StatusType handleMessageStatus = StatusType.NO_STATUS;
 		JSONMessage handleMessage = new JSONMessage();
 
@@ -166,7 +166,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 					if (key.length() > 20) {
 						throw new KeyValueTooLongException("Key too long : " + key);
 					}
-					if (key.trim().equals("") || key == null || key.trim().equals("null")) {
+					if (key.trim().isEmpty() || key == null || key.trim().equals("null")) {
 						throw new InvalidKeyException("Invalid key: " + key);
 					}
 					if (value.length() > 120000) {
@@ -181,10 +181,11 @@ public class ServerConnection implements IServerConnection, Runnable {
 				break;
 			case GET:
 				try {
-					if (!handleMessageValue.trim().equals("") && handleMessageValue != null && !handleMessageValue.trim().equals("null")) {
+					if (!handleMessageValue.trim().isEmpty() && handleMessageValue != null
+							&& !handleMessageValue.trim().equals("null")) {
 						throw new UnexpectedValueException("Unexpected value for GET: " + value);
 					}
-					if (key.trim().equals("") || key == null || key.trim().equals("null")) {
+					if (key.trim().isEmpty() || key == null || key.trim().equals("null")) {
 						throw new InvalidKeyException("Invalid key: " + key);
 					}
 					handleMessageValue = this.kvServer.getKV(key);
