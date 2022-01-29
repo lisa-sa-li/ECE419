@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import java.net.Socket;
 import java.io.IOException;
 
+import shared.exceptions.UnexpectedValueException;
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
 
@@ -20,6 +21,7 @@ public class KVStore implements KVCommInterface, Runnable {
 	int port;
 	private int clientID;
 	private int maxUsers;
+	private boolean running;
 	private Socket clientSocket;
 	private static Logger logger = Logger.getRootLogger();
 	private static final int BUFFER_SIZE = 1024;
@@ -33,7 +35,7 @@ public class KVStore implements KVCommInterface, Runnable {
 	}
 
 	// class for testing
-	public KVStore(String address, int port, int maxUsers, int clientID) {
+	public KVStore(String address, int port, int clientID, int maxUsers) {
 		this.address = address;
 		this.port = port;
 		this.maxUsers = maxUsers;
@@ -43,11 +45,8 @@ public class KVStore implements KVCommInterface, Runnable {
 	@Override
 	public void connect() throws Exception {
 		try {
-			System.out.println("IN CONNECT: "+ address + port);
 			Socket clientSocket = new Socket(address, port);
-			System.out.println("IN after socket");
 			clientConnection = new ClientConnection(clientSocket);
-			System.out.println("IN after client connects");
 
 			logger.info("Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
 					+ clientSocket.getPort());
@@ -82,44 +81,30 @@ public class KVStore implements KVCommInterface, Runnable {
 
 	// for testing
 	public void run() {
+		running = true;
 		int totalUsers = clientID + maxUsers;
-		try {
-			// connect to socket
-			connect();
-
-			System.out.println("umpteenth: ");
-
-
-			// put request per thread
-			for (int i = clientID; i < totalUsers; i ++){
-				System.out.println("loop 1: ");
-				put("cake" + i, "icing" + i);
-				System.out.println("loop 11: ");
+		while(running){
+			try {
+				// connect to socket
+				connect();
+	
+				// put request
+				put("cake" + clientID, "icing" + clientID);
+	
+				// get entry
+				String value;
+				value = get("cake"+clientID).getValue();
+				if(!value.equals("icing"+clientID)){
+					throw new UnexpectedValueException("Unexpected read value: " + value + " for client: " + clientID);
+				} else {
+					System.out.println("SUCCESS: read value: " + value + " for client: " + clientID);
+				}
+				// disconnect from server
+				disconnect();
+				running = false;
+			} catch (Exception e){
+				System.out.println("ERROR: " + e);
 			}
-
-			// update previous entry per thread (test persistent storage)
-			for (int i = clientID; i < totalUsers; i ++){
-				System.out.println("loop 2: ");
-				put("cake" + (i-1), "icing" + (i-1));
-				System.out.println("loop 22: ");
-
-			}
-
-			// get entry per thread
-			String value;
-			for (int i = clientID; i < totalUsers; i ++){
-				System.out.println("loop 3: ");
-				value = get("cake" + i).getValue();
-				System.out.println("GET TEST THREAD VALUE: "+value);
-
-				// if (!value.equals("icing" + (i-1))){
-				// 	testSuccess = false;
-				// }
-			} 
-			disconnect();
-		}
-		catch (Exception e){
-			System.out.println("ERROR: " + e);
 		}
 	}
 
