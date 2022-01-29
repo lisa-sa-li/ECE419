@@ -8,13 +8,16 @@ import app_kvServer.KVServer;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import logger.LogSetup;
+import java.io.File;
 
 public class AllTests {
 
 	static {
 		try {
 			new LogSetup("logs/testing/test.log", Level.ERROR);
-			new KVServer(50000, 10, "NONE");
+			KVServer wipeServer = new KVServer(50000, 10, "NONE", true);
+			wipeServer.clearStorage();
+			KVServer kvServer = new KVServer(50000, 10, "NONE", true);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

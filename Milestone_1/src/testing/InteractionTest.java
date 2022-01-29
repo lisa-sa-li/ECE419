@@ -3,8 +3,9 @@ package testing;
 import org.junit.Test;
 
 import client.KVStore;
+import app_kvServer.KVServer;
 import junit.framework.TestCase;
-import shared.messages.KVMessage;
+import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
 
 public class InteractionTest extends TestCase {
@@ -16,6 +17,9 @@ public class InteractionTest extends TestCase {
 		try {
 			kvClient.connect();
 		} catch (Exception e) {
+			System.out.println("FAILED TO CONNECT CLIENT");
+			System.out.println(e);
+
 		}
 	}
 
@@ -25,9 +29,8 @@ public class InteractionTest extends TestCase {
 
 	@Test
 	public void testPut() {
-		String key = "foo2";
-		String value = "bar2";
-		KVMessage response = null;
+		String key = "foo2", value = "bar2";
+		JSONMessage response = null;
 		Exception ex = null;
 
 		try {
@@ -40,10 +43,54 @@ public class InteractionTest extends TestCase {
 	}
 
 	@Test
+	public void testPutNullKey() {
+		String key = null, value = "bar2";
+		JSONMessage response = null;
+		Exception ex = null;
+
+		try {
+			response = kvClient.put(key, value);
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && response.getStatus() == StatusType.PUT_ERROR);
+	}
+
+	@Test
+	public void testPutManyTerms() {
+		String key = "foo3", value = "bar2 with spaces!";
+		JSONMessage response = null;
+		Exception ex = null;
+
+		try {
+			response = kvClient.put(key, value);
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && response.getStatus() == StatusType.PUT_SUCCESS);
+	}
+
+	@Test
+	public void testPutLongKey() {
+		String key = "tooooloooooooooooooong", value = "bar2";
+		JSONMessage response = null;
+		Exception ex = null;
+
+		try {
+			response = kvClient.put(key, value);
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && response.getStatus() == StatusType.PUT_ERROR);
+	}
+
+	@Test
 	public void testPutDisconnected() {
 		kvClient.disconnect();
-		String key = "foo";
-		String value = "bar";
+		String key = "foo", value = "bar";
 		Exception ex = null;
 
 		try {
@@ -61,7 +108,7 @@ public class InteractionTest extends TestCase {
 		String initialValue = "initial";
 		String updatedValue = "updated";
 
-		KVMessage response = null;
+		JSONMessage response = null;
 		Exception ex = null;
 
 		try {
@@ -78,16 +125,14 @@ public class InteractionTest extends TestCase {
 
 	@Test
 	public void testDelete() {
-		String key = "deleteTestValue";
-		String value = "toDelete";
+		String key = "deleteTestValue", value = "toDelete";
 
-		KVMessage response = null;
+		JSONMessage response = null;
 		Exception ex = null;
 
 		try {
 			kvClient.put(key, value);
 			response = kvClient.put(key, "");
-
 		} catch (Exception e) {
 			ex = e;
 		}
@@ -97,9 +142,8 @@ public class InteractionTest extends TestCase {
 
 	@Test
 	public void testGet() {
-		String key = "foo";
-		String value = "bar";
-		KVMessage response = null;
+		String key = "foo", value = "bar";
+		JSONMessage response = null;
 		Exception ex = null;
 
 		try {
@@ -113,9 +157,26 @@ public class InteractionTest extends TestCase {
 	}
 
 	@Test
+	public void testGetNullKey() {
+		String key = "googone", value = "bar";
+		String nullKey = null;
+		JSONMessage response = null;
+		Exception ex = null;
+
+		try {
+			kvClient.put(key, value);
+			response = kvClient.get(nullKey);
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && response.getStatus() == StatusType.GET_ERROR);
+	}
+
+	@Test
 	public void testGetUnsetValue() {
 		String key = "an unset value";
-		KVMessage response = null;
+		JSONMessage response = null;
 		Exception ex = null;
 
 		try {

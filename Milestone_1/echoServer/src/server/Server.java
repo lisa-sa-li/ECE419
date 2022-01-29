@@ -54,7 +54,7 @@ public class Server extends Thread {
 	                		+  " on port " + client.getPort());
 	            } catch (IOException e) {
 	            	logger.error("Error! " +
-	            			"Unable to establish connection. \n", e);
+	            			"Unable to establish connection to server. \n", e);
 	            }
 	        }
         }

@@ -35,11 +35,10 @@ public class KVStore implements KVCommInterface {
 			Socket clientSocket = new Socket(address, port);
 			clientConnection = new ClientConnection(clientSocket);
 
-			logger.info("Connected to "
-					+ clientSocket.getInetAddress().getHostName()
-					+ " on port " + clientSocket.getPort());
+			logger.info("Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
+					+ clientSocket.getPort());
 		} catch (IOException e) {
-			logger.error("Error! Unable to establish connection. \n", e);
+			logger.error("Error! Unable to establish connection to store. \n", e);
 			throw e;
 		}
 	}
@@ -48,13 +47,12 @@ public class KVStore implements KVCommInterface {
 	public void disconnect() {
 		logger.info("Tearing down the connection ...");
 		try {
-			if (clientSocket != null) {
-				clientSocket.close();
-				clientSocket = null;
-				logger.info("Connection closed!");
-
-				// HOW DO WE CLOSE clientConnection?????
-			}
+			JSONMessage jsonMessage = new JSONMessage();
+			jsonMessage.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "disconnected");
+			this.clientConnection.sendJSONMessage(jsonMessage);
+			this.clientConnection.receiveJSONMessage();
+			this.clientConnection.close();
+			logger.info("Client connection closed!");
 		} catch (IOException e) {
 			logger.error("Error! Unable to close connection. \n", e);
 		}

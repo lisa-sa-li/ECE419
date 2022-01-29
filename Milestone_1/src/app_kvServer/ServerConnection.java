@@ -4,9 +4,12 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.security.InvalidKeyException;
 
 import org.apache.log4j.*;
 
+import shared.exceptions.KeyValueTooLongException;
+import shared.exceptions.UnexpectedValueException;
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
 import shared.messages.TextMessage;
@@ -54,7 +57,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 			logger.info("Connected to " + this.clientSocket.getInetAddress().getHostName() + " on port "
 					+ this.clientSocket.getPort());
 		} catch (IOException e) {
-			logger.error("Error! Unable to establish connection. \n", e);
+			logger.error("Error! Unable to establish server connection. \n", e);
 		}
 	}
 
@@ -77,10 +80,17 @@ public class ServerConnection implements IServerConnection, Runnable {
 		byte read = (byte) input.read();
 		boolean reading = true;
 
+		// Check if stream is closed (read returns -1)
+		if (read == -1) {
+			JSONMessage json = new JSONMessage();
+			json.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "disconnected");
+			return json;
+		}
+
 		int endChar = 0;
 		while (reading && endChar < 3 && read != -1) {
-
 			// Keep a count of EOMs to know when to stop reading
+			// 13 = CR, 10 = LF/NL
 			if (read == 13 || read == 10) {
 				endChar++;
 			}
@@ -93,8 +103,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 				} else {
 					tmp = new byte[msgBytes.length + BUFFER_SIZE];
 					System.arraycopy(msgBytes, 0, tmp, 0, msgBytes.length);
-					System.arraycopy(bufferBytes, 0, tmp, msgBytes.length,
-							BUFFER_SIZE);
+					System.arraycopy(bufferBytes, 0, tmp, msgBytes.length, BUFFER_SIZE);
 				}
 
 				msgBytes = tmp;
@@ -146,13 +155,23 @@ public class ServerConnection implements IServerConnection, Runnable {
 		String value = msg.getValue();
 		StatusType status = msg.getStatus();
 
-		String handleMessageValue = value.isEmpty() ? "" : value; // For PUT or DELETE, send the original value back
+		String handleMessageValue = value; // For PUT or DELETE, send the original value back
 		StatusType handleMessageStatus = StatusType.NO_STATUS;
 		JSONMessage handleMessage = new JSONMessage();
 
 		switch (status) {
 			case PUT:
 				try {
+					// check key, value length
+					if (key.length() > 20) {
+						throw new KeyValueTooLongException("Key too long : " + key);
+					}
+					if (key.trim().isEmpty() || key == null || key.trim().equals("null")) {
+						throw new InvalidKeyException("Invalid key: " + key);
+					}
+					if (value.length() > 120000) {
+						throw new KeyValueTooLongException("Value too long : " + value);
+					}
 					handleMessageStatus = this.kvServer.putKV(key, value);
 					logger.info(handleMessageStatus.name() + ": key " + key + " & value " + value);
 				} catch (Exception e) {
@@ -162,6 +181,13 @@ public class ServerConnection implements IServerConnection, Runnable {
 				break;
 			case GET:
 				try {
+					if (!handleMessageValue.trim().isEmpty() && handleMessageValue != null
+							&& !handleMessageValue.trim().equals("null")) {
+						throw new UnexpectedValueException("Unexpected value for GET: " + value);
+					}
+					if (key.trim().isEmpty() || key == null || key.trim().equals("null")) {
+						throw new InvalidKeyException("Invalid key: " + key);
+					}
 					handleMessageValue = this.kvServer.getKV(key);
 					handleMessageStatus = StatusType.GET_SUCCESS;
 					logger.info("GET_SUCCESS: key " + key + " & value " + handleMessageValue);
@@ -169,6 +195,11 @@ public class ServerConnection implements IServerConnection, Runnable {
 					handleMessageStatus = StatusType.GET_ERROR;
 					logger.info("GET_ERROR: key " + key + " & value " + handleMessageValue);
 				}
+				break;
+			case DISCONNECTED:
+				this.isOpen = false;
+				handleMessageStatus = StatusType.DISCONNECTED;
+				logger.info("Client is disconnected");
 				break;
 			default:
 				logger.error("Unknown command.");
@@ -200,6 +231,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 			try {
 				// close connection
 				if (clientSocket != null) {
+					// Send message????
 					input.close();
 					output.close();
 					clientSocket.close();

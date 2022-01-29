@@ -9,6 +9,7 @@ import org.apache.log4j.*;
 
 import shared.messages.JSONMessage;
 import shared.messages.TextMessage;
+import shared.messages.KVMessage.StatusType;
 
 /**
  * Represents a connection end point for a particular client that is
@@ -46,8 +47,9 @@ public class ClientConnection implements IClientConnection {
 		byte[] jsonBytes = json.getJSONByte();
 		output.write(jsonBytes, 0, jsonBytes.length);
 		output.flush();
-		logger.info("SEND \t<" + clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort() + ">: '"
-				+ json.getJSON() + "'");
+		logger.info(
+				"SEND \t<" + clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort() + ">: '"
+						+ json.getJSON() + "'");
 	}
 
 	@Override
@@ -60,17 +62,17 @@ public class ClientConnection implements IClientConnection {
 		byte read = (byte) input.read();
 		boolean reading = true;
 
-		// logger.info("First Char: " + read);
 		// Check if stream is closed (read returns -1)
-		// if (read == -1){
-		// TextMessage msg = new TextMessage("");
-		// return msg;
-		// }
+		if (read == -1) {
+			JSONMessage json = new JSONMessage();
+			json.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "disconnected");
+			return json;
+		}
 
 		int endChar = 0;
 		while (reading && endChar < 3 && read != -1) {
-
 			// Keep a count of EOMs to know when to stop reading
+			// 13 = CR, 10 = LF/NL
 			if (read == 13 || read == 10) {
 				endChar++;
 			}
@@ -83,8 +85,7 @@ public class ClientConnection implements IClientConnection {
 				} else {
 					tmp = new byte[msgBytes.length + BUFFER_SIZE];
 					System.arraycopy(msgBytes, 0, tmp, 0, msgBytes.length);
-					System.arraycopy(bufferBytes, 0, tmp, msgBytes.length,
-							BUFFER_SIZE);
+					System.arraycopy(bufferBytes, 0, tmp, msgBytes.length, BUFFER_SIZE);
 				}
 
 				msgBytes = tmp;
@@ -132,4 +133,19 @@ public class ClientConnection implements IClientConnection {
 		return json;
 	}
 
+	public void close() throws IOException {
+		try {
+			if (clientSocket != null) {
+				clientSocket.close();
+			}
+			if (input != null) {
+				input.close();
+			}
+			if (output != null) {
+				output.close();
+			}
+		} catch (IOException ioe) {
+			logger.error("Error! Unable to tear down connection!", ioe);
+		}
+	}
 }

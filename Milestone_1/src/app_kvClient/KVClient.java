@@ -9,12 +9,15 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.SocketException;
 
 public class KVClient implements IKVClient, Runnable {
     private static Logger logger = Logger.getRootLogger();
     private static final String PROMPT = "KVClient> ";
     private KVStore kvStore;
     private boolean stop = false;
+    String hostname;
+    int port;
 
     @Override
     public void newConnection(String hostname, int port) throws Exception {
@@ -28,6 +31,8 @@ public class KVClient implements IKVClient, Runnable {
             this.kvStore = null;
             throw e;
         }
+        this.hostname = hostname;
+        this.port = port;
     }
 
     @Override
@@ -77,7 +82,7 @@ public class KVClient implements IKVClient, Runnable {
                 case "put":
                     if (this.kvStore != null) { // && this.kvStore.isRunning()) {
                         String key = tokens[1];
-                        if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes idk
+                        if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes
                             if (tokens.length >= 3) {
                                 // CREATE or UPDATE key,value
                                 StringBuilder val = new StringBuilder();
@@ -91,22 +96,38 @@ public class KVClient implements IKVClient, Runnable {
                                 if (valStr.length() <= 120000) {
                                     try {
                                         JSONMessage msg = this.kvStore.put(tokens[1], valStr);
-                                        // PLACE status message here
-                                        // logger.info(msg);
+                                        System.out.println(msg.getStatus() + "\t key: " + msg.getKey() + " & value: "
+                                                + msg.getValue());
+                                    } catch (SocketException se) {
+                                        try {
+                                            this.kvStore.connect();
+                                            JSONMessage msg = this.kvStore.put(tokens[1], valStr);
+                                            System.out.println(msg.getStatus() + "\t key: " + msg.getKey()
+                                                    + " & value: " + msg.getValue());
+                                        } catch (Exception e) {
+                                            System.out.println("Socket connection to server is closed.");
+                                        }
                                     } catch (Exception e) {
-                                        logger.error("Error putting key: " + e);
+                                        System.out.println("Error putting key: " + e);
                                     }
                                 } else {
-                                    logger.error("Value length must be max 120000."); // Exact size of val bytes idk
+                                    logger.error("Value length must be max 120000."); // Exact size of val bytes
                                 }
                             } else if (tokens.length == 2) {
                                 // DELETE key,value pair
                                 try {
                                     JSONMessage msg = this.kvStore.put(tokens[1], "");
-                                    // PLACE status message here
-                                    // logger.info(msg);
+                                    System.out.println(msg.getStatus() + "\t key: " + msg.getKey());
+                                } catch (SocketException se) {
+                                    try {
+                                        this.kvStore.connect();
+                                        JSONMessage msg = this.kvStore.put(tokens[1], "");
+                                        System.out.println(msg.getStatus() + "\t key: " + msg.getKey());
+                                    } catch (Exception e) {
+                                        System.out.println("Socket connection to server is closed.");
+                                    }
                                 } catch (Exception e) {
-                                    logger.error("Error deleteing key: " + e);
+                                    System.out.println("Error deleting key: " + e);
                                 }
                             } else {
                                 logger.error("No message is passed!");
@@ -120,22 +141,35 @@ public class KVClient implements IKVClient, Runnable {
                     }
                     break;
                 case "get":
-                    if (this.kvStore != null) { // && this.kvStore.isRunning()) {
-                        String key = tokens[1];
-                        if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes idk
-                            try {
-                                JSONMessage msg = this.kvStore.get(key);
-                                // PLACE status message here
-                                // logger.info(msg);
-                            } catch (Exception e) {
-                                logger.error("Error getting key: " + e);
+                    if (tokens.length > 2) {
+                        logger.error("Invalid number of parameters!");
+                    } else {
+                        if (this.kvStore != null) {
+                            String key = tokens[1];
+                            if (key.length() <= 20 && key.length() > 0) {
+                                try {
+                                    JSONMessage msg = this.kvStore.get(key);
+                                    System.out.println(msg.getStatus() + "\t key: " + msg.getKey() + " & value: "
+                                            + msg.getValue());
+                                } catch (SocketException se) {
+                                    try {
+                                        this.kvStore.connect();
+                                        JSONMessage msg = this.kvStore.get(key);
+                                        System.out.println(msg.getStatus() + "\t key: " + msg.getKey() + " & value: "
+                                                + msg.getValue());
+                                    } catch (Exception e) {
+                                        System.out.println("Socket connection to server is closed.");
+                                    }
+                                } catch (Exception e) {
+                                    System.out.println("Error getting key: " + e);
+                                }
+                            } else {
+                                logger.error("Key length must be between 1 and 20.");
                             }
                         } else {
-                            logger.error("Key length must be between 1 and 20.");
+                            System.out.println("Not connected to any store.");
+                            logger.warn("Not connected to any store.");
                         }
-                    } else {
-                        System.out.println("Not connected to any store.");
-                        logger.warn("Not connected to any store.");
                     }
                     break;
                 case "disconnect":

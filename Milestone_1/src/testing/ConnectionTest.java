@@ -3,16 +3,18 @@ package testing;
 import java.net.UnknownHostException;
 
 import client.KVStore;
+import app_kvServer.KVServer;
 
 import junit.framework.TestCase;
-
 public class ConnectionTest extends TestCase {
 
+	private KVServer kvServer;
+	private Thread testThread;
+
 	public void testConnectionSuccess() {
-
 		Exception ex = null;
-
 		KVStore kvClient = new KVStore("localhost", 50000);
+		
 		try {
 			kvClient.connect();
 		} catch (Exception e) {

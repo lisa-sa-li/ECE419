@@ -92,8 +92,6 @@ public class Application implements ClientSocketListener {
 					// SERIALIZE HERE
 					JSONMessage msg = new JSONMessage();
 					msg.setMessage(tokens[0], tokens[1], tokens[2]);
-					System.out.print("HEREEEEE");
-					System.out.print(msg.serialize());
 					sendMessage(msg.serialize());
 				} else {
 					printError("Not connected!");

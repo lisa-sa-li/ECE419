@@ -47,6 +47,18 @@ public class KVServer implements IKVServer, Runnable {
 		this.threads = new ArrayList<Thread>();
 	}
 
+	public KVServer(int port, int cacheSize, String strategy, boolean test) {
+		this.port = port;
+		this.cacheSize = cacheSize;
+		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
+		this.threads = new ArrayList<Thread>();
+
+		if(test){
+			Thread testThread = new Thread(this);
+			testThread.start();
+		}
+	}
+
 	@Override
 	public int getPort() {
 		return this.port;
@@ -143,7 +155,7 @@ public class KVServer implements IKVServer, Runnable {
 							"Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
 									+ clientSocket.getPort());
 				} catch (IOException e) {
-					logger.error("Error! " + "Unable to establish connection. \n", e);
+					logger.error("Error! " + "Unable to establish connection to server. \n", e);
 				} catch (Exception e) {
 					logger.error("Error! \n", e);
 				}
@@ -165,6 +177,10 @@ public class KVServer implements IKVServer, Runnable {
 	public void close() {
 		running = false;
 		try {
+			// find + stop all threads
+			for (int i = 0; i < threads.size(); i++){
+				threads.get(i).interrupt();
+			}
 			serverSocket.close();
 		} catch (IOException e) {
 			logger.error("Error! " +
