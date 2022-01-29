@@ -83,18 +83,18 @@ public class KVStore implements KVCommInterface, Runnable {
 	public void run() {
 		running = true;
 		int totalUsers = clientID + maxUsers;
-		while (running) {
+		while(running){
 			try {
 				// connect to socket
 				connect();
-
+	
 				// put request
 				put("cake" + clientID, "icing" + clientID);
-
+	
 				// get entry
 				String value;
-				value = get("cake" + clientID).getValue();
-				if (!value.equals("icing" + clientID)) {
+				value = get("cake"+clientID).getValue();
+				if(!value.equals("icing"+clientID)){
 					throw new UnexpectedValueException("Unexpected read value: " + value + " for client: " + clientID);
 				} else {
 					System.out.println("SUCCESS: read value: " + value + " for client: " + clientID);
@@ -102,7 +102,7 @@ public class KVStore implements KVCommInterface, Runnable {
 				// disconnect from server
 				disconnect();
 				running = false;
-			} catch (Exception e) {
+			} catch (Exception e){
 				System.out.println("ERROR: " + e);
 			}
 		}

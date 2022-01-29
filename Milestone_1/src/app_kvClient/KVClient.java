@@ -80,7 +80,7 @@ public class KVClient implements IKVClient, Runnable {
                     }
                     break;
                 case "put":
-                    if (this.kvStore != null) {
+                    if (this.kvStore != null) { // && this.kvStore.isRunning()) {
                         String key = tokens[1];
                         if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes
                             if (tokens.length >= 3) {
@@ -114,7 +114,7 @@ public class KVClient implements IKVClient, Runnable {
                                     logger.error("Value length must be max 120000."); // Exact size of val bytes
                                 }
                             } else if (tokens.length == 2) {
-                                // DELETE key, value pair
+                                // DELETE key,value pair
                                 try {
                                     JSONMessage msg = this.kvStore.put(tokens[1], "");
                                     System.out.println(msg.getStatus() + "\t key: " + msg.getKey());
@@ -294,8 +294,8 @@ public class KVClient implements IKVClient, Runnable {
     public static void main(String[] args) {
         try {
             new LogSetup("logs/client.log", Level.ALL);
-            KVClient kvClient = new KVClient();
-            kvClient.run();
+            KVClient kv_client = new KVClient();
+            kv_client.run();
         } catch (IOException e) {
             System.out.println("Error! Unable to initialize logger!");
             e.printStackTrace();
