@@ -178,6 +178,7 @@ public class KVServer implements IKVServer, Runnable {
 			logger.error("Error! Unable to close socket on port: " + port, e);
 			}
 		}
+        System.exit(0);
 	}
 
 	@Override
