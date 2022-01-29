@@ -18,6 +18,7 @@ public class AdditionalTest extends TestCase {
 	public void setUp() {
 		try {
 			persistantStorage = new PersistantStorage("50001");
+			persistantStorage.clearStorage();
 		} catch (Exception e) {
 			System.out.println("Failed to set up persistant storage");
 			System.out.println(e);
@@ -25,7 +26,7 @@ public class AdditionalTest extends TestCase {
 	}
 
 	public void tearDown() {
-		persistantStorage.clearStorage();
+		persistantStorage.deleteStorage();
 	}
 
 	@Test
@@ -35,16 +36,43 @@ public class AdditionalTest extends TestCase {
 	}
 
 	@Test
-	public void testFileCleared() {
+	public void testFileDeleted() {
 		Path path;
 
 		path = Paths.get("./storage/50001_storage.txt");
 		assertTrue(Files.exists(path));
 
-		persistantStorage.clearStorage();
+		persistantStorage.deleteStorage();
 
 		path = Paths.get("./storage/50001_storage.txt");
 		assertFalse(Files.exists(path));
+	}
+
+	@Test
+	public void testFileCleared() {
+		String key = "foo", value = "bar";
+		Path path;
+		File f;
+		String pathToFile = "./storage/50001_storage.txt";
+		Exception ex = null;
+
+		path = Paths.get(pathToFile);
+		assertTrue(Files.exists(path));
+		f = new File(pathToFile);
+		assertTrue(f.length() == 0);
+
+		try {
+			persistantStorage.put(key, value);
+		} catch (Exception e) {
+			ex = e;
+		}
+		assertTrue(ex == null && f.length() > 0);
+
+		persistantStorage.clearStorage();
+		assertTrue(f.length() == 0);
+
+		path = Paths.get(pathToFile);
+		assertTrue(Files.exists(path));
 	}
 
 	@Test
@@ -117,7 +145,7 @@ public class AdditionalTest extends TestCase {
 
 		try {
 			// Remove the file so there's nothing to write to
-			persistantStorage.clearStorage();
+			persistantStorage.deleteStorage();
 			status = persistantStorage.put(key, value);
 		} catch (Exception e) {
 			ex = e;
@@ -165,7 +193,7 @@ public class AdditionalTest extends TestCase {
 
 		try {
 			// Remove the file so there's nothing to read from
-			persistantStorage.clearStorage();
+			persistantStorage.deleteStorage();
 			getValue = persistantStorage.get(key);
 		} catch (Exception e) {
 			ex = e;

@@ -34,6 +34,8 @@ public interface IPersistantStorage {
 
 	public boolean inStorage(String key) throws Exception;
 
+	public void deleteStorage();
+
 	public void clearStorage();
 
 }

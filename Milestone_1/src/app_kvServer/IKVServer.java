@@ -82,6 +82,11 @@ public interface IKVServer {
     public void clearStorage();
 
     /**
+     * Delete the storage of the server
+     */
+    public void deleteStorage();
+
+    /**
      * Starts running the server
      */
     public void run();
