@@ -107,7 +107,10 @@ public class JSONMessage implements KVMessage, Serializable {
         strMessage.append("{");
         String statusEntry = ("\"status\":\"" + this.status.name() + "\",");
         strMessage.append(statusEntry);
-        if (this.value != null && !this.value.trim().isEmpty()) {
+        if (this.value == null) {
+            this.value = "";
+        }
+        if (!this.value.trim().isEmpty()) {
             String KVEntry = ("\"" + this.key + "\":\"" + this.value + "\",");
             strMessage.append(KVEntry);
         } else {

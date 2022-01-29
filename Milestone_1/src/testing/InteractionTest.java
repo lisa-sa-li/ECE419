@@ -43,21 +43,6 @@ public class InteractionTest extends TestCase {
 	}
 
 	@Test
-	public void testPutNullKey() {
-		String key = null, value = "bar2";
-		JSONMessage response = null;
-		Exception ex = null;
-
-		try {
-			response = kvClient.put(key, value);
-		} catch (Exception e) {
-			ex = e;
-		}
-
-		assertTrue(ex == null && response.getStatus() == StatusType.PUT_ERROR);
-	}
-
-	@Test
 	public void testPutManyTerms() {
 		String key = "foo3", value = "bar2 with spaces!";
 		JSONMessage response = null;
@@ -157,23 +142,6 @@ public class InteractionTest extends TestCase {
 	}
 
 	@Test
-	public void testGetNullKey() {
-		String key = "googone", value = "bar";
-		String nullKey = null;
-		JSONMessage response = null;
-		Exception ex = null;
-
-		try {
-			kvClient.put(key, value);
-			response = kvClient.get(nullKey);
-		} catch (Exception e) {
-			ex = e;
-		}
-
-		assertTrue(ex == null && response.getStatus() == StatusType.GET_ERROR);
-	}
-
-	@Test
 	public void testGetUnsetValue() {
 		String key = "an unset value";
 		JSONMessage response = null;
@@ -200,7 +168,7 @@ public class InteractionTest extends TestCase {
 			ex = e;
 		}
 
-		assertTrue(ex == null && response.getStatus() == StatusType.DELETE_ERROR);
+		assertTrue(ex == null && response.getStatus() == StatusType.PUT_ERROR);
 	}
 
 }
