@@ -4,12 +4,13 @@ import org.apache.log4j.Logger;
 import java.net.Socket;
 import java.io.IOException;
 
+import shared.exceptions.UnexpectedValueException;
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
 
 import app_kvClient.ClientConnection;
 
-public class KVStore implements KVCommInterface {
+public class KVStore implements KVCommInterface, Runnable {
 	/**
 	 * Initialize KVStore with address and port of KVServer
 	 * 
@@ -18,6 +19,9 @@ public class KVStore implements KVCommInterface {
 	 */
 	String address;
 	int port;
+	private int clientID;
+	private int maxUsers;
+	private boolean running;
 	private Socket clientSocket;
 	private static Logger logger = Logger.getRootLogger();
 	private static final int BUFFER_SIZE = 1024;
@@ -27,6 +31,15 @@ public class KVStore implements KVCommInterface {
 	public KVStore(String address, int port) {
 		this.address = address;
 		this.port = port;
+		this.clientID = -1;
+	}
+
+	// class for testing
+	public KVStore(String address, int port, int clientID, int maxUsers) {
+		this.address = address;
+		this.port = port;
+		this.maxUsers = maxUsers;
+		this.clientID = clientID;
 	}
 
 	@Override
@@ -64,6 +77,35 @@ public class KVStore implements KVCommInterface {
 		jsonMessage.setMessage(StatusType.PUT.name(), key, value);
 		this.clientConnection.sendJSONMessage(jsonMessage);
 		return this.clientConnection.receiveJSONMessage();
+	}
+
+	// for testing
+	public void run() {
+		running = true;
+		int totalUsers = clientID + maxUsers;
+		while(running){
+			try {
+				// connect to socket
+				connect();
+	
+				// put request
+				put("cake" + clientID, "icing" + clientID);
+	
+				// get entry
+				String value;
+				value = get("cake"+clientID).getValue();
+				if(!value.equals("icing"+clientID)){
+					throw new UnexpectedValueException("Unexpected read value: " + value + " for client: " + clientID);
+				} else {
+					System.out.println("SUCCESS: read value: " + value + " for client: " + clientID);
+				}
+				// disconnect from server
+				disconnect();
+				running = false;
+			} catch (Exception e){
+				System.out.println("ERROR: " + e);
+			}
+		}
 	}
 
 	@Override

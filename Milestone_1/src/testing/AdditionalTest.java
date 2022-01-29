@@ -1,6 +1,9 @@
 package testing;
 
+import java.beans.Transient;
+
 import org.junit.Test;
+import client.KVStore;
 
 import app_kvServer.PersistantStorage;
 import junit.framework.TestCase;

@@ -10805,6 +10805,7 @@ java.net.SocketException: Socket closed
 	at org.apache.tools.ant.Main.startAnt(Main.java:223)
 	at org.apache.tools.ant.launch.Launcher.run(Launcher.java:284)
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
+<<<<<<< HEAD
 2022-01-28 14:13:33,587 ERROR [main] root: Error! Unable to establish connection. 
 
 java.net.ConnectException: Connection refused (Connection refused)
@@ -10869,6 +10870,25 @@ java.net.UnknownHostException: unknown
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+=======
+2022-01-28 22:22:35,394 ERROR [Thread-1] root: Error! Cannot open server socket:
+2022-01-28 22:22:35,395 ERROR [Thread-1] root: Port 50000 is already bound!
+2022-01-28 22:22:35,514 ERROR [main] root: Error! Unable to establish connection to store. 
+
+java.net.UnknownHostException: unknown
+	at java.base/sun.nio.ch.NioSocketImpl.connect(NioSocketImpl.java:567)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:327)
+	at java.base/java.net.Socket.connect(Socket.java:633)
+	at java.base/java.net.Socket.connect(Socket.java:583)
+	at java.base/java.net.Socket.<init>(Socket.java:507)
+	at java.base/java.net.Socket.<init>(Socket.java:287)
+	at client.KVStore.connect(KVStore.java:46)
+	at testing.ConnectionTest.testUnknownHost(ConnectionTest.java:32)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+>>>>>>> 3c3c650f4d75939462d78c0ca33291a2746074e6
 	at junit.framework.TestCase.runTest(TestCase.java:168)
 	at junit.framework.TestCase.runBare(TestCase.java:134)
 	at junit.framework.TestResult$1.protect(TestResult.java:110)
@@ -10887,6 +10907,7 @@ java.net.UnknownHostException: unknown
 	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:299)
 	at jdk.internal.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+<<<<<<< HEAD
 	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
 	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:99)
 	at org.apache.tools.ant.Task.perform(Task.java:350)
@@ -11108,6 +11129,9 @@ java.net.ConnectException: Connection refused (Connection refused)
 	at jdk.internal.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+=======
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+>>>>>>> 3c3c650f4d75939462d78c0ca33291a2746074e6
 	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:99)
 	at org.apache.tools.ant.Task.perform(Task.java:350)
 	at org.apache.tools.ant.Target.execute(Target.java:449)
@@ -11120,6 +11144,7 @@ java.net.ConnectException: Connection refused (Connection refused)
 	at org.apache.tools.ant.Main.startAnt(Main.java:223)
 	at org.apache.tools.ant.launch.Launcher.run(Launcher.java:284)
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
+<<<<<<< HEAD
 2022-01-28 14:13:33,615 ERROR [main] root: Error! Unable to establish connection. 
 
 java.net.ConnectException: Connection refused (Connection refused)
@@ -11135,6 +11160,21 @@ java.net.ConnectException: Connection refused (Connection refused)
 	at client.KVStore.connect(KVStore.java:35)
 	at testing.InteractionTest.setUp(InteractionTest.java:17)
 	at junit.framework.TestCase.runBare(TestCase.java:132)
+=======
+2022-01-28 22:22:35,536 ERROR [main] root: Error! Unable to close connection. 
+
+java.net.SocketException: Socket closed
+	at java.base/sun.nio.ch.NioSocketImpl.ensureOpenAndConnected(NioSocketImpl.java:165)
+	at java.base/sun.nio.ch.NioSocketImpl.beginWrite(NioSocketImpl.java:366)
+	at java.base/sun.nio.ch.NioSocketImpl.implWrite(NioSocketImpl.java:411)
+	at java.base/sun.nio.ch.NioSocketImpl.write(NioSocketImpl.java:440)
+	at java.base/sun.nio.ch.NioSocketImpl$2.write(NioSocketImpl.java:826)
+	at java.base/java.net.Socket$SocketOutputStream.write(Socket.java:1035)
+	at app_kvClient.ClientConnection.sendJSONMessage(ClientConnection.java:48)
+	at client.KVStore.disconnect(KVStore.java:63)
+	at testing.InteractionTest.tearDown(InteractionTest.java:28)
+	at junit.framework.TestCase.runBare(TestCase.java:140)
+>>>>>>> 3c3c650f4d75939462d78c0ca33291a2746074e6
 	at junit.framework.TestResult$1.protect(TestResult.java:110)
 	at junit.framework.TestResult.runProtected(TestResult.java:128)
 	at junit.framework.TestResult.run(TestResult.java:113)
@@ -11151,7 +11191,11 @@ java.net.ConnectException: Connection refused (Connection refused)
 	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:299)
 	at jdk.internal.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+<<<<<<< HEAD
 	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+=======
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+>>>>>>> 3c3c650f4d75939462d78c0ca33291a2746074e6
 	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:99)
 	at org.apache.tools.ant.Task.perform(Task.java:350)
 	at org.apache.tools.ant.Target.execute(Target.java:449)
