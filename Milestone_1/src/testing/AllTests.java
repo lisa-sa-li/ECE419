@@ -10,7 +10,6 @@ import junit.framework.TestSuite;
 import logger.LogSetup;
 import java.io.File;
 
-
 public class AllTests {
 
 	static {

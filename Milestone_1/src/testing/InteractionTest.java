@@ -5,7 +5,6 @@ import org.junit.Test;
 import client.KVStore;
 import app_kvServer.KVServer;
 import junit.framework.TestCase;
-import shared.messages.KVMessage;
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
 
@@ -30,8 +29,7 @@ public class InteractionTest extends TestCase {
 
 	@Test
 	public void testPut() {
-		String key = "foo2";
-		String value = "bar2";
+		String key = "foo2", value = "bar2";
 		JSONMessage response = null;
 		Exception ex = null;
 
@@ -46,8 +44,7 @@ public class InteractionTest extends TestCase {
 
 	@Test
 	public void testPutNullKey() {
-		String key = null;
-		String value = "bar2";
+		String key = null, value = "bar2";
 		JSONMessage response = null;
 		Exception ex = null;
 
@@ -62,8 +59,7 @@ public class InteractionTest extends TestCase {
 
 	@Test
 	public void testPutManyTerms() {
-		String key = "foo3";
-		String value = "bar2 with spaces!";
+		String key = "foo3", value = "bar2 with spaces!";
 		JSONMessage response = null;
 		Exception ex = null;
 
@@ -78,8 +74,7 @@ public class InteractionTest extends TestCase {
 
 	@Test
 	public void testPutLongKey() {
-		String key = "tooooloooooooooooooong";
-		String value = "bar2";
+		String key = "tooooloooooooooooooong", value = "bar2";
 		JSONMessage response = null;
 		Exception ex = null;
 
@@ -95,8 +90,7 @@ public class InteractionTest extends TestCase {
 	@Test
 	public void testPutDisconnected() {
 		kvClient.disconnect();
-		String key = "foo";
-		String value = "bar";
+		String key = "foo", value = "bar";
 		Exception ex = null;
 
 		try {
@@ -114,7 +108,7 @@ public class InteractionTest extends TestCase {
 		String initialValue = "initial";
 		String updatedValue = "updated";
 
-		KVMessage response = null;
+		JSONMessage response = null;
 		Exception ex = null;
 
 		try {
@@ -131,10 +125,9 @@ public class InteractionTest extends TestCase {
 
 	@Test
 	public void testDelete() {
-		String key = "deleteTestValue";
-		String value = "toDelete";
+		String key = "deleteTestValue", value = "toDelete";
 
-		KVMessage response = null;
+		JSONMessage response = null;
 		Exception ex = null;
 
 		try {
@@ -149,9 +142,8 @@ public class InteractionTest extends TestCase {
 
 	@Test
 	public void testGet() {
-		String key = "foo";
-		String value = "bar";
-		KVMessage response = null;
+		String key = "foo", value = "bar";
+		JSONMessage response = null;
 		Exception ex = null;
 
 		try {
@@ -166,10 +158,9 @@ public class InteractionTest extends TestCase {
 
 	@Test
 	public void testGetNullKey() {
-		String key = "googone";
-		String value = "bar";
+		String key = "googone", value = "bar";
 		String nullKey = null;
-		KVMessage response = null;
+		JSONMessage response = null;
 		Exception ex = null;
 
 		try {
@@ -185,7 +176,7 @@ public class InteractionTest extends TestCase {
 	@Test
 	public void testGetUnsetValue() {
 		String key = "an unset value";
-		KVMessage response = null;
+		JSONMessage response = null;
 		Exception ex = null;
 
 		try {

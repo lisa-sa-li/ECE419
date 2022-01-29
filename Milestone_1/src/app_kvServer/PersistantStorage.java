@@ -77,7 +77,7 @@ public class PersistantStorage implements IPersistantStorage {
 
                     // If value == "", that means to delete so we will skip appending the line
                     // Otherwise, update the value and append to file
-                    if (value.trim().equals("") || value == null || value.trim().equals("null")) {
+                    if (value.trim().isEmpty() || value == null || value.trim().equals("null")) {
                         putStatus = StatusType.DELETE_SUCCESS;
                     } else {
                         json.setValue(value);
@@ -97,8 +97,10 @@ public class PersistantStorage implements IPersistantStorage {
             }
 
             // If key does not exist in the file
+            // If delete: return DELETE_ERROR
+            // If put: append to end of file and return PUT_SUCCESS
             if (foundKey == false) {
-                if (value.equals("")) {
+                if (value.isEmpty()) {
                     logger.info("Key does not exist and cannot 'delete'");
                     putStatus = StatusType.DELETE_ERROR;
                 } else {
@@ -108,7 +110,6 @@ public class PersistantStorage implements IPersistantStorage {
                     inputBuffer.append(line);
                     inputBuffer.append('\n');
                     putStatus = StatusType.PUT_SUCCESS;
-
                 }
             }
             file.close();
