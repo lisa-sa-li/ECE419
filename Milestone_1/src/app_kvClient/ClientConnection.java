@@ -95,7 +95,7 @@ public class ClientConnection implements IClientConnection {
 				reading = false;
 			}
 
-			/* read next char from stream */
+			// Read next char from stream
 			read = (byte) input.read();
 		}
 
@@ -110,15 +110,13 @@ public class ClientConnection implements IClientConnection {
 
 		msgBytes = tmp;
 
-		/* build final Object */
+		// Build final Object and convert from bytes to string
 		JSONMessage json = new JSONMessage();
-		// bytes to string
 		String jsonStr = json.byteToString(msgBytes);
 		if (jsonStr == null || jsonStr.trim().isEmpty()) {
 			logger.debug("jsonStr is null in ClientConnection");
 			return null;
 		}
-		// deserialize
 		json.deserialize(jsonStr);
 		logger.info("RECEIVE \t<" + clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort()
 				+ ">: '" + json.getJSON().trim() + "'");

@@ -53,7 +53,7 @@ public class KVServer implements IKVServer, Runnable {
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
 		this.threads = new ArrayList<Thread>();
 
-		if(test){
+		if (test) {
 			Thread testThread = new Thread(this);
 			testThread.start();
 		}
@@ -146,7 +146,6 @@ public class KVServer implements IKVServer, Runnable {
 				try {
 					clientSocket = serverSocket.accept();
 					ServerConnection serverConnection = new ServerConnection(clientSocket, this);
-					// ????
 					Thread newThread = new Thread(serverConnection);
 					newThread.start();
 					this.threads.add(newThread);
@@ -178,7 +177,7 @@ public class KVServer implements IKVServer, Runnable {
 		running = false;
 		try {
 			// find + stop all threads
-			for (int i = 0; i < threads.size(); i++){
+			for (int i = 0; i < threads.size(); i++) {
 				threads.get(i).interrupt();
 			}
 			serverSocket.close();
