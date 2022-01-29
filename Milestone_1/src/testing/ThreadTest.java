@@ -1,6 +1,7 @@
 package testing;
 import client.KVStore;
 import app_kvServer.KVServer;
+import java.util.concurrent.TimeUnit;
 
 import logger.LogSetup;
 import org.apache.log4j.Level;
@@ -16,21 +17,29 @@ public class ThreadTest {
     int port = 8085;
     
     public void testThreads(){
-        kvServer = new KVServer(port, 0, "");
+        // start server twice to clear file
+        kvServer = new KVServer(port, 0, "", true);
+        kvServer.clearStorage();
+        kvServer = new KVServer(port, 0, "", true);
 
         for(int i=0; i < NUM_THREADS; i++){
             // create store
             users[i] = new KVStore("localhost", port, i, NUM_THREADS);
 
-            // run the put + update + get requests
+            // run the put + get requests
             threads[i] = new Thread(users[i]);
 
             // start the thread
-			System.out.println("SANDAKJFHIRHGU: ");
             threads[i].start();
 
+            // in lieu of locks
+			try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                threads[i].interrupt();
+            }
         }
-
+        kvServer.close();
     }
 
     public static void main(String[] args) {
