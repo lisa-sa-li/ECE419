@@ -1530,3 +1530,155 @@ java.io.IOException: Connection is already established
 2022-01-28 17:30:24,594 INFO  [main] root: Connected to localhost on port 8080
 2022-01-28 17:30:24,595 INFO  [main] root: Connection established to 127.0.0.1:8080
 2022-01-28 17:30:27,631 ERROR [main] root: Key length must be between 1 and 20.
+2022-01-28 17:41:10,335 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 17:41:10,336 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 17:41:45,055 ERROR [main] root: Invalid number of parameters!
+2022-01-28 17:57:18,115 ERROR [main] root: Invalid number of parameters!
+2022-01-28 17:57:22,173 WARN  [main] root: Not connected to any store.
+2022-01-28 17:57:24,684 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 17:57:24,684 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 17:57:25,888 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","foo":""}'
+2022-01-28 17:57:25,895 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_ERROR","foo":""}'
+2022-01-28 17:57:36,989 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","sandra":""}'
+2022-01-28 17:57:36,991 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_ERROR","sandra":""}'
+2022-01-28 17:57:40,803 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
+2022-01-28 17:57:40,805 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_ERROR","a":""}'
+2022-01-28 17:58:52,351 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 17:58:52,352 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 17:58:55,084 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
+2022-01-28 17:58:55,092 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_ERROR","a":""}'
+2022-01-28 17:59:16,805 ERROR [main] root: Error! Unable to establish connection to store. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:399)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:242)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:224)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:403)
+	at java.base/java.net.Socket.connect(Socket.java:591)
+	at java.base/java.net.Socket.connect(Socket.java:540)
+	at java.base/java.net.Socket.<init>(Socket.java:436)
+	at java.base/java.net.Socket.<init>(Socket.java:213)
+	at client.KVStore.connect(KVStore.java:35)
+	at app_kvClient.KVClient.newConnection(KVClient.java:29)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:69)
+	at app_kvClient.KVClient.run(KVClient.java:279)
+	at app_kvClient.KVClient.main(KVClient.java:292)
+2022-01-28 17:59:16,813 ERROR [main] root: Something went wrong! 
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:399)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:242)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:224)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:403)
+	at java.base/java.net.Socket.connect(Socket.java:591)
+	at java.base/java.net.Socket.connect(Socket.java:540)
+	at java.base/java.net.Socket.<init>(Socket.java:436)
+	at java.base/java.net.Socket.<init>(Socket.java:213)
+	at client.KVStore.connect(KVStore.java:35)
+	at app_kvClient.KVClient.newConnection(KVClient.java:29)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:69)
+	at app_kvClient.KVClient.run(KVClient.java:279)
+	at app_kvClient.KVClient.main(KVClient.java:292)
+2022-01-28 17:59:19,245 ERROR [main] root: Error! Unable to establish connection to store. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:399)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:242)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:224)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:403)
+	at java.base/java.net.Socket.connect(Socket.java:591)
+	at java.base/java.net.Socket.connect(Socket.java:540)
+	at java.base/java.net.Socket.<init>(Socket.java:436)
+	at java.base/java.net.Socket.<init>(Socket.java:213)
+	at client.KVStore.connect(KVStore.java:35)
+	at app_kvClient.KVClient.newConnection(KVClient.java:29)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:69)
+	at app_kvClient.KVClient.run(KVClient.java:279)
+	at app_kvClient.KVClient.main(KVClient.java:292)
+2022-01-28 17:59:19,246 ERROR [main] root: Something went wrong! 
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:399)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:242)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:224)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:403)
+	at java.base/java.net.Socket.connect(Socket.java:591)
+	at java.base/java.net.Socket.connect(Socket.java:540)
+	at java.base/java.net.Socket.<init>(Socket.java:436)
+	at java.base/java.net.Socket.<init>(Socket.java:213)
+	at client.KVStore.connect(KVStore.java:35)
+	at app_kvClient.KVClient.newConnection(KVClient.java:29)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:69)
+	at app_kvClient.KVClient.run(KVClient.java:279)
+	at app_kvClient.KVClient.main(KVClient.java:292)
+2022-01-28 17:59:23,574 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 17:59:23,574 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 17:59:24,902 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
+2022-01-28 17:59:24,910 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_ERROR","a":""}'
+2022-01-28 18:01:11,797 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 18:01:11,799 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 18:01:14,117 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
+2022-01-28 18:01:14,124 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_ERROR","a":""}'
+2022-01-28 18:02:57,580 ERROR [main] root: Error! Unable to establish connection to store. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:399)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:242)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:224)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:403)
+	at java.base/java.net.Socket.connect(Socket.java:591)
+	at java.base/java.net.Socket.connect(Socket.java:540)
+	at java.base/java.net.Socket.<init>(Socket.java:436)
+	at java.base/java.net.Socket.<init>(Socket.java:213)
+	at client.KVStore.connect(KVStore.java:35)
+	at app_kvClient.KVClient.newConnection(KVClient.java:29)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:69)
+	at app_kvClient.KVClient.run(KVClient.java:279)
+	at app_kvClient.KVClient.main(KVClient.java:292)
+2022-01-28 18:02:57,586 ERROR [main] root: Something went wrong! 
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:399)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:242)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:224)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:403)
+	at java.base/java.net.Socket.connect(Socket.java:591)
+	at java.base/java.net.Socket.connect(Socket.java:540)
+	at java.base/java.net.Socket.<init>(Socket.java:436)
+	at java.base/java.net.Socket.<init>(Socket.java:213)
+	at client.KVStore.connect(KVStore.java:35)
+	at app_kvClient.KVClient.newConnection(KVClient.java:29)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:69)
+	at app_kvClient.KVClient.run(KVClient.java:279)
+	at app_kvClient.KVClient.main(KVClient.java:292)
+2022-01-28 18:03:10,814 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 18:03:10,815 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 18:03:12,604 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
+2022-01-28 18:03:12,613 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_ERROR","a":""}'
+2022-01-28 18:04:33,726 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 18:04:33,727 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 18:04:36,117 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
+2022-01-28 18:04:36,128 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_ERROR","a":""}'
+2022-01-28 18:06:59,730 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 18:06:59,732 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 18:07:01,028 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
+2022-01-28 18:07:01,035 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_ERROR","a":""}'
+2022-01-28 18:07:59,084 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 18:07:59,087 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 18:08:00,119 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
+2022-01-28 18:08:00,127 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_ERROR","a":""}'
+2022-01-28 18:08:47,754 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 18:08:47,754 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 18:08:49,036 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
+2022-01-28 18:08:49,042 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_ERROR","a":""}'
+2022-01-28 18:09:46,955 INFO  [main] root: Connected to localhost on port 8080
+2022-01-28 18:09:46,956 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-28 18:09:48,443 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
+2022-01-28 18:09:48,452 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_ERROR","a":""}'
+2022-01-28 18:10:03,577 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","a":"b",}'
+2022-01-28 18:10:03,580 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","a":"b",}'
+2022-01-28 18:10:05,599 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","a":""}'
+2022-01-28 18:10:05,601 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","a":"b",}'

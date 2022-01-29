@@ -144,24 +144,28 @@ public class KVClient implements IKVClient, Runnable {
                     }
                     break;
                 case "get":
-                    if (this.kvStore != null) { // && this.kvStore.isRunning()) {
-                        String key = tokens[1];
-                        if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes idk
-                            try {
-                                JSONMessage msg = this.kvStore.get(key);
-                                // PLACE status message here
-                                // logger.info(msg);
-                            } catch (Exception e) {
-                                logger.error("Error getting key: " + e);
+                    if (tokens.length > 2) {
+                        logger.error("Invalid number of parameters!");
+                    } else {
+                        if (this.kvStore != null) { // && this.kvStore.isRunning()) {
+                            String key = tokens[1];
+                            if (key.length() <= 20 && key.length() > 0) { // Exact size of key bytes idk
+                                try {
+                                    JSONMessage msg = this.kvStore.get(key);
+                                    // PLACE status message here
+                                    // logger.info(msg);
+                                } catch (Exception e) {
+                                    logger.error("Error getting key: " + e);
+                                }
+                            } else {
+                                logger.error("Key length must be between 1 and 20.");
                             }
                         } else {
-                            logger.error("Key length must be between 1 and 20.");
+                            System.out.println("Not connected to any store.");
+                            logger.warn("Not connected to any store.");
                         }
-                    } else {
-                        System.out.println("Not connected to any store.");
-                        logger.warn("Not connected to any store.");
                     }
-                    break;
+                        break;
                 case "disconnect":
                     if (this.kvStore != null) {
                         disconnect();
