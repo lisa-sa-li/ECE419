@@ -71,13 +71,13 @@ public class PersistantStorage implements IPersistantStorage {
                 json.deserialize(line);
                 keyFromFile = json.getKey();
 
-                // The key already exists in the file, update the old value with the new value
+                // The key exists in the file, update the old value with the new value
                 if (keyFromFile.equals(key) && foundKey == false) {
                     foundKey = true;
 
                     // If value == "", that means to delete so we will skip appending the line
                     // Otherwise, update the value and append to file
-                    if (value.trim().isEmpty() || value == null || value.trim().equals("null")) {
+                    if (value.isEmpty() || value == null) {
                         putStatus = StatusType.DELETE_SUCCESS;
                     } else {
                         json.setValue(value);
@@ -91,6 +91,8 @@ public class PersistantStorage implements IPersistantStorage {
                     // key in a file, remove the subsequent keys
                     continue;
                 } else {
+                    // If it's not the key-value we're looking for, copy the line over to the string
+                    // buffer
                     inputBuffer.append(line);
                     inputBuffer.append('\n');
                 }
@@ -114,7 +116,7 @@ public class PersistantStorage implements IPersistantStorage {
             }
             file.close();
 
-            // Overwrite file with the data
+            // Overwrite file with the string buffer data
             FileOutputStream fileOut = new FileOutputStream(this.pathToFile);
             fileOut.write(inputBuffer.toString().getBytes());
             fileOut.close();

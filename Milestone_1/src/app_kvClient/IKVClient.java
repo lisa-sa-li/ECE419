@@ -16,6 +16,5 @@ public interface IKVClient {
      * 
      * @return instance of KVCommInterface
      */
-    // public KVCommInterface getStore();
     public KVStore getStore();
 }

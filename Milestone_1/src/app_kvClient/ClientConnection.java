@@ -15,8 +15,6 @@ import shared.messages.KVMessage.StatusType;
  * Represents a connection end point for a particular client that is
  * connected to the server. This class is responsible for message reception
  * and sending.
- * The class also implements the echo functionality. Thus whenever a message
- * is received it is going to be echoed back to the client.
  */
 public class ClientConnection implements IClientConnection {
 
@@ -30,11 +28,6 @@ public class ClientConnection implements IClientConnection {
 	private InputStream input;
 	private OutputStream output;
 
-	/**
-	 * Constructs a new CientConnection object for a given TCP socket.
-	 * 
-	 * @param clientSocket the Socket object for the client connection.
-	 */
 	public ClientConnection(Socket clientSocket) throws Exception {
 		this.clientSocket = clientSocket;
 		this.isOpen = true;
@@ -58,7 +51,7 @@ public class ClientConnection implements IClientConnection {
 		byte[] msgBytes = null, tmp = null;
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
 
-		/* read first char from stream */
+		// Read first char from stream
 		byte read = (byte) input.read();
 		boolean reading = true;
 
@@ -77,7 +70,7 @@ public class ClientConnection implements IClientConnection {
 				endChar++;
 			}
 
-			/* if buffer filled, copy to msg array */
+			// If buffer filled, copy to msg array
 			if (index == BUFFER_SIZE) {
 				if (msgBytes == null) {
 					tmp = new byte[BUFFER_SIZE];
@@ -93,16 +86,16 @@ public class ClientConnection implements IClientConnection {
 				index = 0;
 			}
 
-			/* only read valid characters, i.e. letters and constants */
+			// Only read valid characters, i.e. letters and constants
 			bufferBytes[index] = read;
 			index++;
 
-			/* stop reading is DROP_SIZE is reached */
+			// Stop reading is DROP_SIZE is reached */
 			if (msgBytes != null && msgBytes.length + index >= DROP_SIZE) {
 				reading = false;
 			}
 
-			/* read next char from stream */
+			// Read next char from stream
 			read = (byte) input.read();
 		}
 
@@ -117,15 +110,13 @@ public class ClientConnection implements IClientConnection {
 
 		msgBytes = tmp;
 
-		/* build final Object */
+		// Build final Object and convert from bytes to string
 		JSONMessage json = new JSONMessage();
-		// bytes to string
 		String jsonStr = json.byteToString(msgBytes);
 		if (jsonStr == null || jsonStr.trim().isEmpty()) {
 			logger.debug("jsonStr is null in ClientConnection");
 			return null;
 		}
-		// deserialize
 		json.deserialize(jsonStr);
 		logger.info("RECEIVE \t<" + clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort()
 				+ ">: '" + json.getJSON().trim() + "'");

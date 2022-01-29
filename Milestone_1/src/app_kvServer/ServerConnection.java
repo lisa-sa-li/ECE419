@@ -12,7 +12,6 @@ import shared.exceptions.KeyValueTooLongException;
 import shared.exceptions.UnexpectedValueException;
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
-import shared.messages.TextMessage;
 
 import app_kvServer.KVServer;
 
@@ -31,18 +30,18 @@ public class ServerConnection implements IServerConnection, Runnable {
 	private static final int BUFFER_SIZE = 1024;
 	private static final int DROP_SIZE = 128 * BUFFER_SIZE;
 
-	private Socket clientSocket;
+	private Socket serverSocket;
 	private InputStream input;
 	private OutputStream output;
 	private KVServer kvServer;
 
 	/**
-	 * Constructs a new CientConnection object for a given TCP socket.
+	 * Constructs a new ServerConnection object for a given TCP socket.
 	 * 
-	 * @param clientSocket the Socket object for the client connection.
+	 * @param serverSocket the Socket object for the server connection.
 	 */
-	public ServerConnection(Socket clientSocket, KVServer kvServer) throws Exception {
-		this.clientSocket = clientSocket;
+	public ServerConnection(Socket serverSocket, KVServer kvServer) throws Exception {
+		this.serverSocket = serverSocket;
 		this.isOpen = true;
 		this.kvServer = kvServer;
 		connect();
@@ -51,11 +50,11 @@ public class ServerConnection implements IServerConnection, Runnable {
 	@Override
 	public void connect() throws IOException {
 		try {
-			output = this.clientSocket.getOutputStream();
-			input = this.clientSocket.getInputStream();
+			output = this.serverSocket.getOutputStream();
+			input = this.serverSocket.getInputStream();
 
-			logger.info("Connected to " + this.clientSocket.getInetAddress().getHostName() + " on port "
-					+ this.clientSocket.getPort());
+			logger.info("Connected to " + this.serverSocket.getInetAddress().getHostName() + " on port "
+					+ this.serverSocket.getPort());
 		} catch (IOException e) {
 			logger.error("Error! Unable to establish server connection. \n", e);
 		}
@@ -66,7 +65,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		byte[] jsonBytes = json.getJSONByte();
 		output.write(jsonBytes, 0, jsonBytes.length);
 		output.flush();
-		logger.info("SEND \t<" + clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort() + ">: '"
+		logger.info("SEND \t<" + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getPort() + ">: '"
 				+ json.getJSON() + "'");
 	}
 
@@ -76,7 +75,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		byte[] msgBytes = null, tmp = null;
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
 
-		/* read first char from stream */
+		// Read first char from stream
 		byte read = (byte) input.read();
 		boolean reading = true;
 
@@ -95,7 +94,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 				endChar++;
 			}
 
-			/* if buffer filled, copy to msg array */
+			// If buffer filled, copy to msg array
 			if (index == BUFFER_SIZE) {
 				if (msgBytes == null) {
 					tmp = new byte[BUFFER_SIZE];
@@ -111,16 +110,16 @@ public class ServerConnection implements IServerConnection, Runnable {
 				index = 0;
 			}
 
-			/* only read valid characters, i.e. letters and constants */
+			// Only read valid characters, i.e. letters and constants
 			bufferBytes[index] = read;
 			index++;
 
-			/* stop reading is DROP_SIZE is reached */
+			// Stop reading is DROP_SIZE is reached
 			if (msgBytes != null && msgBytes.length + index >= DROP_SIZE) {
 				reading = false;
 			}
 
-			/* read next char from stream */
+			// Read next char from stream
 			read = (byte) input.read();
 		}
 
@@ -135,17 +134,15 @@ public class ServerConnection implements IServerConnection, Runnable {
 
 		msgBytes = tmp;
 
-		/* build final Object */
+		// Build final Object and convert from bytes to string
 		JSONMessage json = new JSONMessage();
-		// bytes to string
 		String jsonStr = json.byteToString(msgBytes);
 		if (jsonStr == null || jsonStr.trim().isEmpty()) {
 			logger.debug("jsonStr is null in ServerConnection");
 			return null;
 		}
-		// deserialize
 		json.deserialize(jsonStr);
-		logger.info("RECEIVE \t<" + clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort()
+		logger.info("RECEIVE \t<" + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getPort()
 				+ ">: '" + json.getJSON().trim() + "'");
 		return json;
 	}
@@ -164,9 +161,9 @@ public class ServerConnection implements IServerConnection, Runnable {
 				try {
 					// check key, value length
 					if (key.length() > 20) {
-						throw new KeyValueTooLongException("Key too long : " + key);
+						throw new KeyValueTooLongException("Key too long: " + key);
 					}
-					if (key.trim().isEmpty() || key == null || key.trim().equals("null")) {
+					if (key.trim().isEmpty() || key == null) {
 						throw new InvalidKeyException("Invalid key: " + key);
 					}
 					if (value.length() > 120000) {
@@ -181,11 +178,13 @@ public class ServerConnection implements IServerConnection, Runnable {
 				break;
 			case GET:
 				try {
-					if (!handleMessageValue.trim().isEmpty() && handleMessageValue != null
-							&& !handleMessageValue.trim().equals("null")) {
+					if (key.length() > 20) {
+						throw new KeyValueTooLongException("Key too long: " + key);
+					}
+					if (!value.trim().isEmpty() && value != null) {
 						throw new UnexpectedValueException("Unexpected value for GET: " + value);
 					}
-					if (key.trim().isEmpty() || key == null || key.trim().equals("null")) {
+					if (key.trim().isEmpty() || key == null) {
 						throw new InvalidKeyException("Invalid key: " + key);
 					}
 					handleMessageValue = this.kvServer.getKV(key);
@@ -230,11 +229,11 @@ public class ServerConnection implements IServerConnection, Runnable {
 		} finally {
 			try {
 				// close connection
-				if (clientSocket != null) {
+				if (serverSocket != null) {
 					// Send message????
 					input.close();
 					output.close();
-					clientSocket.close();
+					serverSocket.close();
 				}
 			} catch (IOException ioe) {
 				logger.error("Error! Unable to tear down connection!", ioe);
