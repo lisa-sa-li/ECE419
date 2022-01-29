@@ -1,12 +1,9 @@
 package testing;
 
-import client.KVStore;
 import app_kvServer.KVServer;
-import java.util.concurrent.TimeUnit;
+import client.KVStore;
 
-import logger.LogSetup;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import java.util.concurrent.TimeUnit;
 
 public class ThreadTest {
 
@@ -43,5 +40,6 @@ public class ThreadTest {
 
     public static void main(String[] args) {
         new ThreadTest().testThreads();
+        System.exit(0);
     }
 }
