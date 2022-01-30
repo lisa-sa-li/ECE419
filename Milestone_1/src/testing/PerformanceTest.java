@@ -93,12 +93,7 @@ public class PerformanceTest {
             System.out.println("The latency (ms) of " + percentagePUT + "% PUT requests and " + percentageGET
                     + "% GET requests is: " + latency);
 
-            try {
-                this.kvServer.clearStorage();
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-
+            this.kvServer.deleteStorage();
         }
     }
 

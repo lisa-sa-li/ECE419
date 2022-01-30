@@ -115,6 +115,11 @@ public class KVServer implements IKVServer, Runnable {
 		this.persistantStorage.clearStorage();
 	}
 
+	@Override
+	public void deleteStorage() {
+		this.persistantStorage.deleteStorage();
+	}
+
 	private boolean initializeServer() {
 		logger.info("Initialize server ...");
 		try {

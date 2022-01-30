@@ -9,6 +9,8 @@ import java.lang.StringBuffer;
 import java.io.FileOutputStream;
 import shared.messages.JSONMessage;
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.FileNotFoundException;
 
 public class PersistantStorage implements IPersistantStorage {
     private static Logger logger = Logger.getRootLogger();
@@ -167,13 +169,26 @@ public class PersistantStorage implements IPersistantStorage {
     }
 
     @Override
-    public void clearStorage() {
+    public void deleteStorage() {
         File file = new File(this.pathToFile);
 
         if (file.delete()) {
             logger.info("File deleted successfully");
         } else {
             logger.info("Failed to delete the file");
+        }
+    }
+
+    @Override
+    public void clearStorage() {
+        try {
+            PrintWriter writer = new PrintWriter(this.pathToFile);
+            writer.print("");
+            writer.close();
+        } catch (FileNotFoundException e) {
+            logger.error("File not found. Cannot clear file.");
+        } catch (Exception e) {
+            logger.error("Error clearing storage.");
         }
     }
 }

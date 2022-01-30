@@ -15,9 +15,8 @@ public class AllTests {
 	static {
 		try {
 			new LogSetup("logs/testing/test.log", Level.ERROR);
-			KVServer wipeServer = new KVServer(50000, 10, "NONE", true);
-			wipeServer.clearStorage();
 			KVServer kvServer = new KVServer(50000, 10, "NONE", true);
+			kvServer.clearStorage();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
