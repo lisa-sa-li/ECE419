@@ -5,6 +5,8 @@
 *.MF
 *.log
 */storage/*_storage.txt
+maildir/*
+
 <<<<<<< HEAD
 m1-server.jar
 =======
