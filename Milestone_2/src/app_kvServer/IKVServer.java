@@ -10,6 +10,13 @@ public interface IKVServer {
         FIFO
     };
 
+    public enum ServerStatus {
+        OPEN,
+        CLOSED,
+        SHUTDOWN,
+        LOCKED,
+    };
+
     /**
      * Get the port number of the server
      * 
@@ -101,4 +108,20 @@ public interface IKVServer {
      * Gracefully stop the server, can perform any additional actions
      */
     public void close();
+
+    // Starts the KVServer, all client requests and all ECS requests are processed.
+    public void start();
+
+    // Stops the KVServer, all client requests are rejected and only ECS requests
+    // are processed.
+    public void stop();
+
+    // Exits the KVServer application.
+    public void shutDown();
+
+    // Lock the KVServer for write operations.
+    public void lockWrite();
+
+    // Unlock the KVServer for write operations.
+    public void unLockWrite();
 }

@@ -10,6 +10,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import shared.messages.KVMessage.StatusType;
+import shared.messages.Metadata;
 
 import logger.LogSetup;
 import app_kvServer.PersistantStorage;
@@ -27,6 +28,7 @@ public class KVServer implements IKVServer, Runnable {
 	private boolean running;
 	private String hostName;
 	private ArrayList<Thread> threads;
+	private ServerStatus serverStatus;
 
 	/**
 	 * Start KV Server at given port
@@ -56,6 +58,50 @@ public class KVServer implements IKVServer, Runnable {
 			Thread testThread = new Thread(this);
 			testThread.start();
 		}
+	}
+
+	public void initKVServer(String metadata) {
+		// Initialize the KVServer with the metadata and block it for client requests,
+		// i.e., all client requests are rejected with an SERVER_STOPPED error message;
+		// ECS requests have to be processed.
+
+	}
+
+	@Override
+	public void start() {
+		this.serverStatus = ServerStatus.OPEN;
+	}
+
+	@Override
+	public void stop() {
+		this.serverStatus = ServerStatus.CLOSED;
+	}
+
+	@Override
+	public void shutDown() {
+		this.serverStatus = ServerStatus.SHUTDOWN;
+	}
+
+	@Override
+	public void lockWrite() {
+		this.serverStatus = ServerStatus.LOCKED;
+	}
+
+	@Override
+	public void unLockWrite() {
+		this.serverStatus = ServerStatus.OPEN;
+	}
+
+	public void moveData() { // range, server
+		// Transfer a subset (range) of the KVServer’s data to another KVServer
+		// (reallocation before removing this server or adding a new KVServer to the
+		// ring);
+		// send a notification to the ECS, if data transfer is completed.
+		lockWrite();
+	}
+
+	public void update(Metadata metadata) {
+		// Update the metadata repository of this server
 	}
 
 	@Override
@@ -169,15 +215,15 @@ public class KVServer implements IKVServer, Runnable {
 	@Override
 	public void kill() {
 		running = false;
-		if(client != null){
-			try{
+		if (client != null) {
+			try {
 				client.close();
 			} catch (IOException e) {
 				logger.error("Error! Unable to close client socket on port: " + port, e);
 			}
 		}
-		if(serverSocket != null){
-			try{
+		if (serverSocket != null) {
+			try {
 				serverSocket.close();
 			} catch (IOException e) {
 				logger.error("Error! Unable to close socket on port: " + port, e);
