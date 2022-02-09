@@ -1735,3 +1735,141 @@ java.net.ConnectException: Connection refused (Connection refused)
 2022-01-29 12:48:05,427 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"DISCONNECTED","disconnected":"disconnected",}'
 2022-01-29 12:48:05,428 INFO  [main] root: Client connection closed!
 2022-01-29 12:48:05,428 INFO  [main] root: Application exit.
+2022-01-29 20:27:55,400 INFO  [main] root: Connected to localhost on port 8080
+2022-01-29 20:27:55,402 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-01-29 20:27:58,670 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hey":"sandra",}'
+2022-01-29 20:27:58,682 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","hey":"sandra",}'
+2022-01-29 20:28:02,546 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","jf":"kjd",}'
+2022-01-29 20:28:02,550 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","jf":"kjd",}'
+2022-01-29 20:28:06,311 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","sandra":""}'
+2022-01-29 20:28:06,317 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","sandra":""}'
+2022-01-29 20:28:20,486 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","flower":""}'
+2022-01-29 20:28:20,490 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","flower":"ditch",}'
+2022-01-29 20:28:23,288 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","hj":""}'
+2022-01-29 20:28:23,290 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_ERROR","hj":""}'
+2022-01-29 20:28:35,595 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hi":"andrea",}'
+2022-01-29 20:28:35,599 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","hi":"andrea",}'
+2022-02-03 20:21:03,563 INFO  [main] root: Connected to localhost on port 8080
+2022-02-03 20:21:03,564 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-02-03 20:21:49,913 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","sofia":"give us an a",}'
+2022-02-03 20:21:49,929 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","sofia":"give us an a",}'
+2022-02-03 20:21:54,084 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","sofia":""}'
+2022-02-03 20:21:54,090 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","sofia":"give us an a",}'
+2022-02-03 20:21:58,707 ERROR [main] root: Unknown command.
+2022-02-03 20:22:01,285 INFO  [main] root: Tearing down the connection ...
+2022-02-03 20:22:01,285 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"DISCONNECTED","disconnected":"disconnected",}'
+2022-02-03 20:22:01,287 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"DISCONNECTED","disconnected":"disconnected",}'
+2022-02-03 20:22:01,288 INFO  [main] root: Client connection closed!
+2022-02-03 20:22:01,288 INFO  [main] root: Disconnected.
+2022-02-03 20:22:02,856 INFO  [main] root: Application exit.
+2022-02-03 20:22:17,194 INFO  [main] root: Connected to localhost on port 8080
+2022-02-03 20:22:17,196 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-02-03 20:22:19,497 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","sofia":""}'
+2022-02-03 20:22:19,529 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","sofia":"give us an a",}'
+2022-02-03 20:22:24,010 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","sofia":""}'
+2022-02-03 20:22:24,032 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"DELETE_SUCCESS","sofia":""}'
+2022-02-03 20:22:49,496 INFO  [main] root: Connected to localhost on port 8080
+2022-02-03 20:22:49,498 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-02-03 20:22:57,637 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","sofia":""}'
+2022-02-03 20:22:57,641 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_ERROR","sofia":""}'
+2022-02-03 20:23:18,235 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","sandra":"is sexy",}'
+2022-02-03 20:23:18,243 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","sandra":"is sexy",}'
+2022-02-03 20:23:23,264 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","sandra":""}'
+2022-02-03 20:23:23,267 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","sandra":"is sexy",}'
+2022-02-03 20:23:29,135 INFO  [main] root: Tearing down the connection ...
+2022-02-03 20:23:29,135 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"DISCONNECTED","disconnected":"disconnected",}'
+2022-02-03 20:23:29,137 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"DISCONNECTED","disconnected":"disconnected",}'
+2022-02-03 20:23:29,137 INFO  [main] root: Client connection closed!
+2022-02-03 20:23:29,138 INFO  [main] root: Application exit.
+2022-02-03 20:24:09,554 INFO  [main] root: Connected to localhost on port 8080
+2022-02-03 20:24:09,554 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-02-03 20:24:14,049 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","sandra":""}'
+2022-02-03 20:24:14,053 ERROR [main] root: Error! Unable to establish connection to store. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:399)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:242)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:224)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:403)
+	at java.base/java.net.Socket.connect(Socket.java:591)
+	at java.base/java.net.Socket.connect(Socket.java:540)
+	at java.base/java.net.Socket.<init>(Socket.java:436)
+	at java.base/java.net.Socket.<init>(Socket.java:213)
+	at client.KVStore.connect(KVStore.java:48)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:156)
+	at app_kvClient.KVClient.run(KVClient.java:285)
+	at app_kvClient.KVClient.main(KVClient.java:298)
+2022-02-03 20:24:17,144 ERROR [main] root: Unknown command.
+2022-02-03 20:24:18,839 ERROR [main] root: Unknown command.
+2022-02-04 11:52:55,970 ERROR [main] root: Error! Unable to establish connection to store. 
+
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:399)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:242)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:224)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:403)
+	at java.base/java.net.Socket.connect(Socket.java:591)
+	at java.base/java.net.Socket.connect(Socket.java:540)
+	at java.base/java.net.Socket.<init>(Socket.java:436)
+	at java.base/java.net.Socket.<init>(Socket.java:213)
+	at client.KVStore.connect(KVStore.java:48)
+	at app_kvClient.KVClient.newConnection(KVClient.java:29)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:69)
+	at app_kvClient.KVClient.run(KVClient.java:285)
+	at app_kvClient.KVClient.main(KVClient.java:298)
+2022-02-04 11:52:55,973 ERROR [main] root: Something went wrong! 
+java.net.ConnectException: Connection refused (Connection refused)
+	at java.base/java.net.PlainSocketImpl.socketConnect(Native Method)
+	at java.base/java.net.AbstractPlainSocketImpl.doConnect(AbstractPlainSocketImpl.java:399)
+	at java.base/java.net.AbstractPlainSocketImpl.connectToAddress(AbstractPlainSocketImpl.java:242)
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:224)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:403)
+	at java.base/java.net.Socket.connect(Socket.java:591)
+	at java.base/java.net.Socket.connect(Socket.java:540)
+	at java.base/java.net.Socket.<init>(Socket.java:436)
+	at java.base/java.net.Socket.<init>(Socket.java:213)
+	at client.KVStore.connect(KVStore.java:48)
+	at app_kvClient.KVClient.newConnection(KVClient.java:29)
+	at app_kvClient.KVClient.handleCommand(KVClient.java:69)
+	at app_kvClient.KVClient.run(KVClient.java:285)
+	at app_kvClient.KVClient.main(KVClient.java:298)
+2022-02-04 11:52:59,973 WARN  [main] root: Nothing was connected.
+2022-02-04 11:53:02,141 INFO  [main] root: Application exit.
+2022-02-04 12:02:16,421 INFO  [main] root: Connected to localhost on port 8080
+2022-02-04 12:02:16,424 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-02-04 12:02:51,801 ERROR [main] root: Unknown command.
+2022-02-04 12:02:55,246 INFO  [main] root: Log level changed to level ALL
+2022-02-04 12:03:11,658 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","ece":"demo",}'
+2022-02-04 12:03:11,676 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","ece":"demo",}'
+2022-02-04 12:03:20,056 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hey":"sandra",}'
+2022-02-04 12:03:20,058 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","hey":"sandra",}'
+2022-02-04 12:03:32,463 INFO  [main] root: Log level changed to level INFO
+2022-02-04 12:03:40,365 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","ece":""}'
+2022-02-04 12:03:40,369 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"DELETE_SUCCESS","ece":""}'
+2022-02-04 12:03:51,437 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","go":"fun",}'
+2022-02-04 12:03:51,441 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","go":"fun",}'
+2022-02-04 12:03:56,076 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","dark":"hall",}'
+2022-02-04 12:03:56,080 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_SUCCESS","dark":"hall",}'
+2022-02-04 12:04:03,796 INFO  [main] root: Tearing down the connection ...
+2022-02-04 12:04:03,797 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"DISCONNECTED","disconnected":"disconnected",}'
+2022-02-04 12:04:03,800 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"DISCONNECTED","disconnected":"disconnected",}'
+2022-02-04 12:04:03,800 INFO  [main] root: Client connection closed!
+2022-02-04 12:04:03,801 INFO  [main] root: Disconnected.
+2022-02-04 12:04:05,136 ERROR [main] root: Unknown command.
+2022-02-04 12:04:24,216 INFO  [main] root: Connected to localhost on port 8080
+2022-02-04 12:04:24,217 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-02-04 12:04:30,739 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","hey":""}'
+2022-02-04 12:04:30,745 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","hey":"sandra",}'
+2022-02-04 12:04:36,476 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","dark":""}'
+2022-02-04 12:04:36,478 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","dark":"hall",}'
+2022-02-04 12:05:08,338 INFO  [main] root: Connected to localhost on port 8080
+2022-02-04 12:05:08,339 INFO  [main] root: Connection established to 127.0.0.1:8080
+2022-02-04 12:05:15,241 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"GET","dark":""}'
+2022-02-04 12:05:15,252 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"GET_SUCCESS","dark":"hall",}'
+2022-02-04 12:05:21,522 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hey":"lisa",}'
+2022-02-04 12:05:21,525 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"PUT_UPDATE","hey":"lisa",}'
+2022-02-04 12:05:31,824 INFO  [main] root: SEND 	<127.0.0.1:8080>: '{"status":"PUT","hate":""}'
+2022-02-04 12:05:31,829 INFO  [main] root: RECEIVE 	<127.0.0.1:8080>: '{"status":"DELETE_ERROR","hate":""}'
+2022-02-05 15:53:26,075 ERROR [main] root: CLI does not respond - Application terminated.
