@@ -1,13 +1,15 @@
 *.iml
 .idea/
 *.class
-*.jar
+# *.jar
 *.MF
 *.log
 */storage/*_storage.txt
-<<<<<<< HEAD
-m1-server.jar
-=======
+maildir/*
+
+# <<<<<<< HEAD
+# m1-server.jar
+# =======
 bin/
 out/
->>>>>>> 7036b79510230a26805a88e742e65d321f5879bf
+# >>>>>>> 7036b79510230a26805a88e742e65d321f5879bf

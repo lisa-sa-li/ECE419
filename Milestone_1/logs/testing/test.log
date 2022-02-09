@@ -15632,6 +15632,7 @@ java.net.SocketException: Socket closed
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
 2022-01-29 17:12:55,942 ERROR [main] root: Problem reading file to put.
 2022-01-29 17:12:55,945 ERROR [main] root: Problem reading file to get.
+<<<<<<< HEAD
 2022-01-29 17:59:11,639 ERROR [Thread-1] root: Error! Cannot open server socket:
 2022-01-29 17:59:11,640 ERROR [Thread-1] root: Port 50000 is already bound!
 2022-01-29 17:59:11,682 ERROR [main] root: Error! Unable to establish connection to store. 
@@ -15649,6 +15650,25 @@ java.net.UnknownHostException: unknown
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+=======
+2022-01-29 17:55:16,413 ERROR [Thread-0] root: Error! Cannot open server socket:
+2022-01-29 17:55:16,416 ERROR [Thread-0] root: Port 50000 is already bound!
+2022-01-29 17:55:16,421 ERROR [main] root: Error! Unable to establish connection to store. 
+
+java.net.UnknownHostException: unknown
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:229)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+	at client.KVStore.connect(KVStore.java:48)
+	at testing.ConnectionTest.testUnknownHost(ConnectionTest.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+>>>>>>> dc79ab36a5155e0d56f73b53a71705f98323c815
 	at junit.framework.TestCase.runTest(TestCase.java:168)
 	at junit.framework.TestCase.runBare(TestCase.java:134)
 	at junit.framework.TestResult$1.protect(TestResult.java:110)
@@ -15667,7 +15687,11 @@ java.net.UnknownHostException: unknown
 	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:299)
 	at jdk.internal.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+<<<<<<< HEAD
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+=======
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+>>>>>>> dc79ab36a5155e0d56f73b53a71705f98323c815
 	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:99)
 	at org.apache.tools.ant.Task.perform(Task.java:350)
 	at org.apache.tools.ant.Target.execute(Target.java:449)
@@ -15680,6 +15704,7 @@ java.net.UnknownHostException: unknown
 	at org.apache.tools.ant.Main.startAnt(Main.java:223)
 	at org.apache.tools.ant.launch.Launcher.run(Launcher.java:284)
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
+<<<<<<< HEAD
 2022-01-29 17:59:11,733 ERROR [main] root: Error! Unable to close connection. 
 
 java.net.SocketException: Socket closed
@@ -15689,6 +15714,13 @@ java.net.SocketException: Socket closed
 	at java.base/sun.nio.ch.NioSocketImpl.write(NioSocketImpl.java:440)
 	at java.base/sun.nio.ch.NioSocketImpl$2.write(NioSocketImpl.java:826)
 	at java.base/java.net.Socket$SocketOutputStream.write(Socket.java:1035)
+=======
+2022-01-29 17:55:16,447 ERROR [main] root: Error! Unable to close connection. 
+
+java.net.SocketException: Socket closed
+	at java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:113)
+	at java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)
+>>>>>>> dc79ab36a5155e0d56f73b53a71705f98323c815
 	at app_kvClient.ClientConnection.sendJSONMessage(ClientConnection.java:41)
 	at client.KVStore.disconnect(KVStore.java:65)
 	at testing.InteractionTest.tearDown(InteractionTest.java:27)
@@ -15709,7 +15741,11 @@ java.net.SocketException: Socket closed
 	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:299)
 	at jdk.internal.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+<<<<<<< HEAD
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+=======
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+>>>>>>> dc79ab36a5155e0d56f73b53a71705f98323c815
 	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:99)
 	at org.apache.tools.ant.Task.perform(Task.java:350)
 	at org.apache.tools.ant.Target.execute(Target.java:449)
@@ -15722,6 +15758,7 @@ java.net.SocketException: Socket closed
 	at org.apache.tools.ant.Main.startAnt(Main.java:223)
 	at org.apache.tools.ant.launch.Launcher.run(Launcher.java:284)
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
+<<<<<<< HEAD
 2022-01-29 17:59:11,766 ERROR [main] root: Problem reading file to put.
 2022-01-29 17:59:11,767 ERROR [main] root: Problem reading file to get.
 2022-01-29 20:26:25,565 ERROR [main] root: Error! Unable to establish connection to store. 
@@ -15739,6 +15776,25 @@ java.net.UnknownHostException: unknown
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+=======
+2022-01-29 17:55:16,476 ERROR [main] root: Problem reading file to put.
+2022-01-29 17:55:16,479 ERROR [main] root: Problem reading file to get.
+2022-01-29 18:29:37,139 ERROR [main] root: Error! Unable to establish connection to store. 
+
+java.net.UnknownHostException: unknown
+	at java.base/java.net.AbstractPlainSocketImpl.connect(AbstractPlainSocketImpl.java:229)
+	at java.base/java.net.SocksSocketImpl.connect(SocksSocketImpl.java:392)
+	at java.base/java.net.Socket.connect(Socket.java:608)
+	at java.base/java.net.Socket.connect(Socket.java:557)
+	at java.base/java.net.Socket.<init>(Socket.java:453)
+	at java.base/java.net.Socket.<init>(Socket.java:230)
+	at client.KVStore.connect(KVStore.java:48)
+	at testing.ConnectionTest.testUnknownHost(ConnectionTest.java:33)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+>>>>>>> dc79ab36a5155e0d56f73b53a71705f98323c815
 	at junit.framework.TestCase.runTest(TestCase.java:168)
 	at junit.framework.TestCase.runBare(TestCase.java:134)
 	at junit.framework.TestResult$1.protect(TestResult.java:110)
@@ -15757,7 +15813,11 @@ java.net.UnknownHostException: unknown
 	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:299)
 	at jdk.internal.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+<<<<<<< HEAD
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+=======
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+>>>>>>> dc79ab36a5155e0d56f73b53a71705f98323c815
 	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:99)
 	at org.apache.tools.ant.Task.perform(Task.java:350)
 	at org.apache.tools.ant.Target.execute(Target.java:449)
@@ -15770,6 +15830,7 @@ java.net.UnknownHostException: unknown
 	at org.apache.tools.ant.Main.startAnt(Main.java:223)
 	at org.apache.tools.ant.launch.Launcher.run(Launcher.java:284)
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
+<<<<<<< HEAD
 2022-01-29 20:26:25,615 ERROR [main] root: Error! Unable to close connection. 
 
 java.net.SocketException: Socket closed
@@ -15779,6 +15840,13 @@ java.net.SocketException: Socket closed
 	at java.base/sun.nio.ch.NioSocketImpl.write(NioSocketImpl.java:440)
 	at java.base/sun.nio.ch.NioSocketImpl$2.write(NioSocketImpl.java:826)
 	at java.base/java.net.Socket$SocketOutputStream.write(Socket.java:1035)
+=======
+2022-01-29 18:29:37,165 ERROR [main] root: Error! Unable to close connection. 
+
+java.net.SocketException: Socket closed
+	at java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:113)
+	at java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)
+>>>>>>> dc79ab36a5155e0d56f73b53a71705f98323c815
 	at app_kvClient.ClientConnection.sendJSONMessage(ClientConnection.java:41)
 	at client.KVStore.disconnect(KVStore.java:65)
 	at testing.InteractionTest.tearDown(InteractionTest.java:27)
@@ -15799,7 +15867,11 @@ java.net.SocketException: Socket closed
 	at org.apache.tools.ant.UnknownElement.execute(UnknownElement.java:299)
 	at jdk.internal.reflect.GeneratedMethodAccessor4.invoke(Unknown Source)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+<<<<<<< HEAD
 	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+=======
+	at java.base/java.lang.reflect.Method.invoke(Method.java:566)
+>>>>>>> dc79ab36a5155e0d56f73b53a71705f98323c815
 	at org.apache.tools.ant.dispatch.DispatchUtils.execute(DispatchUtils.java:99)
 	at org.apache.tools.ant.Task.perform(Task.java:350)
 	at org.apache.tools.ant.Target.execute(Target.java:449)
@@ -15812,6 +15884,7 @@ java.net.SocketException: Socket closed
 	at org.apache.tools.ant.Main.startAnt(Main.java:223)
 	at org.apache.tools.ant.launch.Launcher.run(Launcher.java:284)
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
+<<<<<<< HEAD
 2022-01-29 20:26:25,650 ERROR [main] root: Problem reading file to put.
 2022-01-29 20:26:25,652 ERROR [main] root: Problem reading file to get.
 2022-02-03 20:24:56,222 ERROR [main] root: Error! Unable to establish connection to store. 
@@ -15994,3 +16067,7 @@ java.net.SocketException: Socket closed
 	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:101)
 2022-02-04 12:06:03,603 ERROR [main] root: Problem reading file to put.
 2022-02-04 12:06:03,606 ERROR [main] root: Problem reading file to get.
+=======
+2022-01-29 18:29:37,195 ERROR [main] root: Problem reading file to put.
+2022-01-29 18:29:37,199 ERROR [main] root: Problem reading file to get.
+>>>>>>> dc79ab36a5155e0d56f73b53a71705f98323c815
