@@ -5,7 +5,7 @@ import shared.messages.KVMessage.StatusType;
 import app_kvServer.PersistantStorage;
 import java.util.Random;
 import java.lang.Math;
-import logger.LogSetup;
+import logging.LogSetup;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 

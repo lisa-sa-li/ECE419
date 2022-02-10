@@ -2,7 +2,7 @@ package app_kvClient;
 
 import client.KVStore;
 import shared.messages.JSONMessage;
-import logger.LogSetup;
+import logging.LogSetup;
 import java.net.UnknownHostException;
 import java.io.IOException;
 import org.apache.log4j.Logger;

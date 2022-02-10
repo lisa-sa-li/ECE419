@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 import shared.messages.KVMessage.StatusType;
 import shared.messages.Metadata;
 
-import logger.LogSetup;
+import logging.LogSetup;
 import app_kvServer.PersistantStorage;
 import app_kvServer.ServerConnection;
 
