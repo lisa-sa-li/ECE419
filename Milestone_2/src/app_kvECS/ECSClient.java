@@ -16,6 +16,8 @@ public class ECSClient implements IECSClient, Runnable {
 
 	private static Logger logger = Logger.getRootLogger();
     private String[] servers;
+    private final String SERVER_JAR = "m2-server.jar";
+    private final String CONFIG_FILEPATH = "./servers.cfg";
 
     // UI vars
     private boolean stop = false;
@@ -29,6 +31,10 @@ public class ECSClient implements IECSClient, Runnable {
          * @throws Exception    some meaningfull exception on failure
          * @return  true on success, false on failure
          */
+        // for (String server : servers){
+        //     // start server and attach it to zookeeper
+
+        // }
 
         return false;
     }
@@ -96,40 +102,44 @@ public class ECSClient implements IECSClient, Runnable {
 
         //TODO: launch storage server comprised of m servers
         String action = tokens[0];
-        switch(action){
-            case "start":
-                System.out.println("Launching all storage servers");
-                start();
-                break;
-            case "stop":
-                System.out.println("Stopping all storage servers");
-                stop();
-                break;
-            case "addnode":
-                System.out.println("Adding node");
-                // add node
-                addNode("test",0);
-                break;
-            case "addnodes":
-                System.out.println("Adding nodes");
-                // add node
-                addNodes(0,"test",0);
-                break;
-            case "removenode":
-                System.out.println("Removing node");
-                //removeNodes();
-                String g;
-                break;
-            case "help":
-                //TODO: write printHelp function
-                String g1;
-                // printHelp();
-                break;
-            case "shutdown":
-                System.out.println("Shutting down");
-                shutdown();
-                break;
-            }
+        try{
+            switch(action){
+                case "start":
+                    System.out.println("Launching all storage servers");
+                    start();
+                    break;
+                case "stop":
+                    System.out.println("Stopping all storage servers");
+                    stop();
+                    break;
+                case "addnode":
+                    System.out.println("Adding node");
+                    // add node
+                    addNode("test",0);
+                    break;
+                case "addnodes":
+                    System.out.println("Adding nodes");
+                    // add node
+                    addNodes(0,"test",0);
+                    break;
+                case "removenode":
+                    System.out.println("Removing node");
+                    //removeNodes();
+                    String g;
+                    break;
+                case "help":
+                    //TODO: write printHelp function
+                    String g1;
+                    // printHelp();
+                    break;
+                case "shutdown":
+                    System.out.println("Shutting down");
+                    shutdown();
+                    break;
+                }
+        } catch (Exception e) {
+            logger.error("Unkown Error: " + e.getMessage());
+        }
     }
 
     public void run() {
@@ -139,7 +149,7 @@ public class ECSClient implements IECSClient, Runnable {
             System.out.print(PROMPT);
             try {
                 String cmdLine = stdin.readLine();
-                // this.handleCommand(cmdLine);
+                this.handleCommand(cmdLine);
             } catch (IOException e) {
                 stop = true;
                 printError("CLI does not respond - Application terminated.");
