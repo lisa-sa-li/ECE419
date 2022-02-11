@@ -9,10 +9,11 @@ public class ECSNode implements IECSNode{
     
     private String name;
     private String host;
+    private int id;
     private int port;
     private String[] nodeHashRange;
 
-    enum NodeStatus{
+    public enum NodeStatus{
         WRITELOCK, // added but being written to
         OFFLINE, // not added
         READY, // ready
@@ -27,6 +28,23 @@ public class ECSNode implements IECSNode{
         this.name = name;
         this.host = host;
         this.port = port;
+    }
+
+    public ECSNode(String name, int port, String host, NodeStatus inStatus){
+        // initializing a node
+        this.name = name;
+        this.host = host;
+        this.port = port;
+        this.status = inStatus;
+    }
+
+    public ECSNode(String name, int port, String host, NodeStatus inStatus, int orderAdded){
+        // initializing a node
+        this.name = name;
+        this.host = host;
+        this.port = port;
+        this.status = inStatus;
+        this.id = orderAdded;
     }
 
     public void setStatus(NodeStatus inStatus){
@@ -52,6 +70,7 @@ public class ECSNode implements IECSNode{
 
     @Override
     public String[] getNodeHashRange() {
+        //TODO get hash range
         return null;
     }
 

@@ -2,6 +2,7 @@ package app_kvECS;
 
 import java.util.Map;
 import java.util.Collection;
+import java.util.ArrayList;
 
 import ecs.IECSNode;
 
@@ -47,6 +48,10 @@ public interface IECSClient {
      * @return  array of strings, containing unique names of servers
      */
     public Collection<IECSNode> setupNodes(int count, String cacheStrategy, int cacheSize);
+
+
+    // Returns servers that are offline or stopped
+    public ArrayList<String> getAvailableServers();
 
     /**
      * Wait for all nodes to report status or until timeout expires
