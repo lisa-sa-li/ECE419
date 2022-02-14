@@ -10,14 +10,18 @@ import shared.exceptions.UnexpectedFormatException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.lang.StringBuffer;
 import java.lang.IllegalStateException;
+import java.lang.Runtime;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
+// import java.util.ArrayList;
+// import java.util.Iterator;
+// import java.util.HashMap;
+// import java.util.Map;
+import java.util.*;
 
 import ecs.ECSNode;
 import ecs.IECSNode;
@@ -36,6 +40,7 @@ public class ECSClient implements IECSClient, Runnable {
     private boolean stop = false;
     private static final String PROMPT = "ECSAdmin> ";
 
+    private Random rand = new Random();
 
     public ECSClient(){
         // load servers from config file
@@ -135,16 +140,38 @@ public class ECSClient implements IECSClient, Runnable {
             return null;
         }
 
+        ArrayList<IECSNode> nameArr= new ArrayList<IECSNode>();
+
+
         for (int i = 0; i < count; i++) {
-            String serverName = availServers.remove(0); // Remove first element
+            // Choose a random server, also remove it from availServers so it can't be used again in this loop
+            int int_random = rand.nextInt(availServers.size()); 
+            String serverName = availServers.remove(int_random);
+
             ECSNode serverNode = allServerMap.get(serverName);
             serverNode.setStatus(NodeStatus.STARTING);
             allServerMap.put(serverName, serverNode);
             currServerMap.put(serverName, serverNode);
+            nameArr.add(serverNode);
+
+            // Start the KVServer by issuing an SSH call to the machine
+            String cmd = "java -jar " + SERVER_JAR + " " + serverNode.getNodePort(); 
+            try {
+                Process p = Runtime.getRuntime().exec(cmd);
+            } catch (Exception e) {
+                logger.error("Cannot start the server through an SSH call", e);
+            }
         }
-                    
-        // TODO what am I returning???
-        return null;
+            /*
+            * Randomly choose <numberOfNodes> servers from the available machines and start the KVServer by issuing
+            * an SSH call to the respective machine.
+            * This call launches the storage server with the specified cache size and replacement strategy. For simplicity, 
+            * locate the KVServer.jar in the same directory as the ECS. All storage servers are initialized with the metadata 
+            * and any persisted data, and remain in state stopped.
+            * NOTE: Must call setupNodes before the SSH calls to start the servers and must call awaitNodes before returning
+            * @return  set of strings containing the names of the nodes
+            */
+        return nameArr;
     }
 
     @Override
@@ -156,7 +183,7 @@ public class ECSClient implements IECSClient, Runnable {
             Map.Entry<String, ECSNode> pair = (Map.Entry)it.next();
             ECSNode node = pair.getValue();
             NodeStatus status = node.getStatus();
-            if (status == NodeStatus.OFFLINE) {
+            if (status == NodeStatus.OFFLINE || status == NodeStatus.STOPPED) {
                 availServers.add(pair.getKey().toString());
             }
         }

@@ -1,5 +1,7 @@
 package ecs;
 
+import java.math.BigInteger;
+
 import org.apache.log4j.Logger;
 
 
@@ -12,6 +14,8 @@ public class ECSNode implements IECSNode{
     private int id;
     private int port;
     private String[] nodeHashRange;
+
+    private BigInteger hash;
 
     public enum NodeStatus{
         WRITELOCK, // added but being written to
@@ -87,6 +91,14 @@ public class ECSNode implements IECSNode{
     @Override
     public String getNodeName() {
         return name;
+    }
+
+    public BigInteger getHash() {
+        return hash;
+    }
+
+    public void setHash(BigInteger hashVal){
+        this.hash = hashVal;
     }
 
 }
