@@ -16,6 +16,7 @@ public class ECSNode implements IECSNode{
     private String[] nodeHashRange;
 
     private BigInteger hash;
+    private BigInteger endHash;
 
     public enum NodeStatus{
         WRITELOCK, // added but being written to
@@ -97,8 +98,12 @@ public class ECSNode implements IECSNode{
         return hash;
     }
 
-    public void setHash(BigInteger hashVal){
+    public void setHashRange(BigInteger hashVal, BigInteger endVal){
         this.hash = hashVal;
+        this.endHash = endVal;
     }
+
+
+
 
 }

@@ -13,7 +13,7 @@ import shared.exceptions.UnexpectedValueException;
 
 public class HashRing {
     private static final Logger logger = Logger.getLogger("hashring");
-    // private ArrayList<ECSNode> hashServers = new ArrayList<>();
+    private HashMap<BigInteger, ECSNode> hashServers = new HashMap<BigInteger, ECSNode>();
     private ArrayList<BigInteger> hashOrder = new ArrayList<>();
     private HashMap<String, BigInteger> hashRing = new HashMap<String, BigInteger>();
     private int numServers = 0;
@@ -42,15 +42,20 @@ public class HashRing {
             BigInteger hashed = getHash(toHash);
 
             // let the server know its hash
-            node.setHash(hashed);
+            // node.setHash(hashed);
 
-            // append to hashOrder + hashRing
+            // append to hashOrder + hashRing + hashServers
             hashOrder.add(hashed);
             hashRing.put(name, hashed);
+            hashServers.put(hashed, node);
         }
         // sort the hashes
         Collections.sort(hashOrder);
 
+        // set ranges
+        setRanges();
+
+        // set size
         numServers = hashOrder.size();
     }
 
@@ -86,10 +91,23 @@ public class HashRing {
         if (removeHash == null){
             throw new NullPointerException("Invalid node name");
         }
+
+        // remove values
         hashOrder.remove(removeHash);
         hashRing.remove(name);
 
         numServers -= 1;
+    }
+
+    private void setRanges(){
+        // iterate through sorted key array
+        int idx = 0;
+        for (BigInteger key: hashOrder){
+            ECSNode currNode = hashServers.get(key);
+            int endIdx = (idx+1)%numServers;
+
+            currNode.setHashRange(key, hashOrder.get(endIdx));
+        }
     }
 
     private BigInteger getHash(String value){
