@@ -3,6 +3,7 @@ package ecs;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
+import com.google.gson.Gson;  
 import java.util.HashMap;
 import java.security.KeyException;
 import java.security.MessageDigest;
@@ -10,12 +11,13 @@ import java.security.MessageDigest;
 import org.apache.log4j.Logger;
 
 import shared.exceptions.UnexpectedValueException;
+import shared.messages.Metadata;
 
 public class HashRing {
     private static final Logger logger = Logger.getLogger("hashring");
-    private HashMap<BigInteger, ECSNode> hashServers = new HashMap<BigInteger, ECSNode>();
+    // private HashMap<BigInteger, ECSNode> hashServers = new HashMap<BigInteger, ECSNode>();
     private ArrayList<BigInteger> hashOrder = new ArrayList<>();
-    private HashMap<String, BigInteger> hashRing = new HashMap<String, BigInteger>();
+    private HashMap<BigInteger, String> hashRing = new HashMap<BigInteger, String>();
     private int numServers = 0;
 
 
@@ -46,8 +48,8 @@ public class HashRing {
 
             // append to hashOrder + hashRing + hashServers
             hashOrder.add(hashed);
-            hashRing.put(name, hashed);
-            hashServers.put(hashed, node);
+            hashRing.put(hashed, toHash);
+            // hashServers.put(hashed, node);
         }
         // sort the hashes
         Collections.sort(hashOrder);
@@ -69,7 +71,7 @@ public class HashRing {
         // update lists + reorder
         hashOrder.add(hashed);
         Collections.sort(hashOrder);
-        hashRing.put(name, hashed);
+        hashRing.put(hashed, name);
 
         numServers += 1;
     }
@@ -86,25 +88,31 @@ public class HashRing {
     }
 
     private void removeNode(String name){
-        // get hash from array list
-        BigInteger removeHash = hashRing.get(name);
-        if (removeHash == null){
-            throw new NullPointerException("Invalid node name");
-        }
+        // // get hash from array list
+        // BigInteger removeHash = hashRing.get(name);
+        // if (removeHash == null){
+        //     throw new NullPointerException("Invalid node name");
+        // }
 
-        // remove values
-        hashOrder.remove(removeHash);
-        hashRing.remove(name);
+        // // remove values
+        // hashOrder.remove(removeHash);
+        // hashRing.remove(name);
 
-        numServers -= 1;
+        // numServers -= 1;
+
+        // TODO: prepare + send updated metadata!
     }
 
     private void setRanges(){
+        // System.out.println(new Gson().toJson(mobilePhone));    
+
         // iterate through sorted key array
         int idx = 0;
         for (BigInteger key: hashOrder){
-            ECSNode currNode = hashServers.get(key);
+            String serverName = hashRing.get(key);
             int endIdx = (idx+1)%numServers;
+
+            Metadata metadata = new Metadata(serverName, )
 
             currNode.setHashRange(key, hashOrder.get(endIdx));
         }
@@ -137,3 +145,5 @@ public class HashRing {
     }
 
 }
+
+
