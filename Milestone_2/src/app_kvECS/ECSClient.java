@@ -23,18 +23,37 @@ import java.util.List;
 // import java.util.Map;
 import java.util.*;
 
+import org.apache.zookeeper.*;
+import org.apache.zookeeper.Watcher.Event.KeeperState;
+import org.apache.zookeeper.Watcher.Event.EventType;
+import org.apache.zookeeper.KeeperException;
+
 import ecs.ECSNode;
 import ecs.IECSNode;
 import ecs.ECSNode.NodeStatus;
+import ecs.ZooKeeperApplication;
 
 public class ECSClient implements IECSClient, Runnable {
 
-	private static Logger logger = Logger.getRootLogger();
+    private static Logger logger = Logger.getRootLogger();
     private String[] servers;
     private final String SERVER_JAR = "m2-server.jar";
     private final String CONFIG_FILEPATH = "./servers.cfg";
+    private final String ZK_ROOT_PATH = "./BLAH";
+
     private HashMap<String, ECSNode> allServerMap = new HashMap<String, ECSNode>();
     private HashMap<String, ECSNode> currServerMap = new HashMap<String, ECSNode>();
+
+    private int zkPort = 2181;
+    private String zkHost = "127.0.0.1";
+    private int zkTimeout = 1000;
+    private ZooKeeper zk;
+    private ZooKeeperApplication zkApp;
+
+    // To start ZooKeeper server: $ ./zkServer.sh start
+    // To connect a client to the server: $ ​​./zkCli.sh -server 127.0.0.1:2181 *
+    // Make sure that the port matches that in your zoo.cfg file (2181 is usually
+    // the default in the cfg file, thus used here).
 
     // UI vars
     private boolean stop = false;
@@ -42,12 +61,39 @@ public class ECSClient implements IECSClient, Runnable {
 
     private Random rand = new Random();
 
-    public ECSClient(){
+    public ECSClient() {
         // load servers from config file
         getServerMap();
+
+        zkApp = new ZooKeeperApplication();
+        try {
+            zk = zkApp.connect(zkHost + ":" + String.valueOf(zkPort), zkTimeout);
+        } catch (InterruptedException e) {
+            logger.error("Cannot connect to ZK server!", e);
+        } catch (IOException e) {
+            logger.error("Cannot connect to ZK server!", e);
+        }
+
+        try {
+            boolean doesExist = zk.exists(ZK_ROOT_PATH, false);
+
+            if (!doesExist) {
+                zkApp.create(ZK_ROOT_PATH);
+            }
+            // else {
+            // logger.error("ZooKeeper has not been initialized");
+            // }
+        } catch (KeeperException e) {
+            logger.error(e);
+        } catch (InterruptedException e) {
+            logger.error(e);
+        } catch (Exception e) {
+            logger.error(e);
+        }
+
     }
-    
-    private void getServerMap(){
+
+    private void getServerMap() {
         try {
             BufferedReader file = new BufferedReader(new FileReader(CONFIG_FILEPATH));
             StringBuffer inputBuffer = new StringBuffer();
@@ -57,31 +103,32 @@ public class ECSClient implements IECSClient, Runnable {
                 // Get info from each line: name, host, port
                 String[] serverInfo = line.split(" ");
 
-                if (serverInfo.length != 3){
+                if (serverInfo.length != 3) {
                     logger.error("Error while reading config file: " + line);
                     throw new UnexpectedFormatException("Error while reading config file: " + line);
                 }
                 int port = Integer.parseInt(serverInfo[2]);
                 // create ECSNode w/ status OFFLINE
                 ECSNode serverNode = new ECSNode(serverInfo[0], port, serverInfo[1], ECSNode.NodeStatus.OFFLINE);
-                // add to all server map <3 
+                // add to all server map <3
                 allServerMap.put(serverInfo[0], serverNode);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Could not read from file");
         }
     }
 
-
     @Override
     public boolean start() {
         /**
-         * Starts the storage service by calling start() on all KVServer instances that participate in the service.\
-         * @throws Exception    some meaningfull exception on failure
-         * @return  true on success, false on failure
+         * Starts the storage service by calling start() on all KVServer instances that
+         * participate in the service.\
+         * 
+         * @throws Exception some meaningfull exception on failure
+         * @return true on success, false on failure
          */
         // for (String server : servers){
-        //     // start server and attach it to zookeeper
+        // // start server and attach it to zookeeper
 
         // }
 
@@ -91,25 +138,25 @@ public class ECSClient implements IECSClient, Runnable {
     @Override
     public boolean stop() {
         // TODO something with zookeepr
-        Iterator<Map.Entry< String,ECSNode> > it = currServerMap.entrySet().iterator();
+        Iterator<Map.Entry<String, ECSNode>> it = currServerMap.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<String, ECSNode> pair = (Map.Entry)it.next();
+            Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
             ECSNode node = pair.getValue();
-            node.setStatus(NodeStatus.STOPPED); 
+            node.setStatus(NodeStatus.STOPPED);
             allServerMap.put(pair.getKey().toString(), node);
             // WILL UPDATING THE MAP WHILE ITERATING THROUGH IT MESS IT UP?
             currServerMap.put(pair.getKey().toString(), node);
         }
-
+        // zk.close();
         return true;
     }
 
     @Override
     public boolean shutdown() {
         // TODO something with zookeepr
-        Iterator<Map.Entry< String,ECSNode> > it = currServerMap.entrySet().iterator();
+        Iterator<Map.Entry<String, ECSNode>> it = currServerMap.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<String, ECSNode> pair = (Map.Entry)it.next();
+            Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
             ECSNode node = pair.getValue();
             node.setStatus(NodeStatus.OFFLINE);
             allServerMap.put(pair.getKey().toString(), node);
@@ -140,12 +187,12 @@ public class ECSClient implements IECSClient, Runnable {
             return null;
         }
 
-        ArrayList<IECSNode> nameArr= new ArrayList<IECSNode>();
-
+        ArrayList<IECSNode> nameArr = new ArrayList<IECSNode>();
 
         for (int i = 0; i < count; i++) {
-            // Choose a random server, also remove it from availServers so it can't be used again in this loop
-            int int_random = rand.nextInt(availServers.size()); 
+            // Choose a random server, also remove it from availServers so it can't be used
+            // again in this loop
+            int int_random = rand.nextInt(availServers.size());
             String serverName = availServers.remove(int_random);
 
             ECSNode serverNode = allServerMap.get(serverName);
@@ -155,32 +202,37 @@ public class ECSClient implements IECSClient, Runnable {
             nameArr.add(serverNode);
 
             // Start the KVServer by issuing an SSH call to the machine
-            String cmd = "java -jar " + SERVER_JAR + " " + serverNode.getNodePort(); 
+            String cmd = "java -jar " + SERVER_JAR + " " + serverNode.getNodePort();
             try {
                 Process p = Runtime.getRuntime().exec(cmd);
             } catch (Exception e) {
                 logger.error("Cannot start the server through an SSH call", e);
             }
         }
-            /*
-            * Randomly choose <numberOfNodes> servers from the available machines and start the KVServer by issuing
-            * an SSH call to the respective machine.
-            * This call launches the storage server with the specified cache size and replacement strategy. For simplicity, 
-            * locate the KVServer.jar in the same directory as the ECS. All storage servers are initialized with the metadata 
-            * and any persisted data, and remain in state stopped.
-            * NOTE: Must call setupNodes before the SSH calls to start the servers and must call awaitNodes before returning
-            * @return  set of strings containing the names of the nodes
-            */
+        /*
+         * Randomly choose <numberOfNodes> servers from the available machines and start
+         * the KVServer by issuing
+         * an SSH call to the respective machine.
+         * This call launches the storage server with the specified cache size and
+         * replacement strategy. For simplicity,
+         * locate the KVServer.jar in the same directory as the ECS. All storage servers
+         * are initialized with the metadata
+         * and any persisted data, and remain in state stopped.
+         * NOTE: Must call setupNodes before the SSH calls to start the servers and must
+         * call awaitNodes before returning
+         * 
+         * @return set of strings containing the names of the nodes
+         */
         return nameArr;
     }
 
     @Override
     public ArrayList<String> getAvailableServers() {
-        ArrayList<String> availServers= new ArrayList<String>();
+        ArrayList<String> availServers = new ArrayList<String>();
 
-        Iterator<Map.Entry< String,ECSNode> > it = allServerMap.entrySet().iterator();
+        Iterator<Map.Entry<String, ECSNode>> it = allServerMap.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<String, ECSNode> pair = (Map.Entry)it.next();
+            Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
             ECSNode node = pair.getValue();
             NodeStatus status = node.getStatus();
             if (status == NodeStatus.OFFLINE || status == NodeStatus.STOPPED) {
@@ -194,7 +246,7 @@ public class ECSClient implements IECSClient, Runnable {
     @Override
     public Collection<IECSNode> setupNodes(int count, String cacheStrategy, int cacheSize) {
         // TODO
- 
+
         return null;
     }
 
@@ -235,8 +287,8 @@ public class ECSClient implements IECSClient, Runnable {
     private void handleCommand(String cmdLine) {
         String[] tokens = cmdLine.trim().split("\\s+");
         String action = tokens[0];
-        try{
-            switch(action){
+        try {
+            switch (action) {
                 case "start":
                     System.out.println("Launching all storage servers");
                     start();
@@ -263,7 +315,7 @@ public class ECSClient implements IECSClient, Runnable {
                         logger.error("Invalid number of parameters! Missing names of node(s) to remove");
                     } else {
                         System.out.println("Removing node(s)");
-                        ArrayList<String> nodeNames= new ArrayList<String>();
+                        ArrayList<String> nodeNames = new ArrayList<String>();
                         for (int i = 1; i < tokens.length; i++) {
                             nodeNames.add(tokens[i]);
                         }
@@ -278,7 +330,7 @@ public class ECSClient implements IECSClient, Runnable {
                     System.out.println("Shutting down");
                     shutdown();
                     break;
-                }
+            }
         } catch (Exception e) {
             logger.error("Unkown Error: " + e.getMessage());
         }
