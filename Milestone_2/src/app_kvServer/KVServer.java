@@ -4,10 +4,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.IOException;
 import java.net.BindException;
-import java.util.ArrayList;
+import java.util.*;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import com.google.gson.Gson;
 
 import shared.messages.KVMessage.StatusType;
 import shared.messages.Metadata;
@@ -29,6 +31,9 @@ public class KVServer implements IKVServer, Runnable {
 	private String hostName;
 	private ArrayList<Thread> threads;
 	private ServerStatus serverStatus;
+
+	private HashMap<String, Metadata> serverMetadataMap;	
+	private Metadata serverMetadata;
 
 	/**
 	 * Start KV Server at given port
@@ -93,7 +98,7 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	public void moveData() { // range, server
-		// Transfer a subset (range) of the KVServer’s data to another KVServer
+		// Transfer a subset (range) of the KVServer's data to another KVServer
 		// (reallocation before removing this server or adding a new KVServer to the
 		// ring);
 		// send a notification to the ECS, if data transfer is completed.

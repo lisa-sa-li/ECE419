@@ -3,8 +3,9 @@ package app_kvECS;
 import java.util.Map;
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.HashMap;
 
-import ecs.IECSNode;
+import ecs.ECSNode;
 
 public interface IECSClient {
     /**
@@ -32,7 +33,7 @@ public interface IECSClient {
      * Create a new KVServer with the specified cache size and replacement strategy and add it to the storage service at an arbitrary position.
      * @return  name of new server
      */
-    public IECSNode addNode(String cacheStrategy, int cacheSize);
+    public ECSNode addNode(String cacheStrategy, int cacheSize);
 
     /**
      * Randomly choose <numberOfNodes> servers from the available machines and start the KVServer by issuing an SSH call to the respective machine.
@@ -41,13 +42,13 @@ public interface IECSClient {
      * NOTE: Must call setupNodes before the SSH calls to start the servers and must call awaitNodes before returning
      * @return  set of strings containing the names of the nodes
      */
-    public Collection<IECSNode> addNodes(int count, String cacheStrategy, int cacheSize);
+    public Collection<ECSNode> addNodes(int count, String cacheStrategy, int cacheSize);
 
     /**
      * Sets up `count` servers with the ECS (in this case Zookeeper)
      * @return  array of strings, containing unique names of servers
      */
-    public Collection<IECSNode> setupNodes(int count, String cacheStrategy, int cacheSize);
+    public Collection<ECSNode> setupNodes(int count, String cacheStrategy, int cacheSize);
 
 
     // Returns servers that are offline or stopped
@@ -71,10 +72,10 @@ public interface IECSClient {
     /**
      * Get a map of all nodes
      */
-    public Map<String, IECSNode> getNodes();
+    public HashMap<String, ECSNode> getNodes();
 
     /**
      * Get the specific node responsible for the given key
      */
-    public IECSNode getNodeByKey(String Key);
+    public ECSNode getNodeByKey(String Key);
 }

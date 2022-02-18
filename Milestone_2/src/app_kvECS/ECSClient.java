@@ -13,14 +13,13 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.lang.StringBuffer;
+import java.net.BindException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.lang.IllegalStateException;
 import java.lang.Runtime;
 import java.util.ArrayList;
 import java.util.List;
-// import java.util.ArrayList;
-// import java.util.Iterator;
-// import java.util.HashMap;
-// import java.util.Map;
 import java.util.*;
 
 import org.apache.zookeeper.*;
@@ -30,8 +29,9 @@ import org.apache.zookeeper.KeeperException;
 
 import ecs.ECSNode;
 import ecs.IECSNode;
-import ecs.ECSNode.NodeStatus;
+import ecs.IECSNode.NodeStatus;
 import ecs.ZooKeeperApplication;
+import ecs.HashRing;
 
 public class ECSClient implements IECSClient, Runnable {
 
@@ -43,12 +43,17 @@ public class ECSClient implements IECSClient, Runnable {
 
     private HashMap<String, ECSNode> allServerMap = new HashMap<String, ECSNode>();
     private HashMap<String, ECSNode> currServerMap = new HashMap<String, ECSNode>();
+    private HashRing hashRing;
 
     private int zkPort = 2181;
     private String zkHost = "127.0.0.1";
     private int zkTimeout = 1000;
     private ZooKeeper zk;
     private ZooKeeperApplication zkApp;
+
+    private ServerSocket ecsServerSocket;
+    private String hostname = "127.0.0.1";
+	private ArrayList<Thread> threads;
 
     // To start ZooKeeper server: $ ./zkServer.sh start
     // To connect a client to the server: $ ​​./zkCli.sh -server 127.0.0.1:2181 *
@@ -65,7 +70,8 @@ public class ECSClient implements IECSClient, Runnable {
         // load servers from config file
         getServerMap();
 
-        zkApp = new ZooKeeperApplication();
+        hashRing = new HashRing();
+        zkApp = new ZooKeeperApplication(ZK_ROOT_PATH, zkPort, zkHost);
         try {
             zk = zkApp.connect(zkHost + ":" + String.valueOf(zkPort), zkTimeout);
         } catch (InterruptedException e) {
@@ -80,17 +86,29 @@ public class ECSClient implements IECSClient, Runnable {
             if (!doesExist) {
                 zkApp.create(ZK_ROOT_PATH);
             }
-            // else {
-            // logger.error("ZooKeeper has not been initialized");
-            // }
-        } catch (KeeperException e) {
-            logger.error(e);
-        } catch (InterruptedException e) {
+        } catch (KeeperException | InterruptedException e)) {
             logger.error(e);
         } catch (Exception e) {
             logger.error(e);
         }
+    }
 
+    public void newConnection(ECSNode node) throws Exception {
+        try {
+            int port = node.getNodePort();
+            String serverName = node.getNodeName();
+            Socket clientSocket = new Socket(this.hostname, port);
+			ECSConnection ecsConnection = new ECSConnection(clientSocket, this);
+            Thread newThread = new Thread(ecsConnection, serverName);
+            newThread.start();
+            this.threads.add(newThread);
+
+			logger.info("Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
+					+ clientSocket.getPort());
+
+        } catch (IOException e) {
+            throw e;
+        }
     }
 
     private void getServerMap() {
@@ -127,97 +145,167 @@ public class ECSClient implements IECSClient, Runnable {
          * @throws Exception some meaningfull exception on failure
          * @return true on success, false on failure
          */
-        // for (String server : servers){
-        // // start server and attach it to zookeeper
+        boolean startSuccess = true;
 
-        // }
+        Iterator<Map.Entry<String, ECSNode>> it = currServerMap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
+            String name = pair.getKey().toString();
+            ECSNode node = pair.getValue();
 
-        return false;
+            String zNodePath = ZK_ROOT_PATH + "/" + name;
+            try {
+                zkApp.createOrSetData(zNodePath, "Some Start message tbd");
+            } catch (KeeperException | InterruptedException e) {
+                startSuccess = false;
+                logger.error(e);
+                continue;
+            } catch (Exception e) {
+                startSuccess = false;
+                logger.error(e);
+                continue;
+            }
+
+            node.setStatus(NodeStatus.STARTING);
+            allServerMap.put(name, node);
+            // WILL UPDATING THE MAP WHILE ITERATING THROUGH IT MESS IT UP?
+            currServerMap.put(name, node);
+        }
+
+        return startSuccess;
     }
 
     @Override
     public boolean stop() {
-        // TODO something with zookeepr
+        /**
+        * Stops the service; all participating KVServers are stopped for processing client 
+        * requests but the processes remain running.
+        * @throws Exception    some meaningfull exception on failure
+        * @return  true on success, false on failure
+        */
+        boolean stopSuccess = true;
+
         Iterator<Map.Entry<String, ECSNode>> it = currServerMap.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
+            String name = pair.getKey().toString();
             ECSNode node = pair.getValue();
+
+
+            String zNodePath = ZK_ROOT_PATH + "/" + name;
+            try {
+                zkApp.createOrSetData(zNodePath, "Some Stop message tbd");
+            } catch (KeeperException | InterruptedException e) {
+                stopSuccess = false;
+                logger.error(e);
+                continue;
+            } catch (Exception e) {
+                stopSuccess = false;
+                logger.error(e);
+                continue;
+            }
+
             node.setStatus(NodeStatus.STOPPED);
-            allServerMap.put(pair.getKey().toString(), node);
+            allServerMap.put(name, node);
             // WILL UPDATING THE MAP WHILE ITERATING THROUGH IT MESS IT UP?
-            currServerMap.put(pair.getKey().toString(), node);
+            currServerMap.put(name, node);
         }
-        // zk.close();
-        return true;
+
+        return stopSuccess;
     }
 
     @Override
     public boolean shutdown() {
-        // TODO something with zookeepr
+        boolean shutdownSuccess = true;
+
         Iterator<Map.Entry<String, ECSNode>> it = currServerMap.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
+            String name = pair.getKey().toString();
             ECSNode node = pair.getValue();
+
+            String zNodePath = ZK_ROOT_PATH + "/" + name;
+            try {
+                zkApp.createOrSetData(zNodePath, "Some offline message tbd");
+            } catch (KeeperException | InterruptedException e) {
+                shutdownSuccess = false;
+                logger.error(e);
+                continue;
+            } catch (Exception e) {
+                shutdownSuccess = false;
+                logger.error(e);
+                continue;
+            }
+
             node.setStatus(NodeStatus.OFFLINE);
-            allServerMap.put(pair.getKey().toString(), node);
-            // WILL UPDATING THE MAP WHILE ITERATING THROUGH IT MESS IT UP?
-            currServerMap.put(pair.getKey().toString(), node);
+            allServerMap.put(name, node);
+            // WILL UPDATING THE MAP WHILE ITERATING THROUGH IT MESS IT UP? YES, BUT THEY MAKE ITERATORS FOR THIS SPECIFIC CASE
+            currServerMap.put(name, node);
+            hashRing.removeNode(name);
         }
 
         currServerMap.clear();
         // System.exit(0);
-        return true;
+        return shutdownSuccess;
     }
 
     @Override
-    public IECSNode addNode(String cacheStrategy, int cacheSize) {
+    public ECSNode addNode(String cacheStrategy, int cacheSize) {
         addNodes(1, cacheStrategy, cacheSize);
         return null;
     }
 
     @Override
-    public Collection<IECSNode> addNodes(int count, String cacheStrategy, int cacheSize) {
+    public Collection<ECSNode> addNodes(int count, String cacheStrategy, int cacheSize) {
         ArrayList<String> availServers = getAvailableServers();
 
         if (availServers.size() == 0) {
             logger.error("There are no more available servers");
             return null;
         } else if (count > availServers.size()) {
-            logger.error("There are no not enough available servers");
+            logger.error("There are not enough available servers");
             return null;
         }
 
-        ArrayList<IECSNode> nameArr = new ArrayList<IECSNode>();
+        if (hashRing.isEmpty()) {
+            hashRing.createHashRing(currServerMap);
+        } 
+
+        ArrayList<ECSNode> nameArr = new ArrayList<ECSNode>();
 
         for (int i = 0; i < count; i++) {
             // Choose a random server, also remove it from availServers so it can't be used
             // again in this loop
             int int_random = rand.nextInt(availServers.size());
             String serverName = availServers.remove(int_random);
+            ECSNode node = allServerMap.get(serverName);
 
-            ECSNode serverNode = allServerMap.get(serverName);
-            serverNode.setStatus(NodeStatus.STARTING);
-            allServerMap.put(serverName, serverNode);
-            currServerMap.put(serverName, serverNode);
-            nameArr.add(serverNode);
+            node.setStatus(NodeStatus.STARTING); // Not sure about the status
+            allServerMap.put(serverName, node);
+            currServerMap.put(serverName, node);
+            nameArr.add(node);
+            hashRing.addNode(node);
 
             // Start the KVServer by issuing an SSH call to the machine
-            String cmd = "java -jar " + SERVER_JAR + " " + serverNode.getNodePort();
+            String cmd = "java -jar " + SERVER_JAR + " " + node.getNodePort();
+            // "ssh -n <host> nohup java <path>/ms2-server.jar 50000 ERROR &"
+            
             try {
                 Process p = Runtime.getRuntime().exec(cmd);
+                // create new connection :*
+                // MAKE SURE THIS HAPPENS AFTER ABOVE CALL - MAYBE DELAY NEEDED?
+                newConnection(node);
             } catch (Exception e) {
                 logger.error("Cannot start the server through an SSH call", e);
             }
         }
         /*
          * Randomly choose <numberOfNodes> servers from the available machines and start
-         * the KVServer by issuing
-         * an SSH call to the respective machine.
+         * the KVServer by issuing an SSH call to the respective machine.
          * This call launches the storage server with the specified cache size and
-         * replacement strategy. For simplicity,
-         * locate the KVServer.jar in the same directory as the ECS. All storage servers
-         * are initialized with the metadata
-         * and any persisted data, and remain in state stopped.
+         * replacement strategy. For simplicity, locate the KVServer.jar in the same directory 
+         * as the ECS. All storage servers are initialized with the metadata and any persisted data,
+         * and remain in state stopped.
          * NOTE: Must call setupNodes before the SSH calls to start the servers and must
          * call awaitNodes before returning
          * 
@@ -244,40 +332,77 @@ public class ECSClient implements IECSClient, Runnable {
     }
 
     @Override
-    public Collection<IECSNode> setupNodes(int count, String cacheStrategy, int cacheSize) {
-        // TODO
+    public Collection<ECSNode> setupNodes(int count, String cacheStrategy, int cacheSize) {
+        /**
+        * Sets up `count` servers with the ECS (in this case Zookeeper)
+        * @return  array of strings, containing unique names of servers
+        */
 
+        if (count > allServerMap.size()) {
+            logger.error("There are not enough servers");
+            return null;
+        }
+
+        ArrayList<String> nodes = new ArrayList<String>();
+
+        Iterator<Map.Entry<String, ECSNode>> it = allServerMap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
+            String name = pair.getKey().toString();
+            ECSNode node = pair.getValue();
+            NodeStatus status = node.getStatus();
+
+            if (status == NodeStatus.OFFLINE) { // NOT SURE
+                continue;
+            }
+            
+            String znodePath = ZK_ROOT_PATH + "/" + name;
+
+            try {
+                zkApp.createOrSetData(znodePath, "UNSURE WHAT MESSAGE TO SEND");
+                nodes.add(name);
+            } catch (KeeperException | InterruptedException e) {
+                logger.error(e);
+            }
+        }
         return null;
     }
 
     @Override
     public boolean awaitNodes(int count, int timeout) throws Exception {
         // TODO
+            /**
+            * Wait for all nodes to report status or until timeout expires
+            * @param count     number of nodes to wait for
+            * @param timeout   the timeout in milliseconds
+            * @return  true if all nodes reported successfully, false otherwise
+            */
+
         return false;
     }
 
     @Override
     public boolean removeNodes(Collection<String> nodeNames) {
+        // Error check, make sure there is at least one active node
         // TODO
         for (String name : nodeNames) {
             ECSNode serverNode = allServerMap.get(name);
             serverNode.setStatus(NodeStatus.OFFLINE);
             allServerMap.put(name, serverNode);
             currServerMap.remove(name);
+            hashRing.removeNode(name);
         }
         return false;
     }
 
     @Override
-    public Map<String, IECSNode> getNodes() {
-        // TODO
-        return null;
+    public HashMap<String, ECSNode> getNodes() {
+        return hashRing.getHashRingMap();
     }
 
     @Override
-    public IECSNode getNodeByKey(String Key) {
-        // TODO
-        return null;
+    public ECSNode getNodeByKey(String Key) {
+        return getNodes().get(Key);
     }
 
     private void printError(String error) {
@@ -359,7 +484,6 @@ public class ECSClient implements IECSClient, Runnable {
     }
 
     public void run() {
-        // creating ECS UI
         while (!stop) {
             BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
             System.out.print(PROMPT);

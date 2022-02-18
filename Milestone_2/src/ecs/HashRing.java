@@ -8,16 +8,19 @@ import java.util.HashMap;
 import java.security.KeyException;
 import java.security.MessageDigest;
 
+import java.util.*;
+
 import org.apache.log4j.Logger;
 
 import shared.exceptions.UnexpectedValueException;
 import shared.messages.Metadata;
+import shared.messages.Metadata.MessageType;
 
 public class HashRing {
     private static final Logger logger = Logger.getLogger("hashring");
-    // private HashMap<BigInteger, ECSNode> hashServers = new HashMap<BigInteger, ECSNode>();
     private ArrayList<BigInteger> hashOrder = new ArrayList<>();
-    private HashMap<BigInteger, String> hashRing = new HashMap<BigInteger, String>();
+    private HashMap<String, BigInteger> hashRing = new HashMap<String, BigInteger>();
+    private HashMap<BigInteger, ECSNode> hashServers = new HashMap<BigInteger, ECSNode>();
     private int numServers = 0;
 
 
@@ -44,12 +47,12 @@ public class HashRing {
             BigInteger hashed = getHash(toHash);
 
             // let the server know its hash
-            // node.setHash(hashed);
+            node.setHash(hashed);
 
             // append to hashOrder + hashRing + hashServers
             hashOrder.add(hashed);
-            hashRing.put(hashed, toHash);
-            // hashServers.put(hashed, node);
+            hashRing.put(toHash, hashed);
+            hashServers.put(hashed, node);
         }
         // sort the hashes
         Collections.sort(hashOrder);
@@ -61,7 +64,7 @@ public class HashRing {
         numServers = hashOrder.size();
     }
 
-    private void addNode(ECSNode node){
+    public void addNode(ECSNode node){
         String name = node.getNodeName();
 
         // hash ip:port
@@ -71,12 +74,15 @@ public class HashRing {
         // update lists + reorder
         hashOrder.add(hashed);
         Collections.sort(hashOrder);
-        hashRing.put(hashed, name);
+        hashRing.put(name, hashed);
+
+        // Prepare + send updated metadata AFTER adding to lists
+        setRanges();
 
         numServers += 1;
     }
 
-    private void addNodes(ArrayList<ECSNode> nodes){
+    public void addNodes(ArrayList<ECSNode> nodes){
         for (ECSNode node: nodes){
             try{
                 addNode(node);
@@ -87,35 +93,70 @@ public class HashRing {
         }
     }
 
-    private void removeNode(String name){
-        // // get hash from array list
-        // BigInteger removeHash = hashRing.get(name);
-        // if (removeHash == null){
-        //     throw new NullPointerException("Invalid node name");
-        // }
+    public void removeNode(String name){
+        // get hash from array list
+        BigInteger removeHash = hashRing.get(name);
+        if (removeHash == null){
+            throw new NullPointerException("Invalid node name");
+        }
+        // collect idx of removed node in hashring
+        int idx = hashOrder.indexOf(removeHash);
 
-        // // remove values
-        // hashOrder.remove(removeHash);
-        // hashRing.remove(name);
+        // remove values
+        hashOrder.remove(removeHash);
+        hashRing.remove(name);
+        hashServers.remove(removeHash);
+        
+        // prepare + send updated metadata AFTER removing from lists
+        setRanges();
 
-        // numServers -= 1;
+        numServers -= 1;
 
-        // TODO: prepare + send updated metadata!
     }
 
     private void setRanges(){
-        // System.out.println(new Gson().toJson(mobilePhone));    
-
         // iterate through sorted key array
         int idx = 0;
         for (BigInteger key: hashOrder){
-            String serverName = hashRing.get(key);
-            int endIdx = (idx+1)%numServers;
 
-            Metadata metadata = new Metadata(serverName, )
+            ECSNode currNode = hashServers.get(key);
+            String serverName = currNode.getNodeName();
 
+            // String serverName = hashRing.get(key);
+            int endIdx = (idx+1) % numServers;
+            BigInteger endHash = hashOrder.get(endIdx);
+
+            // update ECSNode
             currNode.setHashRange(key, hashOrder.get(endIdx));
+            // create metadata message for KVServer
+            Metadata metadata = new Metadata(serverName, key, endHash, currNode.getNodePort(), MessageType.UPDATE, hashRing);
+            // send server info
+            currNode.sendMessage(metadata.toString());
+
+            idx ++;
         }
+    }
+
+    public HashMap<String, ECSNode> getHashRingMap() {
+        // Convert the hash ring to {serverName: node}
+        HashMap<String, ECSNode> hashRingtoServers = new HashMap<String, ECSNode>();
+
+        Iterator<Map.Entry<String, BigInteger>> it = hashRing.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, BigInteger> pair = (Map.Entry) it.next();
+
+            String name = pair.getKey().toString();
+            BigInteger hash = pair.getValue();
+            ECSNode node = hashServers.get(hash);
+            hashRingtoServers.put(name, node);
+        }
+
+        return hashRingtoServers;
+    }
+
+        
+    public boolean isEmpty() {
+        return hashOrder.size() != 0 || hashRing.size() != 0;
     }
 
     private BigInteger getHash(String value){

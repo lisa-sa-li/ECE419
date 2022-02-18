@@ -23,6 +23,21 @@ public class ZooKeeperApplication implements Watcher {
     private ZooKeeper _zooKeeper = null;
     private String _rootZnode = "/rootZnode";
 
+
+    private int zkPort = 2181;
+    private String zkHost = "127.0.0.1";
+
+
+    private String ZK_ROOT_PATH;
+    private int ZK_PORT;    
+    private String ZK_HOST;
+
+    public ZooKeeperApplication(String zkRootPath, int zkPort, String zkHost) {
+        this.ZK_ROOT_PATH = zkRootPath;
+        this.ZK_PORT = zkPort;    
+        this.ZK_HOST = zkHost;
+    }
+
     // ****************************************************************
     // CLI
     // ***************************************************************
@@ -94,14 +109,24 @@ public class ZooKeeperApplication implements Watcher {
     }
 
     // CREATE A ZNODE
-    public void create(String path) throws KeeperException, InterruptedException {
-        byte[] data = "id=0, hash-start=0000, hash-end=FFFF".getBytes();
-        _zooKeeper.create(
-                path,
-                data,
-                ZooDefs.Ids.OPEN_ACL_UNSAFE,
-                CreateMode.PERSISTENT);
+    public void create(String path, String data) throws KeeperException, InterruptedException {
+        // byte[] data = "id=0, hash-start=0000, hash-end=FFFF".getBytes();
+        _zooKeeper.create(path, data.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
     }
+
+    public void setData(String path, String data) throws KeeperException, InterruptedException {
+        _zooKeeper.setData(path, data.getBytes(), -1);
+    }
+
+    public void createOrSetData(String path, String data) throws KeeperException, InterruptedException {
+        boolean doesExist = _zooKeeper.exists(ZK_ROOT_PATH, false);
+        if (!doesExist) {
+            create(path, data);
+        } else {
+            setData(path, data);
+        }
+    }
+
 
     // RETURN CHILDREN ZNODES
     void getWorkers() throws KeeperException,

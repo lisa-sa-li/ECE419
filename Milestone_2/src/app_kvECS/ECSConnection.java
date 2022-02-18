@@ -1,4 +1,4 @@
-package ecs;
+package app_kvECS;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -15,6 +15,7 @@ import shared.messages.Metadata;
 import shared.messages.KVMessage.StatusType;
 
 import app_kvServer.KVServer;
+import ecs.ECSNode;
 
 /**
  * Represents a connection end point for a particular client that is
@@ -29,45 +30,39 @@ public class ECSConnection implements Runnable {
 	private static final int BUFFER_SIZE = 1024;
 	private static final int DROP_SIZE = 128 * BUFFER_SIZE;
 
-	private Socket serverSocket;
+	private Socket ecsSocket;
 	private InputStream input;
 	private OutputStream output;
-	private ECSNode ecsNode;
+	private ECSClient ecsClient;
 
-	/**
-	 * Constructs a new ServerConnection object for a given TCP socket.
-	 * 
-	 * @param serverSocket the Socket object for the server connection.
-	 */
-	public ECSConnection(Socket serverSocket, ECSNode ecsNode) throws Exception {
-		this.serverSocket = serverSocket;
+	public ECSConnection(Socket ecsSocket, ECSClient ecsClient) throws Exception {
+		this.ecsSocket = ecsSocket;
 		this.isOpen = true;
-		this.ecsNode = ecsNode;
+		this.ecsClient = ecsClient;
 		connect();
 	}
 
 	public void connect() throws IOException {
 		try {
-			output = this.serverSocket.getOutputStream();
-			input = this.serverSocket.getInputStream();
+			output = this.ecsSocket.getOutputStream();
+			input = this.ecsSocket.getInputStream();
 
-			logger.info("Connected to " + this.serverSocket.getInetAddress().getHostName() + " on port "
-					+ this.serverSocket.getPort());
+			logger.info("Connected to " + this.ecsSocket.getInetAddress().getHostName() + " on port "
+					+ this.ecsSocket.getPort());
 		} catch (IOException e) {
-			logger.error("Error! Unable to establish ECS connection. \n", e);
+			logger.error("Error! Unable to establish server connection. \n", e);
 		}
 	}
 
-	public void sendMetadata(Metadata meta) throws IOException {
-		byte[] jsonBytes = json.getJSONByte();
-        // TODO: get bytes from metadata class
+	public void sendMetadataMessage(String meta) throws IOException {
+		byte[] jsonBytes = meta.getBytes();
 		output.write(jsonBytes, 0, jsonBytes.length);
 		output.flush();
-		logger.info("SEND \t<" + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getPort() + ">: '"
+		logger.info("SEND \t<" + ecsSocket.getInetAddress().getHostAddress() + ":" + ecsSocket.getPort() + ">: '"
 				+ json.getJSON() + "'");
 	}
 
-	public JSONMessage receiveMessage() throws IOException {
+	public JSONMessage receiveMetadataMessage() throws IOException {
 		int index = 0;
 		byte[] msgBytes = null, tmp = null;
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
@@ -139,71 +134,9 @@ public class ECSConnection implements Runnable {
 			return null;
 		}
 		json.deserialize(jsonStr);
-		logger.info("RECEIVE \t<" + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getPort()
+		logger.info("RECEIVE \t<" + ecsSocket.getInetAddress().getHostAddress() + ":" + ecsSocket.getPort()
 				+ ">: '" + json.getJSON().trim() + "'");
 		return json;
-	}
-
-	private JSONMessage handleMessage(JSONMessage msg) throws IOException {
-		String key = msg.getKey();
-		String value = msg.getValue();
-		StatusType status = msg.getStatus();
-
-		String handleMessageValue = value; // For PUT or DELETE, send the original value back
-		StatusType handleMessageStatus = StatusType.NO_STATUS;
-		JSONMessage handleMessage = new JSONMessage();
-
-		switch (status) {
-			case PUT:
-				try {
-					// check key, value length
-					if (key.length() > 20) {
-						throw new KeyValueTooLongException("Key too long: " + key);
-					}
-					if (key.trim().isEmpty() || key == null) {
-						throw new InvalidKeyException("Invalid key: " + key);
-					}
-					if (value.length() > 120000) {
-						throw new KeyValueTooLongException("Value too long : " + value);
-					}
-					handleMessageStatus = this.kvServer.putKV(key, value);
-					logger.info(handleMessageStatus.name() + ": key " + key + " & value " + value);
-				} catch (Exception e) {
-					handleMessageStatus = StatusType.PUT_ERROR;
-					logger.info("PUT_ERROR: key " + key + " & value " + value);
-				}
-				break;
-			case GET:
-				try {
-					if (key.length() > 20) {
-						throw new KeyValueTooLongException("Key too long: " + key);
-					}
-					if (!value.trim().isEmpty() && value != null) {
-						throw new UnexpectedValueException("Unexpected value for GET: " + value);
-					}
-					if (key.trim().isEmpty() || key == null) {
-						throw new InvalidKeyException("Invalid key: " + key);
-					}
-					handleMessageValue = this.kvServer.getKV(key);
-					handleMessageStatus = StatusType.GET_SUCCESS;
-					logger.info("GET_SUCCESS: key " + key + " & value " + handleMessageValue);
-				} catch (Exception e) {
-					handleMessageStatus = StatusType.GET_ERROR;
-					logger.info("GET_ERROR: key " + key + " & value " + handleMessageValue);
-				}
-				break;
-			case DISCONNECTED:
-				this.isOpen = false;
-				handleMessageStatus = StatusType.DISCONNECTED;
-				logger.info("Client is disconnected");
-				break;
-			default:
-				logger.error("Unknown command.");
-				break;
-		}
-
-		handleMessage.setMessage(handleMessageStatus.name(), key, handleMessageValue);
-		return handleMessage;
 	}
 
 	public void run() {
@@ -211,11 +144,12 @@ public class ECSConnection implements Runnable {
 		try {
 			while (this.isOpen) {
 				try {
-					JSONMessage recievedMesage = receiveJSONMessage();
-					if (recievedMesage != null) {
-						JSONMessage sendMessage = handleMessage(recievedMesage);
-						sendJSONMessage(sendMessage);
-					}
+					System.out.println("Listening for messages");
+					JSONMessage recievedMesage = receiveMetadataMessage();
+					// if (recievedMesage != null) {
+					// 	JSONMessage sendMessage = handleMessage(recievedMesage);
+					// 	sendJSONMessage(sendMessage);
+					// }
 				} catch (IOException e) {
 					logger.error("Server connection lost: ", e);
 					this.isOpen = false;
@@ -226,15 +160,16 @@ public class ECSConnection implements Runnable {
 		} finally {
 			try {
 				// close connection
-				if (serverSocket != null) {
+				if (ecsSocket != null) {
 					// Send message????
 					input.close();
 					output.close();
-					serverSocket.close();
+					ecsSocket.close();
 				}
 			} catch (IOException ioe) {
 				logger.error("Error! Unable to tear down connection!", ioe);
 			}
 		}
 	}
+
 }
