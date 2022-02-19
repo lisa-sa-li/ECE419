@@ -5,10 +5,12 @@ import java.net.Socket;
 import java.io.IOException;
 
 import shared.exceptions.UnexpectedValueException;
-import shared.messages.JSONMessage;
+import shared.messages.KVJsonMessage;
 import shared.messages.KVMessage.StatusType;
 
 import app_kvClient.ClientConnection;
+import shared.messages.Metadata;
+import java.util.List;
 
 public class KVStore implements KVCommInterface, Runnable {
 	/**
@@ -27,6 +29,7 @@ public class KVStore implements KVCommInterface, Runnable {
 	private static final int BUFFER_SIZE = 1024;
 	private static final int DROP_SIZE = 1024 * BUFFER_SIZE;
 	private ClientConnection clientConnection;
+	private List<Metadata> metadata;
 
 	public KVStore(String address, int port) {
 		this.address = address;
@@ -34,7 +37,7 @@ public class KVStore implements KVCommInterface, Runnable {
 		this.clientID = -1;
 	}
 
-	// class for testing
+	// initialization for unit testing
 	public KVStore(String address, int port, int clientID, int maxUsers) {
 		this.address = address;
 		this.port = port;
@@ -60,7 +63,7 @@ public class KVStore implements KVCommInterface, Runnable {
 	public void disconnect() {
 		logger.info("Tearing down the connection ...");
 		try {
-			JSONMessage jsonMessage = new JSONMessage();
+			KVJsonMessage jsonMessage = new KVJsonMessage();
 			jsonMessage.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "disconnected");
 			this.clientConnection.sendJSONMessage(jsonMessage);
 			this.clientConnection.receiveJSONMessage();
@@ -72,14 +75,14 @@ public class KVStore implements KVCommInterface, Runnable {
 	}
 
 	@Override
-	public JSONMessage put(String key, String value) throws Exception {
-		JSONMessage jsonMessage = new JSONMessage();
+	public KVJsonMessage put(String key, String value) throws Exception {
+		KVJsonMessage jsonMessage = new KVJsonMessage();
 		jsonMessage.setMessage(StatusType.PUT.name(), key, value);
 		this.clientConnection.sendJSONMessage(jsonMessage);
 		return this.clientConnection.receiveJSONMessage();
 	}
 
-	// for testing
+	// for unit testing
 	public void run() {
 		running = true;
 		int totalUsers = clientID + maxUsers;
@@ -114,5 +117,35 @@ public class KVStore implements KVCommInterface, Runnable {
 		jsonMessage.setMessage(StatusType.GET.name(), key, "");
 		this.clientConnection.sendJSONMessage(jsonMessage);
 		return this.clientConnection.receiveJSONMessage();
+	}
+
+	public void switchServer(String address, int port) throws Exception {
+		this.address = address;
+		this.port = port;
+		this.disconnect();
+		try {
+			this.connect();
+		} catch (Exception e) {
+			logger.error("The connection to the new server was not successful.");
+		}
+	}
+
+	// Connects to the correct server and update the metadata if necessary
+	public void connectToCorrectServer(KVJsonMessage msg, String key) throws Exception {
+		this.metadata = msg.getMetadata();
+
+	}
+
+	// Sends message to the correct server (Used in put() and get())
+	// IDK IF WE ARE RETURNING JSONMESSAGE
+	public KVJsonMessage sendMessageToCorrectServer(KVJsonMessage msg, String key) throws Exception {
+		this.clientConnection.sendJSONMessage(msg);
+		KVJsonMessage returnMsg = this.clientConnection.receiveJSONMessage();
+		if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
+			connectToCorrectServer(returnMsg, key);
+			this.clientConnection.sendJSONMessage(msg);
+			returnMsg = this.clientConnection.receiveJSONMessage();
+		}
+		return returnMsg;
 	}
 }
