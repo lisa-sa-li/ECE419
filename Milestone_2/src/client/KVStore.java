@@ -83,6 +83,15 @@ public class KVStore implements KVCommInterface, Runnable {
 	}
 
 	// for unit testing
+	@Override
+	public JSONMessage get(String key) throws Exception {
+		JSONMessage jsonMessage = new JSONMessage();
+		jsonMessage.setMessage(StatusType.GET.name(), key, "");
+		this.clientConnection.sendJSONMessage(jsonMessage);
+		return this.clientConnection.receiveJSONMessage();
+	}
+
+	// for testing
 	public void run() {
 		running = true;
 		int totalUsers = clientID + maxUsers;
@@ -109,14 +118,6 @@ public class KVStore implements KVCommInterface, Runnable {
 				System.out.println("ERROR: " + e);
 			}
 		}
-	}
-
-	@Override
-	public JSONMessage get(String key) throws Exception {
-		JSONMessage jsonMessage = new JSONMessage();
-		jsonMessage.setMessage(StatusType.GET.name(), key, "");
-		this.clientConnection.sendJSONMessage(jsonMessage);
-		return this.clientConnection.receiveJSONMessage();
 	}
 
 	public void switchServer(String address, int port) throws Exception {
@@ -148,4 +149,10 @@ public class KVStore implements KVCommInterface, Runnable {
 		}
 		return returnMsg;
 	}
+
+// 	Cache metadata of storage service. (Note: this metadata might not be the most recent)
+// Route requests to the storage server that coordinates the respective key-range
+// Metadata updating might be required which is initiated by the storage server if the client library, that caches the metadata, contacted a wrong storage server (i.e., the request could not be served by the storage server identified through the currently cached metadata) due to stale metadata
+// Update metadata and retry the request
+
 }
