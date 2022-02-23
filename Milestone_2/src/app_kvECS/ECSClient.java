@@ -53,7 +53,7 @@ public class ECSClient implements IECSClient, Runnable {
 
     private ServerSocket ecsServerSocket;
     private String hostname = "127.0.0.1";
-	private ArrayList<Thread> threads;
+    private ArrayList<Thread> threads;
 
     // To start ZooKeeper server: $ ./zkServer.sh start
     // To connect a client to the server: $ ​​./zkCli.sh -server 127.0.0.1:2181 *
@@ -86,7 +86,7 @@ public class ECSClient implements IECSClient, Runnable {
             if (!doesExist) {
                 zkApp.create(ZK_ROOT_PATH);
             }
-        } catch (KeeperException | InterruptedException e)) {
+        } catch (KeeperException | InterruptedException e) {
             logger.error(e);
         } catch (Exception e) {
             logger.error(e);
@@ -98,13 +98,13 @@ public class ECSClient implements IECSClient, Runnable {
             int port = node.getNodePort();
             String serverName = node.getNodeName();
             Socket clientSocket = new Socket(this.hostname, port);
-			ECSConnection ecsConnection = new ECSConnection(clientSocket, this);
+            ECSConnection ecsConnection = new ECSConnection(clientSocket, this);
             Thread newThread = new Thread(ecsConnection, serverName);
             newThread.start();
             this.threads.add(newThread);
 
-			logger.info("Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
-					+ clientSocket.getPort());
+            logger.info("Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
+                    + clientSocket.getPort());
 
         } catch (IOException e) {
             throw e;
@@ -178,11 +178,13 @@ public class ECSClient implements IECSClient, Runnable {
     @Override
     public boolean stop() {
         /**
-        * Stops the service; all participating KVServers are stopped for processing client 
-        * requests but the processes remain running.
-        * @throws Exception    some meaningfull exception on failure
-        * @return  true on success, false on failure
-        */
+         * Stops the service; all participating KVServers are stopped for processing
+         * client
+         * requests but the processes remain running.
+         * 
+         * @throws Exception some meaningfull exception on failure
+         * @return true on success, false on failure
+         */
         boolean stopSuccess = true;
 
         Iterator<Map.Entry<String, ECSNode>> it = currServerMap.entrySet().iterator();
@@ -190,7 +192,6 @@ public class ECSClient implements IECSClient, Runnable {
             Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
             String name = pair.getKey().toString();
             ECSNode node = pair.getValue();
-
 
             String zNodePath = ZK_ROOT_PATH + "/" + name;
             try {
@@ -239,7 +240,8 @@ public class ECSClient implements IECSClient, Runnable {
 
             node.setStatus(NodeStatus.OFFLINE);
             allServerMap.put(name, node);
-            // WILL UPDATING THE MAP WHILE ITERATING THROUGH IT MESS IT UP? YES, BUT THEY MAKE ITERATORS FOR THIS SPECIFIC CASE
+            // WILL UPDATING THE MAP WHILE ITERATING THROUGH IT MESS IT UP? YES, BUT THEY
+            // MAKE ITERATORS FOR THIS SPECIFIC CASE
             currServerMap.put(name, node);
             hashRing.removeNode(name);
         }
@@ -269,7 +271,7 @@ public class ECSClient implements IECSClient, Runnable {
 
         if (hashRing.isEmpty()) {
             hashRing.createHashRing(currServerMap);
-        } 
+        }
 
         ArrayList<ECSNode> nameArr = new ArrayList<ECSNode>();
 
@@ -289,7 +291,7 @@ public class ECSClient implements IECSClient, Runnable {
             // Start the KVServer by issuing an SSH call to the machine
             String cmd = "java -jar " + SERVER_JAR + " " + node.getNodePort();
             // "ssh -n <host> nohup java <path>/ms2-server.jar 50000 ERROR &"
-            
+
             try {
                 Process p = Runtime.getRuntime().exec(cmd);
                 // create new connection :*
@@ -303,8 +305,10 @@ public class ECSClient implements IECSClient, Runnable {
          * Randomly choose <numberOfNodes> servers from the available machines and start
          * the KVServer by issuing an SSH call to the respective machine.
          * This call launches the storage server with the specified cache size and
-         * replacement strategy. For simplicity, locate the KVServer.jar in the same directory 
-         * as the ECS. All storage servers are initialized with the metadata and any persisted data,
+         * replacement strategy. For simplicity, locate the KVServer.jar in the same
+         * directory
+         * as the ECS. All storage servers are initialized with the metadata and any
+         * persisted data,
          * and remain in state stopped.
          * NOTE: Must call setupNodes before the SSH calls to start the servers and must
          * call awaitNodes before returning
@@ -334,9 +338,10 @@ public class ECSClient implements IECSClient, Runnable {
     @Override
     public Collection<ECSNode> setupNodes(int count, String cacheStrategy, int cacheSize) {
         /**
-        * Sets up `count` servers with the ECS (in this case Zookeeper)
-        * @return  array of strings, containing unique names of servers
-        */
+         * Sets up `count` servers with the ECS (in this case Zookeeper)
+         * 
+         * @return array of strings, containing unique names of servers
+         */
 
         if (count > allServerMap.size()) {
             logger.error("There are not enough servers");
@@ -355,7 +360,7 @@ public class ECSClient implements IECSClient, Runnable {
             if (status == NodeStatus.OFFLINE) { // NOT SURE
                 continue;
             }
-            
+
             String znodePath = ZK_ROOT_PATH + "/" + name;
 
             try {
@@ -371,12 +376,13 @@ public class ECSClient implements IECSClient, Runnable {
     @Override
     public boolean awaitNodes(int count, int timeout) throws Exception {
         // TODO
-            /**
-            * Wait for all nodes to report status or until timeout expires
-            * @param count     number of nodes to wait for
-            * @param timeout   the timeout in milliseconds
-            * @return  true if all nodes reported successfully, false otherwise
-            */
+        /**
+         * Wait for all nodes to report status or until timeout expires
+         * 
+         * @param count   number of nodes to wait for
+         * @param timeout the timeout in milliseconds
+         * @return true if all nodes reported successfully, false otherwise
+         */
 
         return false;
     }

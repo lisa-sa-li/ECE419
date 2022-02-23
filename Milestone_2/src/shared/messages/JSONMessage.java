@@ -4,7 +4,11 @@ import java.io.Serializable;
 import java.util.StringTokenizer;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.log4j.*;
+import com.google.gson.Gson;
+
+import shared.messages.Metadata;
 
 public class JSONMessage implements KVMessage, Serializable {
 
@@ -17,9 +21,13 @@ public class JSONMessage implements KVMessage, Serializable {
     private StatusType status;
     private String key;
     private String value;
+    // private String metadata;
+    private String metadataStr
 
     private byte[] byteJSON;
     private String json;
+
+    Gson gson = new Gson();
 
     private byte[] addCtrChars(byte[] bytes) {
         byte[] ctrBytes = new byte[] { LINE_FEED, RETURN };
@@ -62,10 +70,12 @@ public class JSONMessage implements KVMessage, Serializable {
         return this.byteJSON;
     }
 
-    public void setMessage(String inStatus, String inKey, String inValue) {
+    public void setMessage(String inStatus, String inKey, String inValue, Metadata metadata) {
+        // Metadata
         setStatus(inStatus);
         setKey(inKey);
         setValue(inValue);
+        setMetadata(metadata);
         this.json = this.serialize();
     }
 
@@ -99,6 +109,23 @@ public class JSONMessage implements KVMessage, Serializable {
         return this.json;
     }
 
+    public void setMetadata(Metadata metadata) {
+        if (metadata != null) {
+            this.metadataStr = gson.toJson(metadata);
+        }
+    }
+
+    public void setMetadataStr(String metadata) {
+        this.metadataStr = metadata;
+    }
+
+    public Metadata getMetadata() {
+        if (this.metadataStr == null) {
+            return null;
+        }
+        return gson.fromJson(this.metadataStr, Metadata.class);
+    }
+
     public String serialize() {
         // initialize string builder to create mutable string
         StringBuilder strMessage = new StringBuilder();
@@ -115,6 +142,14 @@ public class JSONMessage implements KVMessage, Serializable {
             strMessage.append(KVEntry);
         } else {
             String KVEntry = ("\"" + this.key + "\":\"\"");
+            strMessage.append(KVEntry);
+        }
+
+        if (!this.metadataStr.trim().isEmpty()) {
+            String KVEntry = ("\"metadata\":\"" + this.metadataStr + "\",");
+            strMessage.append(KVEntry);
+        } else {
+            String KVEntry = ("\"metadata\":\"\"");
             strMessage.append(KVEntry);
         }
         strMessage.append("}");
@@ -146,16 +181,38 @@ public class JSONMessage implements KVMessage, Serializable {
         String status = tokens[1];
         String key = tokens[2];
         String value;
-        // In a DELETE or GET, there is no tokens[3], so we set it to ""
-        try {
+        String metadataStr;
+
+        if (tokens[3] != "metadata") {
+            // This means token[3] is the value to "value"
             value = tokens[3];
-        } catch (Exception iobe) {
+
+            try {
+                metadataStr = tokens[5];
+            } catch (Exception iobe) {
+                metadataStr = null;
+            }
+        } else {
+            // This means there's no value for "value", so it's a DELETE or GET
             value = "";
+            try {
+                metadataStr = tokens[4];
+            } catch (Exception iobe) {
+                metadataStr = null;
+            }
         }
+
+        // // In a DELETE or GET, there is no tokens[3], so we set it to ""
+        // try {
+        // value = tokens[3];
+        // } catch (Exception iobe) {
+        // value = "";
+        // }
 
         setStatus(status);
         setKey(key);
         setValue(value);
+        setMetadataStr(metadataStr);
     }
 
 }
