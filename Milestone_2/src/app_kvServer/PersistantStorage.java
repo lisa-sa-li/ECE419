@@ -6,11 +6,15 @@ import org.apache.log4j.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.lang.StringBuffer;
+import java.math.BigInteger;
 import java.io.FileOutputStream;
 import shared.messages.JSONMessage;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.FileNotFoundException;
+
+import ecs.HashRing.getHash;
+
 
 public class PersistantStorage implements IPersistantStorage {
     private static Logger logger = Logger.getRootLogger();
@@ -191,4 +195,81 @@ public class PersistantStorage implements IPersistantStorage {
             logger.error("Error clearing storage.");
         }
     }
+
+
+	private boolean isKeyInRange(BigInteger hash, BigInteger endHash, String key){
+        BigInteger keyHash = getHash(key);
+		int left = hash.compareTo(keyHash);
+		int right = endHash.compareTo(keyHash);
+
+		return (left >= 0 && right < 0);
+	}
+
+    @Override
+    public String getDataInRange(BigInteger hash, BigInteger endHash) {
+    try {
+            BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
+            StringBuffer inputBuffer = new StringBuffer();
+            StringBuffer outputBuffer = new StringBuffer();
+            String line;
+            String keyFromFile;
+            boolean foundKey = false;
+            JSONMessage json;
+            StatusType putStatus = StatusType.NO_STATUS;
+
+
+            while ((line = file.readLine()) != null) {
+                // Covert each line to a JSON so we can read the key and value
+                json = new JSONMessage();
+                json.deserialize(line);
+                keyFromFile = json.getKey();
+
+                if (isKeyInRange(hash, endHash, keyFromFile) {
+                    // We have to move this to a new server, write it to an output string buffer
+                    outputBuffer.append(line);
+                    outputBuffer.append('\n');
+                } else {
+                    // We keep this in the current server
+                    inputBuffer.append(line);
+                    inputBuffer.append('\n');
+                }
+            }
+
+            file.close();
+
+            // Overwrite file with the string buffer data
+            FileOutputStream fileOut = new FileOutputStream(this.pathToFile);
+            fileOut.write(inputBuffer.toString().getBytes());
+            fileOut.close();
+
+            logger.info("Split server storage data");
+            return outputBuffer.toString();
+        } catch (Exception e) {
+            logger.error("Problem reading file to put.");
+        }
+        return "";
+    }
+
+    @Override
+    public StatusType appendToStorage(String keyValues) throws Exception {
+        try {
+            BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
+            StringBuffer inputBuffer = new StringBuffer();
+  
+            inputBuffer.append(keyValues);
+  
+            file.close();
+            // Overwrite file with the string buffer data
+            FileOutputStream fileOut = new FileOutputStream(this.pathToFile);
+            fileOut.write(inputBuffer.toString().getBytes());
+            fileOut.close();
+
+            logger.info("Completed 'put_many' operation into storage server");
+            return StatusType.PUT_SUCCESS;
+        } catch (Exception e) {
+            logger.error("Problem reading file to put_many.");
+        }
+        return StatusType.PUT_ERROR;
+    }
+
 }

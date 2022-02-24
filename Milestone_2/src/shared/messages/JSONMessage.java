@@ -9,6 +9,7 @@ import org.apache.log4j.*;
 import com.google.gson.Gson;
 
 import shared.messages.Metadata;
+// import shared.messages.ECSMessage;
 
 public class JSONMessage implements KVMessage, Serializable {
 
@@ -22,7 +23,8 @@ public class JSONMessage implements KVMessage, Serializable {
     private String key;
     private String value;
     // private String metadata;
-    private String metadataStr
+    private String metadataStr;
+    // private String ecsMessageStr;
 
     private byte[] byteJSON;
     private String json;
@@ -70,12 +72,20 @@ public class JSONMessage implements KVMessage, Serializable {
         return this.byteJSON;
     }
 
+    public void setMessage(String inStatus, String inKey, String inValue) {
+        setStatus(inStatus);
+        setKey(inKey);
+        setValue(inValue);
+        this.json = this.serialize();
+    }
+
+
     public void setMessage(String inStatus, String inKey, String inValue, Metadata metadata) {
-        // Metadata
         setStatus(inStatus);
         setKey(inKey);
         setValue(inValue);
         setMetadata(metadata);
+        // setECSMessage(ecsMessage);
         this.json = this.serialize();
     }
 
@@ -126,6 +136,23 @@ public class JSONMessage implements KVMessage, Serializable {
         return gson.fromJson(this.metadataStr, Metadata.class);
     }
 
+    // public void setECSMessage(ECSMessage ecsMessage) {
+    //     if (ecsMessage != null) {
+    //         this.ecsMessageStr = gson.toJson(ecsMessage);
+    //     }
+    // }
+
+    // public void setECSMessageStr(String ecsMessage) {
+    //     this.ecsMessageStr = ecsMessage;
+    // }
+
+    // public ECSMessage getECSMessage() {
+    //     if (this.ecsMessageStr == null) {
+    //         return null;
+    //     }
+    //     return gson.fromJson(this.ecsMessageStr, ECSMessage.class);
+    // }
+
     public String serialize() {
         // initialize string builder to create mutable string
         StringBuilder strMessage = new StringBuilder();
@@ -152,6 +179,13 @@ public class JSONMessage implements KVMessage, Serializable {
             String KVEntry = ("\"metadata\":\"\"");
             strMessage.append(KVEntry);
         }
+        // if (!this.ecsMessageStr.trim().isEmpty()) {
+        //     String KVEntry = ("\"ecs\":\"" + this.ecsMessageStr + "\",");
+        //     strMessage.append(KVEntry);
+        // } else {
+        //     String KVEntry = ("\"ecs\":\"\"");
+        //     strMessage.append(KVEntry);
+        // }
         strMessage.append("}");
 
         this.json = strMessage.toString();
@@ -182,25 +216,38 @@ public class JSONMessage implements KVMessage, Serializable {
         String key = tokens[2];
         String value;
         String metadataStr;
+        String ecsMessageStr;
+
+        int buffer = 0;
 
         if (tokens[3] != "metadata") {
             // This means token[3] is the value to "value"
             value = tokens[3];
-
-            try {
-                metadataStr = tokens[5];
-            } catch (Exception iobe) {
-                metadataStr = null;
-            }
         } else {
-            // This means there's no value for "value", so it's a DELETE or GET
+            // This means there's no value for "value", so token[3] is the key "metadata"
             value = "";
-            try {
-                metadataStr = tokens[4];
-            } catch (Exception iobe) {
-                metadataStr = null;
-            }
+            buffer++;
         }
+        try {
+            metadataStr = tokens[5 - buffer];
+        } catch (Exception iobe) {
+            metadataStr = null;
+        }
+
+
+        // if (tokens[5 - buffer] != "ecs") {
+        //     // This means token[5 - buffer] is the value to "metadata"
+        //     metadataStr = tokens[5 - buffer];
+        // } else {
+        //     // This means there's no value for "metadata"
+        //     metadataStr = null;
+        //     buffer++;
+        // }
+        // try {
+        //     ecsMessageStr = tokens[7 - buffer];
+        // } catch (Exception iobe) {
+        //     ecsMessageStr = null;
+        // }
 
         // // In a DELETE or GET, there is no tokens[3], so we set it to ""
         // try {
@@ -213,6 +260,7 @@ public class JSONMessage implements KVMessage, Serializable {
         setKey(key);
         setValue(value);
         setMetadataStr(metadataStr);
+        // setECSMessageStr(ecsMessageStr);
     }
 
 }

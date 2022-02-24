@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import logger.LogSetup;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.Watcher.Event.EventType;
@@ -19,7 +18,7 @@ public class ZooKeeperApplication implements Watcher {
     private boolean running = true;
     private static final String PROMPT = "ZKDemo> ";
     private static Logger logger = Logger.getRootLogger();
-    private static Application demo;
+    private static ZooKeeperApplication demo;
     private ZooKeeper _zooKeeper = null;
     private String _rootZnode = "/rootZnode";
 
@@ -65,12 +64,12 @@ public class ZooKeeperApplication implements Watcher {
         // INPUT: connect
         if (tokens[0].equals("connect")) {
             try {
-                demo.connect();
+                demo.connect("localhost:2181", 1000);
             } catch (Exception e) {
                 logger.info("Could not connect to ZK.");
             }
             try {
-                demo.create(_rootZnode);
+                demo.create(_rootZnode, "Swag");
             } catch (Exception e) {
                 logger.info("Could not create new Znode.");
             }
@@ -79,7 +78,7 @@ public class ZooKeeperApplication implements Watcher {
         else if (tokens[0].equals("add")) {
             logger.info("Adding new Znode, " + tokens[1]);
             try {
-                demo.create(_rootZnode + tokens[1]);
+                demo.create(_rootZnode + tokens[1], "Swag");
             } catch (Exception e) {
                 logger.info(e);
             }
@@ -119,8 +118,7 @@ public class ZooKeeperApplication implements Watcher {
     }
 
     public void createOrSetData(String path, String data) throws KeeperException, InterruptedException {
-        boolean doesExist = _zooKeeper.exists(ZK_ROOT_PATH, false);
-        if (!doesExist) {
+        if (_zooKeeper.exists(ZK_ROOT_PATH, false) == null) {
             create(path, data);
         } else {
             setData(path, data);
@@ -196,8 +194,8 @@ public class ZooKeeperApplication implements Watcher {
     // ***************************************************************
     public static void main(String[] args) {
         try {
-            new LogSetup("logs/ecs-client.log", Level.INFO);
-            demo = new Application();
+            // new LogSetup("logs/ecs-client.log", Level.INFO);
+            demo = new ZooKeeperApplication();
             demo.run();
         } catch (IOException e) {
             System.out.println("Error! Unable to initialize logger!");

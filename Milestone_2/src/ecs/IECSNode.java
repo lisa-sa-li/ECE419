@@ -3,10 +3,10 @@ package ecs;
 public interface IECSNode {
     
     public enum NodeStatus{
-        WRITELOCK, // added but being written to
         OFFLINE, // not added
-        READY, // ready
         STARTING, // added, waiting to be written to
+        WRITELOCK, // added but being written to
+        READY, // ready
         STOPPED, // removed but not yet offline
     }
 
