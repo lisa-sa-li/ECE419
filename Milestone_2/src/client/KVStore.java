@@ -94,8 +94,11 @@ public class KVStore implements KVCommInterface, Runnable {
 	}
 
 	// Change for M2 --> Needs edit
-	// Might want to check the node from the previous metadata first before just randomly sending message
-	// Also, want to make sure it succeeds before stopping this function
+	// Want to check the node from the existing metadata first before just randomly sending message (in the if statement before returning that function call)
+	// Also, want to make sure it can successfully put before stopping this function --> maybe put it in while loop with boolean flag
+	// this is to prep for the cases when server just dies randomly in the middle of putting
+	// Actually, put while loop in sendMessageToCorrectServer() function might be better
+	// Call updateToCorrectNodeInfo(JSONMessage msg, String key) in if statement before the return statement to check the stale metadata
 	@Override
 	public JSONMessage put(String key, String value) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
@@ -109,7 +112,7 @@ public class KVStore implements KVCommInterface, Runnable {
 	}
 
 	// Change for M2 --> Needs edit
-	// Might want to check the node from the previous metadata first before just randomly sending message
+	// Want to check the node from the previous metadata first before just randomly sending message
 	// Also, want to make sure it succeeds before stopping this function
 	@Override
 	public JSONMessage get(String key) throws Exception {
