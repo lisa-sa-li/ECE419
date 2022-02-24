@@ -120,13 +120,13 @@ public class KVStore implements KVCommInterface, Runnable {
 	// Find out if the current ECSNode is responsible for the given key
 	public boolean isECSNodeResponsibleForKey(String key, ECSNode currNode) {
 		BigInteger keyHash = hashRing.getHash(key);
+		// Three cases where the node is responsible for the key
 		// Case 1: inHash <= key <= endHash
-		// Case 2:
-		// if ( ((currNode.getHash().compareTo(currNode.getEndHash()) == -1) && (currNode.getHash().compareTo(keyHash) != 1) && (currNode.getEndHash().compareTo(keyHash) != -1)) ||
-		// 		(()) ) {
-		// 	return true;
-		// }
-		return false;
+		// Case 2: inHash >= endHash and key >= inHash and key >= endHash
+		// Case 3: inHash >= endHash and key <= inHash and key <= endHash
+		return ((currNode.getHash().compareTo(currNode.getEndHash()) != 1) && (currNode.getHash().compareTo(keyHash) != 1) && (currNode.getEndHash().compareTo(keyHash) != -1)) ||
+				((currNode.getHash().compareTo(currNode.getEndHash()) != -1) && (currNode.getHash().compareTo(keyHash) != 1) && (currNode.getEndHash().compareTo(keyHash) != 1)) ||
+				((currNode.getHash().compareTo(currNode.getEndHash()) != -1) && (currNode.getHash().compareTo(keyHash) != -1) && (currNode.getEndHash().compareTo(keyHash) != -1));
 	}
 
 	// Connects to the correct server and update the metadata if necessary
