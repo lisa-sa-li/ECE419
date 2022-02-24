@@ -1,6 +1,7 @@
 package app_kvClient;
 
 import shared.messages.JSONMessage;
+
 import java.io.IOException;
 
 public interface IClientConnection {

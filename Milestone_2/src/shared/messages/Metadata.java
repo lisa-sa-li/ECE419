@@ -60,6 +60,22 @@ public class Metadata implements Serializable {
         this.order = order;
     }
 
+    public HashMap<String, BigInteger> getOrder(){
+        if (this.order != null) {
+            return this.order;
+        } else {
+            return null;
+        }
+    }
+
+    public String getName(){ return this.name; }
+
+    public BigInteger getInHash(){ return this.hash; }
+
+    public BigInteger getEndHash(){ return this.endHash; }
+
+    public int getPort(){ return this.port; }
+
     public void setStatus(MessageType status){
         this.status = status;
     }

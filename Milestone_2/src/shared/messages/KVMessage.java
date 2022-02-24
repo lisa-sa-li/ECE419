@@ -13,7 +13,8 @@ public interface KVMessage {
 		DELETE_SUCCESS, /* Delete - request successful */
 		DELETE_ERROR, /* Delete - request not successful */
 		DISCONNECTED, /* Server or client is disconnected */
-		NO_STATUS /* Equivalent to null */
+		NO_STATUS, /* Equivalent to null */
+		SERVER_NOT_RESPONSIBLE /* the server is not responsible for the key */
 	}
 
 	/**
