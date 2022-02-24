@@ -23,11 +23,10 @@ public class HashRing {
     private HashMap<BigInteger, ECSNode> hashServers = new HashMap<BigInteger, ECSNode>();
     private int numServers = 0;
 
-    public void createHashRing(HashMap<String,ECSNode> currServers){
+    public void createHashRing(HashMap<String,ECSNode> currServers) throws Exception{
         // this function should only be called once per execution
         if (hashOrder.size() != 0 || hashRing.size() != 0){
             throw new UnexpectedValueException("This function cannot be called twice");
-            return;
         }
         int numCurrServers = currServers.size();
 
@@ -98,13 +97,12 @@ public class HashRing {
         numServers += 1;
     }
 
-    public void addNodes(ArrayList<ECSNode> nodes){
+    public void addNodes(ArrayList<ECSNode> nodes) throws Exception{
         for (ECSNode node: nodes){
             try{
                 addNode(node);
             } catch (Exception e){
                 throw new Exception("Could not add node: "+ node.getNodeName());
-                return;
             }
         }
     }
