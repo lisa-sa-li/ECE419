@@ -11,12 +11,18 @@ import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
 import ecs.HashRing;
 import ecs.ECSNode;
+import ecs.IECSNode.NodeStatus;
 
 import app_kvClient.ClientConnection;
 import shared.messages.Metadata;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.LinkedList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class KVStore implements KVCommInterface, Runnable {
 	/**
@@ -39,6 +45,10 @@ public class KVStore implements KVCommInterface, Runnable {
 	private HashMap<String, BigInteger> metadataOrder;
 	private HashRing hashRing;
 	private ECSNode currReceiverNode;
+	private List<Metadata> metadataList;
+	private List<ECSNode> ECSNodeOrdered;
+	private ECSNode currentNode;
+
 
 	public KVStore(String address, int port) {
 		this.address = address;
@@ -58,7 +68,7 @@ public class KVStore implements KVCommInterface, Runnable {
 	public void connect() throws Exception {
 		try {
 			Socket clientSocket = new Socket(address, port);
-			clientConnection = new ClientConnection(clientSocket);
+			this.clientConnection = new ClientConnection(clientSocket);
 			logger.info("Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
 					+ clientSocket.getPort());
 		} catch (IOException e) {
@@ -85,15 +95,14 @@ public class KVStore implements KVCommInterface, Runnable {
 	// Change for M2
 	@Override
 	public JSONMessage put(String key, String value) throws Exception {
-		JSONMessage jsonMessage = new JSONMessage();
-		jsonMessage.setMessage(StatusType.PUT.name(), key, value, null);
-
 		// if (this.metadata != null) {
 
 		// }
-
-		this.clientConnection.sendJSONMessage(jsonMessage);
-		return this.clientConnection.receiveJSONMessage();
+		JSONMessage jsonMessage = new JSONMessage();
+		jsonMessage.setMessage(StatusType.PUT.name(), key, value, null);
+		return this.sendMessageToCorrectServer(jsonMessage, key);
+		// this.clientConnection.sendJSONMessage(jsonMessage);
+		// return this.clientConnection.receiveJSONMessage();
 	}
 
 	// Change for M2
@@ -101,11 +110,14 @@ public class KVStore implements KVCommInterface, Runnable {
 	public JSONMessage get(String key) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
 		jsonMessage.setMessage(StatusType.GET.name(), key, "", null);
-		// if (this.metadata != null && this.metadataOrder != null) {
-
-		// }
-		this.clientConnection.sendJSONMessage(jsonMessage);
-		return this.clientConnection.receiveJSONMessage();
+		if (this.currentNode == null) { // || !(isECSNodeResponsibleForKey(key, this.currReceiverNode))){
+			this.clientConnection.sendJSONMessage(jsonMessage);
+			JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
+			if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
+				this.updateToCorrectNodeInfo(returnMsg, key);
+			}
+		}
+		return jsonMessage; // THIS IS WRONG - Just there for ant purposes - NEED TO CHANGE
 	}
 
 	public void switchServer() throws Exception {
@@ -129,19 +141,44 @@ public class KVStore implements KVCommInterface, Runnable {
 				((currNode.getHash().compareTo(currNode.getEndHash()) != -1) && (currNode.getHash().compareTo(keyHash) != -1) && (currNode.getEndHash().compareTo(keyHash) != -1));
 	}
 
-	// Connects to the correct server and update the metadata if necessary
-	public void updateMetadata(JSONMessage msg, String key) throws Exception {
+	// Update the server address and port to have the most recent responsible node's information
+	public void updateToCorrectNodeInfo(JSONMessage msg, String key) throws Exception {
 		this.metadata = msg.getMetadata();
 		this.metadataOrder = this.metadata.getOrder(); // String key 120.0.0.1:8008, BigInteger value inHash
 		this.currReceiverNode = this.metadata.getReceiverNode();
+		// Order the server nodes in ascending order in Array so that it can be iterated over to find the responsible server
+		this.orderMetadataIntoECSNodeList(true);
+		// Iterate over the Array of servers to find the responsible node and update the server address and server port
+		for (int i = 0; i < this.ECSNodeOrdered.size(); i++) {
+			boolean isNodeResponsibleForKey = isECSNodeResponsibleForKey(key, this.ECSNodeOrdered.get(i));
+			if (isNodeResponsibleForKey) {
+				this.currentNode = this.ECSNodeOrdered.get(i);
+				this.address = this.currentNode.getNodeHost();
+				this.port = this.currentNode.getNodePort();
+			}
+		}
+	}
 
-		boolean isNodeResponsibleForKey = isECSNodeResponsibleForKey(key, this.currReceiverNode);
-		// if (isNodeResponsibleForKey) {
-
-		// }
-		// Update the correct server's address and port information
-		// this.address = correctAddress;
-		// this.port = correctPort;
+	public void orderMetadataIntoECSNodeList(final boolean ascending) {
+		// From https://stackoverflow.com/questions/8119366/sorting-hashmap-by-values
+		this.ECSNodeOrdered = new ArrayList<>();
+		List<Entry<String, BigInteger>> metadataList = new LinkedList<Entry<String, BigInteger>>(this.metadataOrder.entrySet());
+		Collections.sort(metadataList, new Comparator<Entry<String, BigInteger>>() {
+			public int compare(Entry<String, BigInteger> o1, Entry<String, BigInteger> o2) {
+				if (ascending) {
+					return o1.getValue().compareTo(o2.getValue());
+				} else {
+					return o2.getValue().compareTo(o1.getValue());
+				}
+			}
+		});
+		for (Entry<String, BigInteger> entry : metadataList) {
+			String[] keyList = entry.getKey().split(":");
+			String serverAddress = keyList[0];
+			int serverPort = Integer.valueOf(keyList[1]);
+			ECSNode temp = new ECSNode(serverAddress, serverPort, entry.getValue());
+			this.ECSNodeOrdered.add(temp);
+		}
 	}
 
 	// Sends message to the correct server (Used in put() and get())
@@ -149,7 +186,7 @@ public class KVStore implements KVCommInterface, Runnable {
 		this.clientConnection.sendJSONMessage(msg);
 		JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
 		if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
-			this.updateMetadata(returnMsg, key);
+			this.updateToCorrectNodeInfo(returnMsg, key);
 			this.switchServer();
 			this.clientConnection.sendJSONMessage(msg);
 			returnMsg = this.clientConnection.receiveJSONMessage();

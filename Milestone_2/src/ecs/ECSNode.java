@@ -48,6 +48,13 @@ public class ECSNode implements IECSNode {
         this.id = orderAdded;
     }
 
+    public ECSNode(String host, int port, BigInteger inHash){
+        // initializing a node just to be used for temporary node in KVStore
+        this.host = host;
+        this.port = port;
+        this.hash = inHash;
+    }
+
     public void setStatus(NodeStatus inStatus){
         this.status = inStatus;
     }
