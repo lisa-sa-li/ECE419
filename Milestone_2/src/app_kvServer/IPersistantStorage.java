@@ -41,6 +41,6 @@ public interface IPersistantStorage {
 
 	public String getDataInRange(BigInteger hash, BigInteger endHash);
 
-	public StatusType appendToStorage(String keyValues);
+	public StatusType appendToStorage(String keyValues) throws Exception;
 	
 }

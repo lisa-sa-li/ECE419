@@ -10,6 +10,7 @@ import shared.exceptions.UnexpectedValueException;
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
 import ecs.HashRing;
+import ecs.ECSNode;
 
 import app_kvClient.ClientConnection;
 import shared.messages.Metadata;
@@ -37,6 +38,7 @@ public class KVStore implements KVCommInterface, Runnable {
 	private Metadata metadata;
 	private HashMap<String, BigInteger> metadataOrder;
 	private HashRing hashRing;
+	private ECSNode currReceiverNode;
 
 	public KVStore(String address, int port) {
 		this.address = address;
@@ -86,9 +88,9 @@ public class KVStore implements KVCommInterface, Runnable {
 		JSONMessage jsonMessage = new JSONMessage();
 		jsonMessage.setMessage(StatusType.PUT.name(), key, value, null);
 
-		if (this.metadata != null) {
+		// if (this.metadata != null) {
 
-		}
+		// }
 
 		this.clientConnection.sendJSONMessage(jsonMessage);
 		return this.clientConnection.receiveJSONMessage();
@@ -99,9 +101,9 @@ public class KVStore implements KVCommInterface, Runnable {
 	public JSONMessage get(String key) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
 		jsonMessage.setMessage(StatusType.GET.name(), key, "", null);
-		if (this.metadata != null && this.metadataOrder != null) {
+		// if (this.metadata != null && this.metadataOrder != null) {
 
-		}
+		// }
 		this.clientConnection.sendJSONMessage(jsonMessage);
 		return this.clientConnection.receiveJSONMessage();
 	}
@@ -115,16 +117,31 @@ public class KVStore implements KVCommInterface, Runnable {
 		}
 	}
 
+	// Find out if the current ECSNode is responsible for the given key
+	public boolean isECSNodeResponsibleForKey(String key, ECSNode currNode) {
+		BigInteger keyHash = hashRing.getHash(key);
+		// Case 1: inHash <= key <= endHash
+		// Case 2:
+		// if ( ((currNode.getHash().compareTo(currNode.getEndHash()) == -1) && (currNode.getHash().compareTo(keyHash) != 1) && (currNode.getEndHash().compareTo(keyHash) != -1)) ||
+		// 		(()) ) {
+		// 	return true;
+		// }
+		return false;
+	}
+
 	// Connects to the correct server and update the metadata if necessary
 	public void updateMetadata(JSONMessage msg, String key) throws Exception {
 		this.metadata = msg.getMetadata();
 		this.metadataOrder = this.metadata.getOrder(); // String key 120.0.0.1:8008, BigInteger value inHash
+		this.currReceiverNode = this.metadata.getReceiverNode();
 
-		BigInteger keyHash = hashRing.getHash(key);
+		boolean isNodeResponsibleForKey = isECSNodeResponsibleForKey(key, this.currReceiverNode);
+		// if (isNodeResponsibleForKey) {
 
+		// }
 		// Update the correct server's address and port information
-		this.address = correctAddress;
-		this.port = correctPort;
+		// this.address = correctAddress;
+		// this.port = correctPort;
 	}
 
 	// Sends message to the correct server (Used in put() and get())
