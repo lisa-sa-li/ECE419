@@ -35,11 +35,20 @@ public class ECSConnection implements Runnable {
 	private OutputStream output;
 	private ECSClient ecsClient;
 
+	KVServer kvServer;
+
 	public ECSConnection(Socket ecsSocket, ECSClient ecsClient) throws Exception {
 		this.ecsSocket = ecsSocket;
 		this.isOpen = true;
 		this.ecsClient = ecsClient;
 		connect();
+	}
+
+	public ECSConnection(String zkHost, int zkPort, String serverName, KVServer kvServer) throws Exception {
+ 		this.kvServer = kvServer;
+		// CREATE HEARTBEART
+
+
 	}
 
 	public void connect() throws IOException {
@@ -54,8 +63,11 @@ public class ECSConnection implements Runnable {
 		}
 	}
 
-	public void sendMetadataMessage(String meta) throws IOException {
-		byte[] jsonBytes = meta.getBytes();
+	public void sendJSONMessage(Metadata meta) throws IOException {
+		JSONMessage json =  new JSONMessage();
+		json.setMessage(meta.getStatus().name(), "blah","blah", meta);
+		byte[] jsonBytes = json.getJSONByte();
+
 		output.write(jsonBytes, 0, jsonBytes.length);
 		output.flush();
 		logger.info("SEND \t<" + ecsSocket.getInetAddress().getHostAddress() + ":" + ecsSocket.getPort() + ">: '"

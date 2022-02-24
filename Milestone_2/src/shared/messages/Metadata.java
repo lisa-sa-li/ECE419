@@ -4,80 +4,65 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.HashMap;
 
+import ecs.ECSNode;
+
 import com.google.gson.Gson;
 
 public class Metadata implements Serializable {
     
-    public String name;
+    public MessageType status;
     public BigInteger hash;
     public BigInteger endHash; // non-inclusive
-    public int port;
-    public MessageType status;
     public HashMap<String, BigInteger> order;
     public String data;
-
+    public ECSNode receiverNode;
 
     private static final char LINE_FEED = 0x0A;
     private static final char RETURN = 0x0D;
 
     public enum MessageType {
-        TBD,                // placeholder status
-        ACK,                // Acknowledgment
-        DONE,                // Done data transfer
-        UPDATE,             // needs to update metadata (new server added next to it)
-		DATA,               // data transfer
-        STOP,               // Stop KVServer
-        SHUTDOWN,           // KVServer is stopped, respond to neither ECS nor KVClient 
+        SET_METADATA, 
+        MOVE_DATA,
+
+        START, // start KVServer,
+        STOP,  // stop KVServer
+        SHUTDOWN,
+        LOCKED,
+        UNLOCK, // unlock
+        CLEAR_STORAGE, // clears persistant storage
+        DELETE_STORAGE, // deletes persistant storage
+
+        
+        // TBD,                // placeholder status
+        // ACK,                // Acknowledgment
+        // DONE,                // Done data transfer
+        // UPDATE,             // needs to update metadata (new server added next to it)
+		// DATA,               // data transfer
+        // STOP,               // Stop KVServer
+        // SHUTDOWN,           // KVServer is stopped, respond to neither ECS nor KVClient 
+        // DIE,           // KVServer is decommissioned
     }
 
-    public Metadata() {
-        this.status = MessageType.TBD;
-    }
-
-    public Metadata(String inName, BigInteger inHash, BigInteger inEndHash, int inPort) {
-        this.name = inName;
-        this.hash = inHash;
-        this.endHash = inEndHash;
-        this.port = inPort;
-        this.status = MessageType.TBD;
-    }
-
-    public Metadata(String inName, BigInteger inHash, BigInteger inEndHash, int inPort, MessageType status, HashMap<String, BigInteger> order) {
-        this.name = inName;
-        this.hash = inHash;
-        this.endHash = inEndHash;
-        this.port = inPort;
+    public Metadata(MessageType status, HashMap<String, BigInteger> order, ECSNode receiverNode) {
         this.status = status;
         this.order = order;
+        this.receiverNode = receiverNode;
     }
 
-    public Metadata(String data) {
-        this.status = MessageType.DATA;
-        this.data = data;
-    }
-
-    public void setOrder(HashMap<String, BigInteger> order){
-        this.order = order;
+    public MessageType getStatus() {
+        return this.status;
     }
 
     public HashMap<String, BigInteger> getOrder(){
-        if (this.order != null) {
-            return this.order;
-        } else {
-            return null;
-        }
+        return this.order;
     }
 
-    public String getName(){ return this.name; }
-
-    public BigInteger getInHash(){ return this.hash; }
-
-    public BigInteger getEndHash(){ return this.endHash; }
-
-    public int getPort(){ return this.port; }
-
-    public void setStatus(MessageType status){
+    public void setStatus(MessageType status) {
         this.status = status;
+    }
+
+    public ECSNode getReceiverNode() {
+        return this.receiverNode;
     }
 
     @Override
@@ -113,6 +98,14 @@ public class Metadata implements Serializable {
     public byte[] getBytes() {
         String msg = this.toString();
         return addCtrChars(toByteArray(msg));
+    }
+
+    public String byteToString(byte[] msgBytes){
+        // turn bytes to string
+        byte[] tmp = addCtrChars(msgBytes);
+        String jsonStr = new String(tmp);
+
+        return jsonStr;
     }
 
 }

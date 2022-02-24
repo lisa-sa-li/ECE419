@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.*;
 
 import org.apache.zookeeper.*;
+import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.data.Stat;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.KeeperException;
@@ -81,10 +83,8 @@ public class ECSClient implements IECSClient, Runnable {
         }
 
         try {
-            boolean doesExist = zk.exists(ZK_ROOT_PATH, false);
-
-            if (!doesExist) {
-                zkApp.create(ZK_ROOT_PATH);
+            if (zk.exists(ZK_ROOT_PATH, false) != null) {
+                zkApp.create(ZK_ROOT_PATH, "Swag");
             }
         } catch (KeeperException | InterruptedException e) {
             logger.error(e);
@@ -99,6 +99,7 @@ public class ECSClient implements IECSClient, Runnable {
             String serverName = node.getNodeName();
             Socket clientSocket = new Socket(this.hostname, port);
             ECSConnection ecsConnection = new ECSConnection(clientSocket, this);
+            node.setConnection(ecsConnection);
             Thread newThread = new Thread(ecsConnection, serverName);
             newThread.start();
             this.threads.add(newThread);

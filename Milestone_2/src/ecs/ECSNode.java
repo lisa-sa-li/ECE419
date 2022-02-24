@@ -60,9 +60,9 @@ public class ECSNode implements IECSNode {
         this.ecsConnection = ecsConnection;
     }
 
-    public void sendMessage(String msg){
+    public void sendMessage(Metadata msg){
         try{
-            this.ecsConnection.sendMetadataMessage(msg);
+            this.ecsConnection.sendJSONMessage(msg);
         } catch (Exception e){
             logger.info("Unable to send message: " + e);
         }
@@ -105,6 +105,10 @@ public class ECSNode implements IECSNode {
 
     public BigInteger getHash() {
         return hash;
+    }
+
+    public BigInteger getEndHash() {
+        return endHash;
     }
 
     public void setHashRange(BigInteger hashVal, BigInteger endVal){

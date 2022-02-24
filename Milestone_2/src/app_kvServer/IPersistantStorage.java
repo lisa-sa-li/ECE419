@@ -1,6 +1,7 @@
 package app_kvServer;
 
 import shared.messages.KVMessage.StatusType;
+import java.math.BigInteger;
 
 public interface IPersistantStorage {
 	/**
@@ -38,4 +39,8 @@ public interface IPersistantStorage {
 
 	public void clearStorage();
 
+	public String getDataInRange(BigInteger hash, BigInteger endHash);
+
+	public StatusType appendToStorage(String keyValues);
+	
 }

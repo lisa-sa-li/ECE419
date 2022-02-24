@@ -23,7 +23,6 @@ public class HashRing {
     private HashMap<BigInteger, ECSNode> hashServers = new HashMap<BigInteger, ECSNode>();
     private int numServers = 0;
 
-
     public void createHashRing(HashMap<String,ECSNode> currServers){
         // this function should only be called once per execution
         if (hashOrder.size() != 0 || hashRing.size() != 0){
@@ -64,20 +63,37 @@ public class HashRing {
         numServers = hashOrder.size();
     }
 
-    public void addNode(ECSNode node){
-        String name = node.getNodeName();
+    public void addNode(ECSNode newNode){
+        String name = newNode.getNodeName();
 
         // hash ip:port
-        String toHash = node.getNodeHost() + ":" + Integer.toString(node.getNodePort()); 
+        String toHash = newNode.getNodeHost() + ":" + Integer.toString(newNode.getNodePort()); 
         BigInteger hashed = getHash(toHash);
-
+        
         // update lists + reorder
         hashOrder.add(hashed);
         Collections.sort(hashOrder);
         hashRing.put(name, hashed);
+        hashServers.put(hashed, newNode);
 
-        // Prepare + send updated metadata AFTER adding to lists
-        setRanges();
+        // collect idx of new node in hashring
+        int idx = hashOrder.indexOf(hashed);
+        // find previous node to get data from
+        int prevIdx = (idx-1) % numServers;
+        ECSNode prevNode = hashServers.get(hashOrder.get(prevIdx));
+
+        // set hash
+        newNode.setHashRange(hashed, prevNode.getEndHash());
+
+        // send metadata to servers
+        Metadata update = new Metadata(MessageType.MOVE_DATA, hashRing, newNode);
+        prevNode.sendMessage(update);
+
+        Metadata updateNewNode = new Metadata(MessageType.SET_METADATA, hashRing, null);
+        newNode.sendMessage(updateNewNode);
+
+        // update other servers w/ new hashring
+        updateAll(prevNode.getHash());
 
         numServers += 1;
     }
@@ -101,39 +117,41 @@ public class HashRing {
         }
         // collect idx of removed node in hashring
         int idx = hashOrder.indexOf(removeHash);
+        // find current node
+        ECSNode deadNode = hashServers.get(hashOrder.get(idx));
+        // find previous node to send data to
+        int prevIdx = (idx-1) % numServers;
+        ECSNode prevNode = hashServers.get(hashOrder.get(prevIdx));
 
-        // remove values
+        // remove values from lists
         hashOrder.remove(removeHash);
         hashRing.remove(name);
         hashServers.remove(removeHash);
-        
-        // prepare + send updated metadata AFTER removing from lists
-        setRanges();
 
+        // send metadata to servers
+        Metadata update = new Metadata(MessageType.SET_METADATA, hashRing, null);
+        prevNode.sendMessage(update);
+        Metadata death = new Metadata(MessageType.MOVE_DATA, hashRing, prevNode);
+        deadNode.sendMessage(death);
+        
         numServers -= 1;
+
+        // meaningless to pass in hash, but doing it anyways
+        updateAll(prevNode.getHash());
 
     }
 
-    private void setRanges(){
+    private void updateAll(BigInteger hashed){
         // iterate through sorted key array
-        int idx = 0;
         for (BigInteger key: hashOrder){
 
+            if (key.compareTo(hashed) == 0){
+                continue;
+            }
             ECSNode currNode = hashServers.get(key);
-            String serverName = currNode.getNodeName();
-
-            // String serverName = hashRing.get(key);
-            int endIdx = (idx+1) % numServers;
-            BigInteger endHash = hashOrder.get(endIdx);
-
-            // update ECSNode
-            currNode.setHashRange(key, hashOrder.get(endIdx));
-            // create metadata message for KVServer
-            Metadata metadata = new Metadata(serverName, key, endHash, currNode.getNodePort(), MessageType.UPDATE, hashRing);
+            Metadata metadata = new Metadata(MessageType.SET_METADATA, hashRing, null);
             // send server info
-            currNode.sendMessage(metadata.toString());
-
-            idx ++;
+            currNode.sendMessage(metadata);
         }
     }
 
@@ -159,7 +177,7 @@ public class HashRing {
         return hashOrder.size() != 0 || hashRing.size() != 0;
     }
 
-    private BigInteger getHash(String value){
+    public BigInteger getHash(String value){
         try {
             // get message bytes
             byte[] byteVal = value.getBytes("UTF-8");

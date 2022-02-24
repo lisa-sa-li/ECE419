@@ -2,9 +2,11 @@ package app_kvServer;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.io.OutputStream;
 import java.io.IOException;
 import java.net.BindException;
 import java.util.*;
+import java.math.BigInteger;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -13,10 +15,13 @@ import com.google.gson.Gson;
 
 import shared.messages.KVMessage.StatusType;
 import shared.messages.Metadata;
+import shared.messages.JSONMessage;
 
 import logging.LogSetup;
 import app_kvServer.PersistantStorage;
 import app_kvServer.ServerConnection;
+import app_kvECS.ECSConnection;
+import ecs.ECSNode;
 
 public class KVServer implements IKVServer, Runnable {
 
@@ -25,15 +30,22 @@ public class KVServer implements IKVServer, Runnable {
 	private int port;
 	private int cacheSize;
 	private PersistantStorage persistantStorage;
-	private ServerSocket serverSocket;
 	private Socket client;
 	private boolean running;
 	private String hostName;
 	private ArrayList<Thread> threads;
 	private ServerStatus serverStatus;
+	private ServerSocket serverSocket;
 
-	private HashMap<String, Metadata> serverMetadataMap;	
-	private Metadata serverMetadata;
+	private ECSConnection ecsConnection;
+	private String serverName;
+	private String zkHost;
+	private int zkPort;
+
+	// hashring variables
+	private BigInteger hash;
+    private BigInteger endHash;
+    private HashMap<String, BigInteger> hashRing;
 
 	/**
 	 * Start KV Server at given port
@@ -52,6 +64,19 @@ public class KVServer implements IKVServer, Runnable {
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
 		this.threads = new ArrayList<Thread>();
 	}
+
+	// public KVServer(int port, String serverName, String zkHost, int zkPort) {
+	// 	this.port = port;
+	// 	this.serverName = serverName;
+	// 	this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
+	// 	this.threads = new ArrayList<Thread>();
+
+	// 	this.zkHost = zkHost;
+	// 	this.zkPort = zkPort;
+
+	// 	// ecsConnection = new ECSConnection(clientSocket, this);
+	// 	this.ecsConnection = new ECSConnection(zkHost, zkPort, serverName, this);
+	// }
 
 	public KVServer(int port, int cacheSize, String strategy, boolean test) {
 		this.port = port;
@@ -97,16 +122,93 @@ public class KVServer implements IKVServer, Runnable {
 		this.serverStatus = ServerStatus.OPEN;
 	}
 
-	public void moveData() { // range, server
+	public boolean inHashRing(){
+		return (hashRing.get(this.serverName) != null);
+	}
+
+	public void getHashRange(){
+		if (inHashRing() == false){
+			this.hash = null;
+			this.endHash = null;
+			return;
+		}
+
+		Collection<BigInteger> keys = hashRing.values();
+		ArrayList<BigInteger> orderedKeys = new ArrayList<>(keys);
+		Collections.sort(orderedKeys);
+
+		this.hash = hashRing.get(this.serverName);
+		if (orderedKeys.size() == 1){
+			this.endHash = null;
+			return;
+		} 
+		Integer nextIdx = orderedKeys.indexOf(this.hash);
+		nextIdx = (nextIdx+1)%orderedKeys.size();
+
+		this.endHash = orderedKeys.get(nextIdx);
+	}
+
+	public void moveData(Metadata metadata) { // range, server
 		// Transfer a subset (range) of the KVServer's data to another KVServer
 		// (reallocation before removing this server or adding a new KVServer to the
 		// ring);
 		// send a notification to the ECS, if data transfer is completed.
 		lockWrite();
+
+		ECSNode receiverNode = metadata.getReceiverNode();
+		String hostOfReceiver = receiverNode.getNodeHost();
+		int portOfReceiver = receiverNode.getNodePort();
+		String nameOfReceiver = receiverNode.getNodeName();
+		BigInteger hash = receiverNode.getHash();
+		BigInteger endHash = receiverNode.getEndHash();
+
+		try {
+			// This is the data being remove from this server and being moved to the reciever server
+			String dataInRange = persistantStorage.getDataInRange(hash, endHash);
+
+			Socket socket = new Socket(hostOfReceiver, portOfReceiver);
+			OutputStream output = socket.getOutputStream();
+
+			JSONMessage json = new JSONMessage();
+			json.setMessage(StatusType.PUT_MANY.name(), "put_many", dataInRange, null);
+			byte[] jsonBytes = json.getJSONByte();
+
+			output.write(jsonBytes, 0, jsonBytes.length);
+			output.flush();
+			output.close();
+			logger.info("Send data to node " + nameOfReceiver);
+		} catch (Exception e) {
+			logger.error("Unable to send data to node " + nameOfReceiver + ", "+ e);
+		}
+
+		unLockWrite();
 	}
 
 	public void update(Metadata metadata) {
 		// Update the metadata repository of this server
+	}
+
+	public boolean isMe(BigInteger toHash){
+		int isEndHashLarger = this.endHash.compareTo(this.hash);
+		
+		// a.compareTo(b)
+		//  0 = equal
+		//  1 = a > b
+		// -1 = a < b
+
+		// BigInteger z = new BigInteger("0");
+		BigInteger z = BigInteger.valueOf(0);
+
+		int left = this.hash.compareTo(toHash);
+		int right = this.endHash.compareTo(toHash);
+		int zero = z.compareTo(toHash);
+
+		if (isEndHashLarger > 0) {
+			return (left >= 0 && right < 0);
+		} else {
+			
+			return (left >= 0 && zero < 0) || (zero >= 0 && right < 0);
+		}
 	}
 
 	@Override
@@ -154,6 +256,10 @@ public class KVServer implements IKVServer, Runnable {
 	@Override
 	public StatusType putKV(String key, String value) throws Exception {
 		return this.persistantStorage.put(key, value);
+	}
+
+	public StatusType appendToStorage(String keyValues) throws Exception {
+		return this.persistantStorage.appendToStorage(keyValues);
 	}
 
 	@Override

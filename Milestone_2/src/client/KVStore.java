@@ -87,8 +87,7 @@ public class KVStore implements KVCommInterface, Runnable {
 		jsonMessage.setMessage(StatusType.PUT.name(), key, value, null);
 
 		if (this.metadata != null) {
-			BigInteger currInHash = this.metadata.getInHash();
-			BigInteger currEndHash = this.metadata.getEndHash();
+
 		}
 
 		this.clientConnection.sendJSONMessage(jsonMessage);
@@ -101,7 +100,7 @@ public class KVStore implements KVCommInterface, Runnable {
 		JSONMessage jsonMessage = new JSONMessage();
 		jsonMessage.setMessage(StatusType.GET.name(), key, "", null);
 		if (this.metadata != null && this.metadataOrder != null) {
-			this.metadata.getInHash() <= key
+
 		}
 		this.clientConnection.sendJSONMessage(jsonMessage);
 		return this.clientConnection.receiveJSONMessage();

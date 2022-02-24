@@ -12,6 +12,8 @@ import shared.exceptions.KeyValueTooLongException;
 import shared.exceptions.UnexpectedValueException;
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
+import shared.messages.Metadata.MessageType;
+import shared.messages.Metadata;
 
 import app_kvServer.KVServer;
 
@@ -174,6 +176,16 @@ public class ServerConnection implements IServerConnection, Runnable {
 					logger.info("PUT_ERROR: key " + key + " & value " + value);
 				}
 				break;
+			case PUT_MANY:
+				// When another KVServer passes this server data due to the hashring changing 
+				try {
+					handleMessageStatus = this.kvServer.appendToStorage(value);
+					// logger.info(handleMessageStatus.name() + ": key " + key + " & value " + value);
+				} catch (Exception e) {
+					handleMessageStatus = StatusType.PUT_ERROR;
+					// logger.info("PUT_ERROR: key " + key + " & value " + value);
+				}
+				break;
 			case GET:
 				try {
 					if (key.length() > 20) {
@@ -207,14 +219,64 @@ public class ServerConnection implements IServerConnection, Runnable {
 		return handleMessage;
 	}
 
+	 private JSONMessage handleMetadataMessage(Metadata message) {
+		// String handleMessageValue = value; // For PUT or DELETE, send the original value back
+		StatusType handleMessageStatus = StatusType.NO_STATUS;
+		JSONMessage handleMessage = new JSONMessage();
+
+        try {
+            switch (message.getStatus()) {
+                case START:
+					this.kvServer.start();
+					break;
+				case STOP:
+					this.kvServer.stop();
+					break;
+				case SHUTDOWN:
+					this.kvServer.shutDown();
+					break;
+				case LOCKED:
+					this.kvServer.lockWrite();
+					break;
+				case UNLOCK:
+					this.kvServer.unLockWrite();
+					break;
+				case MOVE_DATA:
+					this.kvServer.moveData(message);
+					break;
+				case CLEAR_STORAGE:
+					this.kvServer.clearStorage();
+					break;
+				case DELETE_STORAGE:
+					this.kvServer.deleteStorage();
+					break;
+				default:
+					break;
+			}
+        } catch (Exception e) {
+            logger.error("Unkown Error: " + e.getMessage());
+        }
+				// handleMessage.setMessage(handleMessageStatus.name(), "blah", "blah");
+		return handleMessage;
+
+    }
+
+
 	public void run() {
 		// while connection is open, listen for messages
 		try {
 			while (this.isOpen) {
 				try {
-					JSONMessage recievedMesage = receiveJSONMessage();
-					if (recievedMesage != null) {
-						JSONMessage sendMessage = handleMessage(recievedMesage);
+					JSONMessage recievedMessage = receiveJSONMessage();
+					if (recievedMessage != null) {
+						JSONMessage sendMessage;
+						Metadata metadata = recievedMessage.getMetadata();
+
+						if (metadata == null) {
+							sendMessage = handleMessage(recievedMessage);
+						} else {
+							sendMessage = handleMetadataMessage(metadata);
+						}
 						sendJSONMessage(sendMessage);
 					}
 				} catch (IOException e) {
