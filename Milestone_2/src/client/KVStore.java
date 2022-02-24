@@ -48,6 +48,7 @@ public class KVStore implements KVCommInterface, Runnable {
 	private List<Metadata> metadataList;
 	private List<ECSNode> ECSNodeOrdered;
 	private ECSNode currentNode;
+	private boolean wasSuccessful;
 
 
 	public KVStore(String address, int port) {
@@ -92,32 +93,34 @@ public class KVStore implements KVCommInterface, Runnable {
 		}
 	}
 
-	// Change for M2
+	// Change for M2 --> Needs edit
+	// Might want to check the node from the previous metadata first before just randomly sending message
+	// Also, want to make sure it succeeds before stopping this function
 	@Override
 	public JSONMessage put(String key, String value) throws Exception {
-		// if (this.metadata != null) {
-
-		// }
 		JSONMessage jsonMessage = new JSONMessage();
 		jsonMessage.setMessage(StatusType.PUT.name(), key, value, null);
-		return this.sendMessageToCorrectServer(jsonMessage, key);
-		// this.clientConnection.sendJSONMessage(jsonMessage);
-		// return this.clientConnection.receiveJSONMessage();
+		if ((this.currentNode == null) || !(isECSNodeResponsibleForKey(key, this.currentNode))){
+			return this.sendMessageToCorrectServer(jsonMessage, key);
+		} else {
+			this.clientConnection.sendJSONMessage(jsonMessage);
+			return this.clientConnection.receiveJSONMessage();
+		}
 	}
 
-	// Change for M2
+	// Change for M2 --> Needs edit
+	// Might want to check the node from the previous metadata first before just randomly sending message
+	// Also, want to make sure it succeeds before stopping this function
 	@Override
 	public JSONMessage get(String key) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
 		jsonMessage.setMessage(StatusType.GET.name(), key, "", null);
-		if (this.currentNode == null) { // || !(isECSNodeResponsibleForKey(key, this.currReceiverNode))){
+		if ((this.currentNode == null) || !(isECSNodeResponsibleForKey(key, this.currentNode))){
+			return sendMessageToCorrectServer(jsonMessage, key);
+		} else {
 			this.clientConnection.sendJSONMessage(jsonMessage);
-			JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
-			if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
-				this.updateToCorrectNodeInfo(returnMsg, key);
-			}
+			return this.clientConnection.receiveJSONMessage();
 		}
-		return jsonMessage; // THIS IS WRONG - Just there for ant purposes - NEED TO CHANGE
 	}
 
 	public void switchServer() throws Exception {
@@ -181,7 +184,7 @@ public class KVStore implements KVCommInterface, Runnable {
 		}
 	}
 
-	// Sends message to the correct server (Used in put() and get())
+	// Sends message to the correct server (Used in put() and get()) --> Needs edit
 	public JSONMessage sendMessageToCorrectServer(JSONMessage msg, String key) throws Exception {
 		this.clientConnection.sendJSONMessage(msg);
 		JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
