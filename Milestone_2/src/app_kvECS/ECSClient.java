@@ -271,7 +271,11 @@ public class ECSClient implements IECSClient, Runnable {
         }
 
         if (hashRing.isEmpty()) {
-            hashRing.createHashRing(currServerMap);
+            try {
+                hashRing.createHashRing(currServerMap);
+            } catch (Exception e) {
+                logger.error(e);
+            }
         }
 
         ArrayList<ECSNode> nameArr = new ArrayList<ECSNode>();

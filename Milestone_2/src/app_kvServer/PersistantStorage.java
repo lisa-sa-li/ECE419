@@ -20,6 +20,7 @@ public class PersistantStorage implements IPersistantStorage {
     private String fileName;
     private String pathToFile;
     private String dir = "./storage";
+    private HashRing hashRing;
 
     public PersistantStorage(String name) {
         this.fileName = name.trim() + "_storage.txt";
@@ -223,7 +224,7 @@ public class PersistantStorage implements IPersistantStorage {
 
 
 	private boolean isKeyInRange(BigInteger hash, BigInteger endHash, String key){
-        BigInteger keyHash = getHash(key);
+        BigInteger keyHash = hashRing.getHash(key);
 		int left = hash.compareTo(keyHash);
 		int right = endHash.compareTo(keyHash);
 

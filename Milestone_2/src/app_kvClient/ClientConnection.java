@@ -8,6 +8,7 @@ import java.net.Socket;
 import org.apache.log4j.*;
 
 import shared.messages.JSONMessage;
+import shared.messages.KVMessage;
 import shared.messages.TextMessage;
 import shared.messages.KVMessage.StatusType;
 
@@ -35,16 +36,18 @@ public class ClientConnection implements IClientConnection {
 		input = clientSocket.getInputStream();
 	}
 
+	// NEED TO CHANGE FOR M2 --> CHANGED
 	@Override
-	public void sendJSONMessage(JSONMessage json) throws IOException {
-		byte[] jsonBytes = json.getJSONByte();
+	public void sendJSONMessage(JSONMessage kvJson) throws IOException {
+		byte[] jsonBytes = kvJson.getJSONByte();
 		output.write(jsonBytes, 0, jsonBytes.length);
 		output.flush();
 		logger.info(
 				"SEND \t<" + clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort() + ">: '"
-						+ json.getJSON() + "'");
+						+ kvJson.getJSON() + "'");
 	}
 
+	// NEED TO CHANGE FOR M2
 	@Override
 	public JSONMessage receiveJSONMessage() throws IOException {
 		int index = 0;
@@ -58,7 +61,7 @@ public class ClientConnection implements IClientConnection {
 		// Check if stream is closed (read returns -1)
 		if (read == -1) {
 			JSONMessage json = new JSONMessage();
-			json.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "disconnected");
+			json.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "disconnected", null);
 			return json;
 		}
 
@@ -120,7 +123,6 @@ public class ClientConnection implements IClientConnection {
 		json.deserialize(jsonStr);
 		logger.info("RECEIVE \t<" + clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort()
 				+ ">: '" + json.getJSON().trim() + "'");
-
 		return json;
 	}
 

@@ -53,6 +53,14 @@ public class Metadata implements Serializable {
         return this.status;
     }
 
+    public HashMap<String, BigInteger> getOrder(){
+        return this.order;
+    }
+
+    public void setStatus(MessageType status) {
+        this.status = status;
+    }
+
     public ECSNode getReceiverNode() {
         return this.receiverNode;
     }
