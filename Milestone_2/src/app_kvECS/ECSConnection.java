@@ -16,6 +16,7 @@ import shared.messages.KVMessage.StatusType;
 
 import app_kvServer.KVServer;
 import ecs.ECSNode;
+import ecs.ZooKeeperApplication;
 
 /**
  * Represents a connection end point for a particular client that is
@@ -47,6 +48,25 @@ public class ECSConnection implements Runnable {
 	public ECSConnection(String zkHost, int zkPort, String serverName, KVServer kvServer) throws Exception {
  		this.kvServer = kvServer;
 		// CREATE HEARTBEART
+
+		 zkApp = new ZooKeeperApplication(ZK_ROOT_PATH, zkPort, zkHost);
+        try {
+            zk = zkApp.connect(zkHost + ":" + String.valueOf(zkPort), zkTimeout);
+        } catch (InterruptedException e) {
+            logger.error("Cannot connect to ZK server!", e);
+        } catch (IOException e) {
+            logger.error("Cannot connect to ZK server!", e);
+        }
+
+        try {
+            if (zk.exists(ZK_ROOT_PATH, false) != null) {
+                zkApp.create(ZK_ROOT_PATH, "Swag");
+            }
+        } catch (KeeperException | InterruptedException e) {
+            logger.error(e);
+        } catch (Exception e) {
+            logger.error(e);
+        }
 
 
 	}
