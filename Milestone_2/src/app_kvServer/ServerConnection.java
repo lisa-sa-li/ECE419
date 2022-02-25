@@ -241,6 +241,9 @@ public class ServerConnection implements IServerConnection, Runnable {
 				case UNLOCK:
 					this.kvServer.unLockWrite();
 					break;
+				case SET_METADATA:
+					this.kvServer.update(message);
+					break;
 				case MOVE_DATA:
 					this.kvServer.moveData(message);
 					break;

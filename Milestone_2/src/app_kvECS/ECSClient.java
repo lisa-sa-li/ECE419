@@ -6,6 +6,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import logging.ECSLogSetup;
 import shared.exceptions.UnexpectedFormatException;
+import java.util.concurrent.TimeUnit;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -39,9 +40,9 @@ public class ECSClient implements IECSClient, Runnable {
 
     private static Logger logger = Logger.getRootLogger();
     private String[] servers;
-    private final String SERVER_JAR = "m2-server.jar";
-    private final String CONFIG_FILEPATH = "./servers.cfg";
-    private final String ZK_ROOT_PATH = "./BLAH";
+    private String SERVER_JAR = "m2-server.jar";
+    private String CONFIG_FILEPATH = "./servers.cfg";
+    // private String ZooKeeperApplication.ZK_NODE_ROOT_PATH = "./BLAH";
 
     private HashMap<String, ECSNode> allServerMap = new HashMap<String, ECSNode>();
     private HashMap<String, ECSNode> currServerMap = new HashMap<String, ECSNode>();
@@ -73,40 +74,53 @@ public class ECSClient implements IECSClient, Runnable {
         getServerMap();
 
         hashRing = new HashRing();
-        zkApp = new ZooKeeperApplication(ZK_ROOT_PATH, zkPort, zkHost);
+        zkApp = new ZooKeeperApplication(ZooKeeperApplication.ZK_NODE_ROOT_PATH, zkPort, zkHost);
         try {
             zk = zkApp.connect(zkHost + ":" + String.valueOf(zkPort), zkTimeout);
-        } catch (InterruptedException e) {
-            logger.error("Cannot connect to ZK server!", e);
-        } catch (IOException e) {
+        } catch (InterruptedException | IOException e) {
             logger.error("Cannot connect to ZK server!", e);
         }
 
         try {
-            if (zk.exists(ZK_ROOT_PATH, false) != null) {
-                zkApp.create(ZK_ROOT_PATH, "Swag");
+            if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH, false) == null) {
+                zkApp.create(ZooKeeperApplication.ZK_NODE_ROOT_PATH, "root_node");
+            }
+			if (zk.exists(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, false) == null) {
+                zkApp.create(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, "heartbeat");
             }
         } catch (KeeperException | InterruptedException e) {
-            logger.error(e);
+            logger.error("Cannot create root or heartbeat paths in ZK! " + e);
         } catch (Exception e) {
-            logger.error(e);
+            logger.error("Hi2 " + e);
         }
     }
 
     public void newConnection(ECSNode node) throws Exception {
         try {
+            System.out.println("NEW CONNECTION");
             int port = node.getNodePort();
             String serverName = node.getNodeName();
+            System.out.println("NEW CONNECTION " + port + serverName);
+
             Socket clientSocket = new Socket(this.hostname, port);
+            System.out.println("NEW CONNECTION3");
             ECSConnection ecsConnection = new ECSConnection(clientSocket, this);
+            System.out.println("NEW CONNECTION4");
             node.setConnection(ecsConnection);
+            System.out.println("NEW CONNECTION5");
+
             Thread newThread = new Thread(ecsConnection, serverName);
+            System.out.println("NEW CONNECTION5.5");
+
             newThread.start();
+            System.out.println("NEW CONNECTION5.9");
+
             this.threads.add(newThread);
 
             logger.info("Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
                     + clientSocket.getPort());
-
+            
+            System.out.println("NEW CONNECTION6");
         } catch (IOException e) {
             throw e;
         }
@@ -154,12 +168,12 @@ public class ECSClient implements IECSClient, Runnable {
             String name = pair.getKey().toString();
             ECSNode node = pair.getValue();
 
-            String zNodePath = ZK_ROOT_PATH + "/" + name;
+            String zNodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + name;
             try {
                 zkApp.createOrSetData(zNodePath, "Some Start message tbd");
             } catch (KeeperException | InterruptedException e) {
                 startSuccess = false;
-                logger.error(e);
+                logger.error("Hi3" + e);
                 continue;
             } catch (Exception e) {
                 startSuccess = false;
@@ -194,12 +208,12 @@ public class ECSClient implements IECSClient, Runnable {
             String name = pair.getKey().toString();
             ECSNode node = pair.getValue();
 
-            String zNodePath = ZK_ROOT_PATH + "/" + name;
+            String zNodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + name;
             try {
                 zkApp.createOrSetData(zNodePath, "Some Stop message tbd");
             } catch (KeeperException | InterruptedException e) {
                 stopSuccess = false;
-                logger.error(e);
+                logger.error("Cannot stop ZK " + e);
                 continue;
             } catch (Exception e) {
                 stopSuccess = false;
@@ -226,12 +240,12 @@ public class ECSClient implements IECSClient, Runnable {
             String name = pair.getKey().toString();
             ECSNode node = pair.getValue();
 
-            String zNodePath = ZK_ROOT_PATH + "/" + name;
+            String zNodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + name;
             try {
                 zkApp.createOrSetData(zNodePath, "Some offline message tbd");
             } catch (KeeperException | InterruptedException e) {
                 shutdownSuccess = false;
-                logger.error(e);
+                logger.error("Cannont shutdown ZK " + e);
                 continue;
             } catch (Exception e) {
                 shutdownSuccess = false;
@@ -272,9 +286,12 @@ public class ECSClient implements IECSClient, Runnable {
 
         if (hashRing.isEmpty()) {
             try {
+                System.out.println("EMPTY, go here:");
                 hashRing.createHashRing(currServerMap);
-            } catch (Exception e) {
-                logger.error(e);
+                System.out.println("FINISHED HASHRING");
+            } catch (Exception e){
+                logger.error("Unable to initialize hashring");
+                return null;
             }
         }
 
@@ -292,17 +309,49 @@ public class ECSClient implements IECSClient, Runnable {
             currServerMap.put(serverName, node);
             nameArr.add(node);
             hashRing.addNode(node);
+            
+
+            // String javaCmd = String.join(" ",
+            //         "java -jar",
+            //         SERVER_JAR,
+            //         String.valueOf(node.getNodePort()),
+            //         node.getNodeName(),
+            //         zkHost,
+            //         String.valueOf(zkPort));
+
+            // boolean isLocal = node.getNodeHost().equals("127.0.0.1") || node.getNodeHost().equals("localhost");
+
+            // String cmd;
+
+            // if (isLocal) {
+            //   String cmd = javaCmd;
+            // } else {
+            //    String cmd = String.join(" ",
+            //             "ssh -o StrictHostKeyChecking=no -n",
+            //             node.getNodeHost(),
+            //             "nohup",
+            //             javaCmd,
+            //             "&");
+            // }
+
 
             // Start the KVServer by issuing an SSH call to the machine
-            String cmd = "java -jar " + SERVER_JAR + " " + node.getNodePort();
-            // "ssh -n <host> nohup java <path>/ms2-server.jar 50000 ERROR &"
-
+            System.out.print("System.getProperty(user.dir)" + System.getProperty("user.dir"));
+            String cmd = "java -jar " + System.getProperty("user.dir")+ "/" +  SERVER_JAR + " " + String.valueOf(node.getNodePort());
+            // // 
+            // String cmd2 = "ssh -n " + this.hostname + " nohup " + cmd + " ERROR &";
+            System.out.println("THIS IS THE CMD STRING: " + cmd);
             try {
                 Process p = Runtime.getRuntime().exec(cmd);
+                // p.waitFor();
                 // create new connection :*
                 // MAKE SURE THIS HAPPENS AFTER ABOVE CALL - MAYBE DELAY NEEDED?
+                TimeUnit.SECONDS.sleep(10);
+
                 newConnection(node);
             } catch (Exception e) {
+                System.out.println("THIS IS SSH error: " + e);
+
                 logger.error("Cannot start the server through an SSH call", e);
             }
         }
@@ -366,7 +415,7 @@ public class ECSClient implements IECSClient, Runnable {
                 continue;
             }
 
-            String znodePath = ZK_ROOT_PATH + "/" + name;
+            String znodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + name;
 
             try {
                 zkApp.createOrSetData(znodePath, "UNSURE WHAT MESSAGE TO SEND");
@@ -394,6 +443,10 @@ public class ECSClient implements IECSClient, Runnable {
 
     @Override
     public boolean removeNodes(Collection<String> nodeNames) {
+        if (nodeNames.size() > currServerMap.size()) {
+            logger.error("You are removing too many nodes. There must be at least one active server.");
+            return false;
+        }
         // Error check, make sure there is at least one active node
         // TODO
         for (String name : nodeNames) {
@@ -403,7 +456,7 @@ public class ECSClient implements IECSClient, Runnable {
             currServerMap.remove(name);
             hashRing.removeNode(name);
         }
-        return false;
+        return true;
     }
 
     @Override
@@ -457,7 +510,6 @@ public class ECSClient implements IECSClient, Runnable {
                         }
                         removeNodes(nodeNames);
                     }
-                    String g;
                     break;
                 case "help":
                     printHelp();
@@ -514,10 +566,16 @@ public class ECSClient implements IECSClient, Runnable {
             new ECSLogSetup("logs/ecs.log", Level.ALL);
             ECSClient ecsClient = new ECSClient();
             ecsClient.run();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             System.out.println("Error! Unable to initialize logger!");
             e.printStackTrace();
             System.exit(1);
-        }
+        } 
+        // catch (Exception e) {
+        //     System.out.println("Error! Unable to initialize logger!");
+        //     e.printStackTrace();
+        //     System.exit(1);
+        // }
     }
 }

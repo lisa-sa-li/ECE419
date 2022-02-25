@@ -65,18 +65,18 @@ public class KVServer implements IKVServer, Runnable {
 		this.threads = new ArrayList<Thread>();
 	}
 
-	// public KVServer(int port, String serverName, String zkHost, int zkPort) {
-	// 	this.port = port;
-	// 	this.serverName = serverName;
-	// 	this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
-	// 	this.threads = new ArrayList<Thread>();
+	public KVServer(int port, String serverName, String zkHost, int zkPort) {
+		this.port = port;
+		this.serverName = serverName;
+		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
+		this.threads = new ArrayList<Thread>();
 
-	// 	this.zkHost = zkHost;
-	// 	this.zkPort = zkPort;
+		this.zkHost = zkHost;
+		this.zkPort = zkPort;
 
 	// 	// ecsConnection = new ECSConnection(clientSocket, this);
 	// 	this.ecsConnection = new ECSConnection(zkHost, zkPort, serverName, this);
-	// }
+	}
 
 	public KVServer(int port, int cacheSize, String strategy, boolean test) {
 		this.port = port;
@@ -186,28 +186,31 @@ public class KVServer implements IKVServer, Runnable {
 
 	public void update(Metadata metadata) {
 		// Update the metadata repository of this server
+		this.hashRing = metadata.order;
+		getHashRange();
 	}
 
 	public boolean isMe(BigInteger toHash){
+		if (this.endHash == null){
+			// only server in the ring
+			return true;
+		}
+
 		int isEndHashLarger = this.endHash.compareTo(this.hash);
-		
 		// a.compareTo(b)
 		//  0 = equal
 		//  1 = a > b
 		// -1 = a < b
 
-		// BigInteger z = new BigInteger("0");
-		BigInteger z = BigInteger.valueOf(0);
-
 		int left = this.hash.compareTo(toHash);
 		int right = this.endHash.compareTo(toHash);
-		int zero = z.compareTo(toHash);
 
 		if (isEndHashLarger > 0) {
-			return (left >= 0 && right < 0);
+			// left = 12, right = 20, tohash 18
+			return (left <= 0 && right > 0);
 		} else {
-			
-			return (left >= 0 && zero < 0) || (zero >= 0 && right < 0);
+			// left = 99, right = 2, tohash 1
+			return (left <= 0 || right > 0);
 		}
 	}
 
@@ -364,6 +367,7 @@ public class KVServer implements IKVServer, Runnable {
 				System.out.println("Usage: Server <port>!");
 			} else {
 				int port = Integer.parseInt(args[0]);
+				// System.out.println("args", args);
 				// TODO: set params for cache size and strategy
 				new KVServer(port, 1, "").run();
 			}

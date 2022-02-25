@@ -26,13 +26,14 @@ public class HashRing {
     public void createHashRing(HashMap<String,ECSNode> currServers) throws Exception{
         // this function should only be called once per execution
         if (hashOrder.size() != 0 || hashRing.size() != 0){
+            System.out.println("CANNOT CALL HASHRING TWICE");
             throw new UnexpectedValueException("This function cannot be called twice");
         }
         int numCurrServers = currServers.size();
 
         if (numCurrServers == 0){
             // no active nodes
-            logger.error("No current servers to construct hashring");
+            logger.info("No current servers to construct hashring");
             return;
         }
 
@@ -56,10 +57,10 @@ public class HashRing {
         Collections.sort(hashOrder);
 
         // set ranges
-        setRanges();
+        updateAll();
 
         // set size
-        numServers = hashOrder.size();
+        this.numServers = hashOrder.size();
     }
 
     public void addNode(ECSNode newNode){
@@ -68,7 +69,7 @@ public class HashRing {
         // hash ip:port
         String toHash = newNode.getNodeHost() + ":" + Integer.toString(newNode.getNodePort()); 
         BigInteger hashed = getHash(toHash);
-        
+
         // update lists + reorder
         hashOrder.add(hashed);
         Collections.sort(hashOrder);
@@ -77,23 +78,26 @@ public class HashRing {
 
         // collect idx of new node in hashring
         int idx = hashOrder.indexOf(hashed);
+
         // find previous node to get data from
-        int prevIdx = (idx-1) % numServers;
-        ECSNode prevNode = hashServers.get(hashOrder.get(prevIdx));
-
-        // set hash
-        newNode.setHashRange(hashed, prevNode.getEndHash());
-
-        // send metadata to servers
-        Metadata update = new Metadata(MessageType.MOVE_DATA, hashRing, newNode);
-        prevNode.sendMessage(update);
+        if (numServers == 0){
+            // There is no end hash because it's the only node in the ring
+            newNode.setHashRange(hashed, null);
+        } else {
+            int prevIdx = (idx-1) % numServers;
+            ECSNode prevNode = hashServers.get(hashOrder.get(prevIdx));
+            // send metadata to servers
+            Metadata update = new Metadata(MessageType.MOVE_DATA, hashRing, newNode);
+            prevNode.sendMessage(update);
+            // set hash
+            newNode.setHashRange(hashed, prevNode.getEndHash());
+            updateAll(prevNode.getHash());
+        }
 
         Metadata updateNewNode = new Metadata(MessageType.SET_METADATA, hashRing, null);
         newNode.sendMessage(updateNewNode);
 
         // update other servers w/ new hashring
-        updateAll(prevNode.getHash());
-
         numServers += 1;
     }
 
@@ -142,10 +146,19 @@ public class HashRing {
     private void updateAll(BigInteger hashed){
         // iterate through sorted key array
         for (BigInteger key: hashOrder){
-
             if (key.compareTo(hashed) == 0){
                 continue;
             }
+            ECSNode currNode = hashServers.get(key);
+            Metadata metadata = new Metadata(MessageType.SET_METADATA, hashRing, null);
+            // send server info
+            currNode.sendMessage(metadata);
+        }
+    }
+
+    private void updateAll(){
+        // iterate through sorted key array
+        for (BigInteger key: hashOrder){
             ECSNode currNode = hashServers.get(key);
             Metadata metadata = new Metadata(MessageType.SET_METADATA, hashRing, null);
             // send server info
@@ -172,7 +185,8 @@ public class HashRing {
 
         
     public boolean isEmpty() {
-        return hashOrder.size() != 0 || hashRing.size() != 0;
+        return hashRing.size() != 0;
+        // || hashRing.size() != 0;
     }
 
     public BigInteger getHash(String value){
@@ -190,10 +204,11 @@ public class HashRing {
             for (byte b : mdDigest) {
                 // code below: modified code from https://stackoverflow.com/questions/11380062/what-does-value-0xff-do-in-java
                 stringHash.append(Integer.toHexString((b & 0xFF) | 0x100), 1, 3);
-                System.out.println("HERE IS THE HASH VAL: " + stringHash);
             }
+            System.out.println("HERE IS THE HASH VAL: " + stringHash);
             // return stringHash.toString();
             // return hex biginteger
+
             return new BigInteger(stringHash.toString(), 16);
 
         } catch (Exception e) {

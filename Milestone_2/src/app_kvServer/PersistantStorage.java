@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.FileNotFoundException;
 
+import ecs.HashRing;
 
 public class PersistantStorage implements IPersistantStorage {
     private static Logger logger = Logger.getRootLogger();
