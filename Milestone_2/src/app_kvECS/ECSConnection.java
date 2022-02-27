@@ -22,7 +22,7 @@ import shared.messages.KVMessage.StatusType;
 import app_kvServer.KVServer;
 import ecs.ECSNode;
 import ecs.ZooKeeperApplication;
-
+import ecs.HeartbeatApplication;
 
 /**
  * Represents a connection end point for a particular client that is
@@ -47,7 +47,7 @@ public class ECSConnection implements Runnable {
 	private KVServer kvServer;
 
 	private ZooKeeper zk;
-    private ZooKeeperApplication zkApp;
+	private ZooKeeperApplication zkApp;
 
 	public ECSConnection(Socket ecsSocket, ECSClient ecsClient) throws Exception {
 		this.ecsSocket = ecsSocket;
@@ -57,54 +57,55 @@ public class ECSConnection implements Runnable {
 	}
 
 	public ECSConnection(String zkHost, int zkPort, String serverName, KVServer kvServer) throws Exception {
- 		this.kvServer = kvServer;
+		this.kvServer = kvServer;
 		// CREATE HEARTBEART
 
 		zkApp = new ZooKeeperApplication(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, zkPort, zkHost);
-        try {
-            zk = zkApp.connect(zkHost + ":" + String.valueOf(zkPort), zkTimeout);
-        } catch (InterruptedException | IOException e) {
-            logger.error("Cannot connect to ZK server!", e);
+		try {
+			zk = zkApp.connect(zkHost + ":" + String.valueOf(zkPort), zkTimeout);
+		} catch (InterruptedException | IOException e) {
+			logger.error("Cannot connect to ZK server!", e);
 			System.exit(1);
-        } 
-
-        try {
-            if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH, false) == null) {
-                logger.error("ZK does not exist, has not been initialized yet");
-				System.exit(1);
-            }
-        } catch (KeeperException | InterruptedException e) {
-            logger.error(e);
-			System.exit(1);
-        } catch (Exception e) {
-            logger.error(e);
-			System.exit(1);
-        }
+		}
 
 		try {
-            if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + serverName, false) == null) {
-                logger.error("This node has not been added to ZK yet????");
+			if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH, false) == null) {
+				logger.error("ZK does not exist, has not been initialized yet");
 				System.exit(1);
-            }
-        } catch (KeeperException | InterruptedException e) {
-            logger.error(e);
+			}
+		} catch (KeeperException | InterruptedException e) {
+			logger.error(e);
 			System.exit(1);
-        } catch (Exception e) {
-            logger.error(e);
+		} catch (Exception e) {
+			logger.error(e);
 			System.exit(1);
-        }
+		}
 
 		try {
-            zkApp.create(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH + "/" + serverName, "heartbeat", CreateMode.EPHEMERAL);
-        
-        } catch (KeeperException | InterruptedException e) {
-            logger.error(e);
+			if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + serverName, false) == null) {
+				logger.error("This node has not been added to ZK yet????");
+				System.exit(1);
+			}
+		} catch (KeeperException | InterruptedException e) {
+			logger.error(e);
 			System.exit(1);
-        } catch (Exception e) {
-            logger.error(e);
+		} catch (Exception e) {
+			logger.error(e);
 			System.exit(1);
-        }
+		}
 
+		try {
+			String heartbeatPath = ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH + "/" + serverName;
+			zkApp.create(heartbeatPath, "heartbeat", CreateMode.EPHEMERAL);
+			// Set heartbeat here
+			zk.exists(heartbeatPath, new HeartbeatApplication(kvServer, zk, serverName));
+		} catch (KeeperException | InterruptedException e) {
+			logger.error(e);
+			System.exit(1);
+		} catch (Exception e) {
+			logger.error(e);
+			System.exit(1);
+		}
 
 	}
 
@@ -121,8 +122,8 @@ public class ECSConnection implements Runnable {
 	}
 
 	public void sendJSONMessage(Metadata meta) throws IOException {
-		JSONMessage json =  new JSONMessage();
-		json.setMessage(meta.getStatus().name(), "blah","blah", meta);
+		JSONMessage json = new JSONMessage();
+		json.setMessage(meta.getStatus().name(), "blah", "blah", meta);
 		byte[] jsonBytes = json.getJSONByte();
 
 		output.write(jsonBytes, 0, jsonBytes.length);
@@ -213,15 +214,15 @@ public class ECSConnection implements Runnable {
 		try {
 			System.out.println("Runnin in ECSConnection");
 			while (this.isOpen) {
-			System.out.println("Runnin Biteches");
+				System.out.println("Runnin Biteches");
 				try {
 					System.out.println("Listening for messages");
 					JSONMessage recievedMesage = receiveMetadataMessage();
 					System.out.println("got eeem");
 
 					// if (recievedMesage != null) {
-					// 	JSONMessage sendMessage = handleMessage(recievedMesage);
-					// 	sendJSONMessage(sendMessage);
+					// JSONMessage sendMessage = handleMessage(recievedMesage);
+					// sendJSONMessage(sendMessage);
 					// }
 				} catch (IOException e) {
 					logger.error("Server connection lost: ", e);
