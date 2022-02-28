@@ -68,7 +68,7 @@ public class KVStore implements KVCommInterface, Runnable {
 	@Override
 	public void connect() throws Exception {
 		try {
-			Socket clientSocket = new Socket(address, port);
+			Socket clientSocket = new Socket(this.address, this.port);
 			this.clientConnection = new ClientConnection(clientSocket);
 			logger.info("Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
 					+ clientSocket.getPort());
@@ -94,36 +94,83 @@ public class KVStore implements KVCommInterface, Runnable {
 	}
 
 	// Change for M2 --> Needs edit
-	// Want to check the node from the existing metadata first before just randomly sending message (in the if statement before returning that function call)
-	// Also, want to make sure it can successfully put before stopping this function --> maybe put it in while loop with boolean flag
-	// this is to prep for the cases when server just dies randomly in the middle of putting
-	// Actually, put while loop in sendMessageToCorrectServer() function might be better
-	// Call updateToCorrectNodeInfo(JSONMessage msg, String key) in if statement before the return statement to check the stale metadata
 	@Override
 	public JSONMessage put(String key, String value) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
 		jsonMessage.setMessage(StatusType.PUT.name(), key, value, null);
-		if ((this.currentNode == null) || !(isECSNodeResponsibleForKey(key, this.currentNode))){
-			return this.sendMessageToCorrectServer(jsonMessage, key);
-		} else {
-			this.clientConnection.sendJSONMessage(jsonMessage);
-			return this.clientConnection.receiveJSONMessage();
-		}
+		return this.runPutGet(jsonMessage, key);
 	}
 
-	// Change for M2 --> Needs edit
-	// Want to check the node from the previous metadata first before just randomly sending message
-	// Also, want to make sure it succeeds before stopping this function
 	@Override
 	public JSONMessage get(String key) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
 		jsonMessage.setMessage(StatusType.GET.name(), key, "", null);
-		if ((this.currentNode == null) || !(isECSNodeResponsibleForKey(key, this.currentNode))){
-			return sendMessageToCorrectServer(jsonMessage, key);
-		} else {
+		return this.runPutGet(jsonMessage, key);
+	}
+
+	public JSONMessage runPutGet(JSONMessage jsonMessage, String key) throws Exception {
+		JSONMessage finalMsg = null;
+		wasSuccessful = false;
+		if ((this.currentNode == null) || (this.ECSNodeOrdered == null)){ // when initializing, first need to get metadata
 			this.clientConnection.sendJSONMessage(jsonMessage);
-			return this.clientConnection.receiveJSONMessage();
+			JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
+			// Want to make sure it can successfully call function before stopping this method
+			while (!wasSuccessful) {
+				try {
+					if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
+						this.updateToCorrectNodeInfo(returnMsg, key);
+						this.switchServer();
+						this.clientConnection.sendJSONMessage(jsonMessage);
+						returnMsg = this.clientConnection.receiveJSONMessage();
+					} else {
+						wasSuccessful = true;
+						finalMsg = returnMsg;
+					}
+				} catch (Exception e) {
+					logger.error(e);
+				}
+			}
+		} else { // metadata already exists (might be stale)
+			if (!(isECSNodeResponsibleForKey(key, this.currentNode))) {
+				this.updateToCorrectNodeFromList(key);
+				this.clientConnection.sendJSONMessage(jsonMessage);
+				JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
+				while (!wasSuccessful) {
+					try {
+						if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
+							this.updateToCorrectNodeInfo(returnMsg, key);
+							this.switchServer();
+							this.clientConnection.sendJSONMessage(jsonMessage);
+							returnMsg = this.clientConnection.receiveJSONMessage();
+						} else {
+							wasSuccessful = true;
+							finalMsg = returnMsg;
+						}
+					} catch (Exception e) {
+						logger.error(e);
+					}
+				}
+			} else {
+				this.clientConnection.sendJSONMessage(jsonMessage);
+				JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
+				while (!wasSuccessful) {
+					try {
+						if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
+							this.updateToCorrectNodeInfo(returnMsg, key);
+							this.switchServer();
+							this.clientConnection.sendJSONMessage(jsonMessage);
+							returnMsg = this.clientConnection.receiveJSONMessage();
+						} else {
+							wasSuccessful = true;
+							finalMsg = returnMsg;
+						}
+					} catch (Exception e) {
+						logger.error(e);
+					}
+				}
+			}
 		}
+		return finalMsg;
 	}
 
 	public void switchServer() throws Exception {
@@ -154,7 +201,11 @@ public class KVStore implements KVCommInterface, Runnable {
 		this.currReceiverNode = this.metadata.getReceiverNode();
 		// Order the server nodes in ascending order in Array so that it can be iterated over to find the responsible server
 		this.orderMetadataIntoECSNodeList(true);
-		// Iterate over the Array of servers to find the responsible node and update the server address and server port
+		this.updateToCorrectNodeFromList(key);
+	}
+
+	// Iterate over the Array of servers to find the responsible node and update the server address and server port
+	public void updateToCorrectNodeFromList(String key){
 		for (int i = 0; i < this.ECSNodeOrdered.size(); i++) {
 			boolean isNodeResponsibleForKey = isECSNodeResponsibleForKey(key, this.ECSNodeOrdered.get(i));
 			if (isNodeResponsibleForKey) {
@@ -186,24 +237,6 @@ public class KVStore implements KVCommInterface, Runnable {
 			this.ECSNodeOrdered.add(temp);
 		}
 	}
-
-	// Sends message to the correct server (Used in put() and get()) --> Needs edit
-	public JSONMessage sendMessageToCorrectServer(JSONMessage msg, String key) throws Exception {
-		this.clientConnection.sendJSONMessage(msg);
-		JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
-		if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
-			this.updateToCorrectNodeInfo(returnMsg, key);
-			this.switchServer();
-			this.clientConnection.sendJSONMessage(msg);
-			returnMsg = this.clientConnection.receiveJSONMessage();
-		}
-		return returnMsg;
-	}
-
-	// Cache metadata of storage service. (Note: this metadata might not be the most recent)
-	// Route requests to the storage server that coordinates the respective key-range
-	// Metadata updating might be required which is initiated by the storage server if the client library, that caches the metadata, contacted a wrong storage server (i.e., the request could not be served by the storage server identified through the currently cached metadata) due to stale metadata
-	// Update metadata and retry the request
 
 	// for testing
 	public void run() {

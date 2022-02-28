@@ -36,7 +36,6 @@ public class ClientConnection implements IClientConnection {
 		input = clientSocket.getInputStream();
 	}
 
-	// NEED TO CHANGE FOR M2 --> CHANGED
 	@Override
 	public void sendJSONMessage(JSONMessage kvJson) throws IOException {
 		byte[] jsonBytes = kvJson.getJSONByte();
@@ -47,7 +46,6 @@ public class ClientConnection implements IClientConnection {
 						+ kvJson.getJSON() + "'");
 	}
 
-	// NEED TO CHANGE FOR M2
 	@Override
 	public JSONMessage receiveJSONMessage() throws IOException {
 		int index = 0;
