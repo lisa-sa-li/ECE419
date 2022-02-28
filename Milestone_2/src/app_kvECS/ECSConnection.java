@@ -56,63 +56,15 @@ public class ECSConnection implements Runnable {
 		connect();
 	}
 
-	public ECSConnection(String zkHost, int zkPort, String serverName, KVServer kvServer) throws Exception {
-		this.kvServer = kvServer;
-		// CREATE HEARTBEART
-
-		zkApp = new ZooKeeperApplication(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, zkPort, zkHost);
-		try {
-			zk = zkApp.connect(zkHost + ":" + String.valueOf(zkPort), zkTimeout);
-		} catch (InterruptedException | IOException e) {
-			logger.error("Cannot connect to ZK server!", e);
-			System.exit(1);
-		}
-
-		try {
-			if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH, false) == null) {
-				logger.error("ZK does not exist, has not been initialized yet");
-				System.exit(1);
-			}
-		} catch (KeeperException | InterruptedException e) {
-			logger.error(e);
-			System.exit(1);
-		} catch (Exception e) {
-			logger.error(e);
-			System.exit(1);
-		}
-
-		try {
-			if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + serverName, false) == null) {
-				logger.error("This node has not been added to ZK yet????");
-				System.exit(1);
-			}
-		} catch (KeeperException | InterruptedException e) {
-			logger.error(e);
-			System.exit(1);
-		} catch (Exception e) {
-			logger.error(e);
-			System.exit(1);
-		}
-
-		try {
-			String heartbeatPath = ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH + "/" + serverName;
-			zkApp.create(heartbeatPath, "heartbeat", CreateMode.EPHEMERAL);
-			// Set heartbeat here
-			zk.exists(heartbeatPath, new HeartbeatApplication(kvServer, zk, serverName));
-		} catch (KeeperException | InterruptedException e) {
-			logger.error(e);
-			System.exit(1);
-		} catch (Exception e) {
-			logger.error(e);
-			System.exit(1);
-		}
-
-	}
-
 	public void connect() throws IOException {
+		System.out.println("CALLS CONNECT");
 		try {
+			System.out.println("IN CONNECT");
 			output = this.ecsSocket.getOutputStream();
+			System.out.println("OUTPTU : " + output);
+			
 			input = this.ecsSocket.getInputStream();
+			System.out.println("INPUT : " + input);
 
 			logger.info("Connected to " + this.ecsSocket.getInetAddress().getHostName() + " on port "
 					+ this.ecsSocket.getPort());
@@ -138,7 +90,16 @@ public class ECSConnection implements Runnable {
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
 
 		// Read first char from stream
-		byte read = (byte) input.read();
+		System.out.println("input " + input);
+		byte read = -1;
+		try {
+			System.out.println("1");
+			read = (byte) input.read();
+			System.out.println("2");
+		} catch (Exception e) {
+			logger.error("WHAT WHY " + e);
+		}
+
 		boolean reading = true;
 
 		// Check if stream is closed (read returns -1)

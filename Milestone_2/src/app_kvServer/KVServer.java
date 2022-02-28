@@ -11,6 +11,11 @@ import java.math.BigInteger;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+import org.apache.zookeeper.*;
+import org.apache.zookeeper.Watcher.Event.KeeperState;
+import org.apache.zookeeper.Watcher.Event.EventType;
+import org.apache.zookeeper.KeeperException;
+
 import com.google.gson.Gson;
 
 import shared.messages.KVMessage.StatusType;
@@ -22,6 +27,8 @@ import app_kvServer.PersistantStorage;
 import app_kvServer.ServerConnection;
 import app_kvECS.ECSConnection;
 import ecs.ECSNode;
+import ecs.ZooKeeperApplication;
+import ecs.HeartbeatApplication;
 
 public class KVServer implements IKVServer, Runnable {
 
@@ -41,6 +48,10 @@ public class KVServer implements IKVServer, Runnable {
 	private String serverName;
 	private String zkHost;
 	private int zkPort;
+
+	private int zkTimeout = 1000;
+    private ZooKeeper zk;
+    private ZooKeeperApplication zkApp;
 
 	// hashring variables
 	private BigInteger hash;
@@ -63,6 +74,13 @@ public class KVServer implements IKVServer, Runnable {
 		this.cacheSize = cacheSize;
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
 		this.threads = new ArrayList<Thread>();
+
+		System.out.println("HERE");
+		try {
+			initHeartbeat("127.0.0.1",2181, "BLAH", this);
+		} catch (Exception e) {
+			logger.error("HELLO2" + e);
+		}
 	}
 
 	public KVServer(int port, String serverName, String zkHost, int zkPort) {
@@ -74,6 +92,12 @@ public class KVServer implements IKVServer, Runnable {
 		this.zkHost = zkHost;
 		this.zkPort = zkPort;
 
+		System.out.println("HERE2");
+		try {
+			initHeartbeat("127.0.0.1",2181, "BLAH", this);
+		} catch (Exception e) {
+			logger.error("HELLO" + e);
+		}
 	// 	// ecsConnection = new ECSConnection(clientSocket, this);
 	// 	this.ecsConnection = new ECSConnection(zkHost, zkPort, serverName, this);
 	}
@@ -88,6 +112,59 @@ public class KVServer implements IKVServer, Runnable {
 			Thread testThread = new Thread(this);
 			testThread.start();
 		}
+	}
+
+	public void initHeartbeat(String zkHost, int zkPort, String serverName, KVServer kvServer) throws Exception {
+		// this.kvServer = kvServer;
+		// CREATE HEARTBEART
+
+		// zkApp = new ZooKeeperApplication(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, zkPort, zkHost);
+		// try {
+		// 	zk = zkApp.connect(zkHost + ":" + String.valueOf(zkPort), zkTimeout);
+		// } catch (InterruptedException | IOException e) {
+		// 	logger.error("Cannot connect to ZK server!", e);
+		// 	System.exit(1);
+		// }
+
+		// try {
+		// 	if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH, false) == null) {
+		// 		logger.error("ZK does not exist, has not been initialized yet");
+		// 		System.exit(1);
+		// 	}
+		// } catch (KeeperException | InterruptedException e) {
+		// 	logger.error(e);
+		// 	System.exit(1);
+		// } catch (Exception e) {
+		// 	logger.error(e);
+		// 	System.exit(1);
+		// }
+
+		// try {
+		// 	if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + serverName, false) == null) {
+		// 		logger.error("This node has not been added to ZK yet????");
+		// 		System.exit(1);
+		// 	}
+		// } catch (KeeperException | InterruptedException e) {
+		// 	logger.error(e);
+		// 	System.exit(1);
+		// } catch (Exception e) {
+		// 	logger.error(e);
+		// 	System.exit(1);
+		// }
+
+		// try {
+		// 	String heartbeatPath = ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH + "/" + serverName;
+		// 	zkApp.create(heartbeatPath, "heartbeat", CreateMode.EPHEMERAL);
+		// 	// Set heartbeat here
+		// 	zk.exists(heartbeatPath, new HeartbeatApplication(this, zk, serverName));
+		// } catch (KeeperException | InterruptedException e) {
+		// 	logger.error(e);
+		// 	System.exit(1);
+		// } catch (Exception e) {
+		// 	logger.error(e);
+		// 	System.exit(1);
+		// }
+
 	}
 
 	public void initKVServer(String metadata) {

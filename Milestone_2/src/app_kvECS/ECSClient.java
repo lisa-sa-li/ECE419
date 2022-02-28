@@ -100,7 +100,7 @@ public class ECSClient implements IECSClient, Runnable {
             System.out.println("NEW CONNECTION");
             int port = node.getNodePort();
             String serverName = node.getNodeName();
-            System.out.println("NEW CONNECTION " + port + serverName);
+            System.out.println("NEW CONNECTION " + port +" " + this.hostname + " " + serverName);
 
             Socket clientSocket = new Socket(this.hostname, port);
             System.out.println("NEW CONNECTION3");
@@ -122,7 +122,9 @@ public class ECSClient implements IECSClient, Runnable {
             
             System.out.println("NEW CONNECTION6");
         } catch (IOException e) {
+            logger.error("ERROR MAKING NEW CONNECTION IN ECSCLIENT");
             throw e;
+
         }
     }
 
@@ -338,15 +340,14 @@ public class ECSClient implements IECSClient, Runnable {
             // Start the KVServer by issuing an SSH call to the machine
             System.out.print("System.getProperty(user.dir)" + System.getProperty("user.dir"));
             String cmd = "java -jar " + System.getProperty("user.dir")+ "/" +  SERVER_JAR + " " + String.valueOf(node.getNodePort());
+            System.out.println("THIS IS THE CMD " + cmd);
             // // 
-            // String cmd2 = "ssh -n " + this.hostname + " nohup " + cmd + " ERROR &";
-            System.out.println("THIS IS THE CMD STRING: " + cmd);
             try {
                 Process p = Runtime.getRuntime().exec(cmd);
                 // p.waitFor();
                 // create new connection :*
                 // MAKE SURE THIS HAPPENS AFTER ABOVE CALL - MAYBE DELAY NEEDED?
-                TimeUnit.SECONDS.sleep(10);
+                TimeUnit.SECONDS.sleep(3);
 
                 newConnection(node);
             } catch (Exception e) {
