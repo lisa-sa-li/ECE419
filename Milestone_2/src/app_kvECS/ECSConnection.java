@@ -29,7 +29,8 @@ import ecs.HeartbeatApplication;
  * connected to the server. This class is responsible for message reception
  * and sending.
  */
-public class ECSConnection implements Runnable {
+// public class ECSConnection implements Runnable {
+public class ECSConnection {
 
 	private static Logger logger = Logger.getRootLogger();
 
@@ -41,7 +42,6 @@ public class ECSConnection implements Runnable {
 	private Socket ecsSocket;
 	private InputStream input;
 	private OutputStream output;
-	private ECSClient ecsClient;
 	private int zkTimeout = 1000;
 
 	private KVServer kvServer;
@@ -49,23 +49,16 @@ public class ECSConnection implements Runnable {
 	private ZooKeeper zk;
 	private ZooKeeperApplication zkApp;
 
-	public ECSConnection(Socket ecsSocket, ECSClient ecsClient) throws Exception {
+	public ECSConnection(Socket ecsSocket) throws Exception {
 		this.ecsSocket = ecsSocket;
 		this.isOpen = true;
-		this.ecsClient = ecsClient;
 		connect();
 	}
 
 	public void connect() throws IOException {
-		System.out.println("CALLS CONNECT");
 		try {
-			System.out.println("IN CONNECT");
 			output = this.ecsSocket.getOutputStream();
-			System.out.println("OUTPTU : " + output);
-			
 			input = this.ecsSocket.getInputStream();
-			System.out.println("INPUT : " + input);
-
 			logger.info("Connected to " + this.ecsSocket.getInetAddress().getHostName() + " on port "
 					+ this.ecsSocket.getPort());
 		} catch (IOException e) {
@@ -170,41 +163,41 @@ public class ECSConnection implements Runnable {
 		return json;
 	}
 
-	public void run() {
-		// while connection is open, listen for messages
-		try {
-			System.out.println("Runnin in ECSConnection");
-			while (this.isOpen) {
-				System.out.println("Runnin Biteches");
-				try {
-					System.out.println("Listening for messages");
-					JSONMessage recievedMesage = receiveMetadataMessage();
-					System.out.println("got eeem");
+	// public void run() {
+	// 	// while connection is open, listen for messages
+	// 	try {
+	// 		System.out.println("Runnin in ECSConnection");
+	// 		while (this.isOpen) {
+	// 			System.out.println("Runnin Biteches");
+	// 			try {
+	// 				System.out.println("Listening for messages");
+	// 				JSONMessage recievedMesage = receiveMetadataMessage();
+	// 				System.out.println("got eeem");
 
-					// if (recievedMesage != null) {
-					// JSONMessage sendMessage = handleMessage(recievedMesage);
-					// sendJSONMessage(sendMessage);
-					// }
-				} catch (IOException e) {
-					logger.error("Server connection lost: ", e);
-					this.isOpen = false;
-				} catch (Exception e) {
-					logger.error(e);
-				}
-			}
-		} finally {
-			try {
-				// close connection
-				if (ecsSocket != null) {
-					// Send message????
-					input.close();
-					output.close();
-					ecsSocket.close();
-				}
-			} catch (IOException ioe) {
-				logger.error("Error! Unable to tear down connection!", ioe);
-			}
-		}
-	}
+	// 				// if (recievedMesage != null) {
+	// 				// JSONMessage sendMessage = handleMessage(recievedMesage);
+	// 				// sendJSONMessage(sendMessage);
+	// 				// }
+	// 			} catch (IOException e) {
+	// 				logger.error("Server connection lost: ", e);
+	// 				this.isOpen = false;
+	// 			} catch (Exception e) {
+	// 				logger.error(e);
+	// 			}
+	// 		}
+	// 	} finally {
+	// 		try {
+	// 			// close connection
+	// 			if (ecsSocket != null) {
+	// 				// Send message????
+	// 				input.close();
+	// 				output.close();
+	// 				ecsSocket.close();
+	// 			}
+	// 		} catch (IOException ioe) {
+	// 			logger.error("Error! Unable to tear down connection!", ioe);
+	// 		}
+	// 	}
+	// }
 
 }

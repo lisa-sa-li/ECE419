@@ -103,22 +103,17 @@ public class ECSClient implements IECSClient, Runnable {
             System.out.println("NEW CONNECTION " + port +" " + this.hostname + " " + serverName);
 
             Socket clientSocket = new Socket(this.hostname, port);
+
             System.out.println("NEW CONNECTION3");
-            ECSConnection ecsConnection = new ECSConnection(clientSocket, this);
+            ECSConnection ecsConnection = new ECSConnection(clientSocket);
             System.out.println("NEW CONNECTION4");
+            // set socket in ecsConnection
             node.setConnection(ecsConnection);
             System.out.println("NEW CONNECTION5");
 
-            Thread newThread = new Thread(ecsConnection, serverName);
-            System.out.println("NEW CONNECTION5.5");
-
-            newThread.start();
-            System.out.println("NEW CONNECTION5.9");
-
-            this.threads.add(newThread);
-
             logger.info("Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
                     + clientSocket.getPort());
+
             
             System.out.println("NEW CONNECTION6");
         } catch (IOException e) {
@@ -306,11 +301,12 @@ public class ECSClient implements IECSClient, Runnable {
             String serverName = availServers.remove(int_random);
             ECSNode node = allServerMap.get(serverName);
 
+            System.out.println("ADDING NODE IN ADDNODE ECSCLIENT");
+
             node.setStatus(NodeStatus.STARTING); // Not sure about the status
             allServerMap.put(serverName, node);
             currServerMap.put(serverName, node);
             nameArr.add(node);
-            hashRing.addNode(node);
             
 
             // String javaCmd = String.join(" ",
@@ -347,14 +343,16 @@ public class ECSClient implements IECSClient, Runnable {
                 // p.waitFor();
                 // create new connection :*
                 // MAKE SURE THIS HAPPENS AFTER ABOVE CALL - MAYBE DELAY NEEDED?
-                TimeUnit.SECONDS.sleep(3);
+                TimeUnit.SECONDS.sleep(1);
 
                 newConnection(node);
+                hashRing.addNode(node);
             } catch (Exception e) {
                 System.out.println("THIS IS SSH error: " + e);
 
                 logger.error("Cannot start the server through an SSH call", e);
             }
+
         }
         /*
          * Randomly choose <numberOfNodes> servers from the available machines and start
