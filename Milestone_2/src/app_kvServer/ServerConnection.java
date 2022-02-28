@@ -71,6 +71,8 @@ public class ServerConnection implements IServerConnection, Runnable {
 
 	@Override
 	public JSONMessage receiveJSONMessage() throws IOException {
+		logger.info("HEARD");
+
 		int index = 0;
 		byte[] msgBytes = null, tmp = null;
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
@@ -137,6 +139,8 @@ public class ServerConnection implements IServerConnection, Runnable {
 		// Build final Object and convert from bytes to string
 		JSONMessage json = new JSONMessage();
 		String jsonStr = json.byteToString(msgBytes);
+		logger.info("RECEIVED MESSAGE: " + jsonStr);
+
 		if (jsonStr == null || jsonStr.trim().isEmpty()) {
 			logger.debug("jsonStr is null in ServerConnection");
 			return null;
@@ -270,10 +274,14 @@ public class ServerConnection implements IServerConnection, Runnable {
 		try {
 			while (this.isOpen) {
 				try {
+					logger.info("LISTENING");
 					JSONMessage recievedMessage = receiveJSONMessage();
+					logger.info("LISTENING AFTER");
 					if (recievedMessage != null) {
 						JSONMessage sendMessage;
+
 						Metadata metadata = recievedMessage.getMetadata();
+
 
 						if (metadata == null) {
 							sendMessage = handleMessage(recievedMessage);

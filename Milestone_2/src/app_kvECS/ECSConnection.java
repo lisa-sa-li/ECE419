@@ -83,16 +83,7 @@ public class ECSConnection {
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
 
 		// Read first char from stream
-		System.out.println("input " + input);
-		byte read = -1;
-		try {
-			System.out.println("1");
-			read = (byte) input.read();
-			System.out.println("2");
-		} catch (Exception e) {
-			logger.error("WHAT WHY " + e);
-		}
-
+		byte read = (byte) input.read();
 		boolean reading = true;
 
 		// Check if stream is closed (read returns -1)

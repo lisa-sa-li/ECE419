@@ -185,7 +185,7 @@ public class HashRing {
 
         
     public boolean isEmpty() {
-        return hashRing.size() != 0;
+        return hashRing.size() == 0;
         // || hashRing.size() != 0;
     }
 
@@ -205,7 +205,6 @@ public class HashRing {
                 // code below: modified code from https://stackoverflow.com/questions/11380062/what-does-value-0xff-do-in-java
                 stringHash.append(Integer.toHexString((b & 0xFF) | 0x100), 1, 3);
             }
-            System.out.println("HERE IS THE HASH VAL: " + stringHash);
             // return stringHash.toString();
             // return hex biginteger
 

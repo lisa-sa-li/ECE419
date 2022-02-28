@@ -85,7 +85,6 @@ public class JSONMessage implements KVMessage, Serializable {
         setKey(inKey);
         setValue(inValue);
         setMetadata(metadata);
-        // setECSMessage(ecsMessage);
         this.json = this.serialize();
     }
 

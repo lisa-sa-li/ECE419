@@ -15,7 +15,9 @@ public interface KVMessage {
 		DELETE_ERROR, /* Delete - request not successful */
 		DISCONNECTED, /* Server or client is disconnected */
 		NO_STATUS, /* Equivalent to null */
-		SERVER_NOT_RESPONSIBLE /* the server is not responsible for the key */
+		SERVER_NOT_RESPONSIBLE, /* the server is not responsible for the key */
+		SET_METADATA, /* the server is not responsible for the key */
+		MOVE_DATA, /* the server is not responsible for the key */
 	}
 
 	/**

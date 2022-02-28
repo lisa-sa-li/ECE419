@@ -74,7 +74,6 @@ public class PersistantStorage implements IPersistantStorage {
             for (byte b : mdDigest) {
                 // code below: modified code from https://stackoverflow.com/questions/11380062/what-does-value-0xff-do-in-java
                 stringHash.append(Integer.toHexString((b & 0xFF) | 0x100), 1, 3);
-                System.out.println("HERE IS THE HASH VAL: " + stringHash);
             }
             // return stringHash.toString();
             // return hex biginteger

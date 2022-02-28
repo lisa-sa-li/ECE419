@@ -75,12 +75,7 @@ public class KVServer implements IKVServer, Runnable {
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
 		this.threads = new ArrayList<Thread>();
 
-		System.out.println("HERE");
-		try {
-			initHeartbeat("127.0.0.1",2181, "BLAH", this);
-		} catch (Exception e) {
-			logger.error("HELLO2" + e);
-		}
+		logger.debug("HERE1");
 	}
 
 	public KVServer(int port, String serverName, String zkHost, int zkPort) {
@@ -92,9 +87,9 @@ public class KVServer implements IKVServer, Runnable {
 		this.zkHost = zkHost;
 		this.zkPort = zkPort;
 
-		System.out.println("HERE2");
+		logger.debug("HERE2");
 		try {
-			initHeartbeat("127.0.0.1",2181, "BLAH", this);
+			initHeartbeat("127.0.0.1",port, "BLAH", this);
 		} catch (Exception e) {
 			logger.error("HELLO" + e);
 		}
@@ -437,11 +432,18 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	public static void main(String[] args) {
+		logger.debug(">>>>>>> ARGS " + Arrays.toString(args));
 		try {
 			new LogSetup("logs/server.log", Level.ALL);
 			if (args.length != 1) {
 				System.out.println("Error! Invalid number of arguments!");
 				System.out.println("Usage: Server <port>!");
+			} else if (args.length == 4) {
+				int port = Integer.parseInt(args[0]);
+				String serverName = args[1];
+				String zkHost = args[2];
+				int zkPort = Integer.parseInt(args[3]);
+				new KVServer(port, serverName, zkHost, zkPort).run();
 			} else {
 				int port = Integer.parseInt(args[0]);
 				// System.out.println("args", args);
