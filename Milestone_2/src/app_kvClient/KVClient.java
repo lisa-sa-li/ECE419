@@ -49,10 +49,20 @@ public class KVClient implements IKVClient, Runnable {
 
     private void handleCommand(String cmdLine) {
         // Shorthand to connect (easter egg)
-        if (cmdLine.equals("-1")) {
-            cmdLine = "connect 127.0.0.1 8080\n";
-        }
+        // if (cmdLine.equals("-1")) {
+        //     cmdLine = "connect 127.0.0.1 8080\n";
+        // }
         String[] tokens = cmdLine.trim().split("\\s+");
+
+        if (tokens[0].equals("-1")) {
+            if (tokens.length == 2) {
+                cmdLine = "connect 127.0.0.1 " + tokens[1] + "\n";
+            } else {
+                cmdLine = "connect 127.0.0.1 8080\n";
+            }
+            tokens = cmdLine.trim().split("\\s+");
+        }
+
         try {
             switch (tokens[0]) {
                 case "quit":

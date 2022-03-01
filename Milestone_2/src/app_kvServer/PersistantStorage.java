@@ -87,6 +87,10 @@ public class PersistantStorage implements IPersistantStorage {
     @Override
     public StatusType put(String key, String value) throws Exception {
         try {
+            logger.debug("hi" + key);
+            logger.debug("hi2 " + value);
+
+
             // Below is slightly modified logic from
             // https://stackoverflow.com/questions/20039980/java-replace-line-in-text-file
             BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
@@ -96,6 +100,10 @@ public class PersistantStorage implements IPersistantStorage {
             boolean foundKey = false;
             JSONMessage json;
             StatusType putStatus = StatusType.NO_STATUS;
+
+
+            logger.debug("2key " + key);
+            logger.debug("2value " + value);
 
             while ((line = file.readLine()) != null) {
                 // Covert each line to a JSON so we can read the key and value

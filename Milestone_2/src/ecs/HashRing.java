@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import shared.exceptions.UnexpectedValueException;
 import shared.messages.Metadata;
 import shared.messages.Metadata.MessageType;
+import shared.messages.JSONMessage;
 
 public class HashRing {
     private static final Logger logger = Logger.getLogger("hashring");
@@ -95,7 +96,9 @@ public class HashRing {
         }
 
         Metadata updateNewNode = new Metadata(MessageType.SET_METADATA, hashRing, null);
+        // Metadata updateNewNode = new Metadata(MessageType.SET_METADATA, hashRing, newNode);
         newNode.sendMessage(updateNewNode);
+        JSONMessage msg = newNode.receiveMessage();
 
         // update other servers w/ new hashring
         numServers += 1;

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.StringTokenizer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.*;
 
 import org.apache.log4j.*;
 import com.google.gson.Gson;
@@ -22,14 +23,11 @@ public class JSONMessage implements KVMessage, Serializable {
     private StatusType status;
     private String key;
     private String value;
-    // private String metadata;
     private String metadataStr;
-    // private String ecsMessageStr;
 
     private byte[] byteJSON;
     private String json;
 
-    Gson gson = new Gson();
 
     private byte[] addCtrChars(byte[] bytes) {
         byte[] ctrBytes = new byte[] { LINE_FEED, RETURN };
@@ -66,6 +64,9 @@ public class JSONMessage implements KVMessage, Serializable {
     }
 
     public byte[] getJSONByte() {
+        if (this.json == null) {
+            serialize();
+        }
         if (this.byteJSON == null) {
             this.stringToByte(this.json);
         }
@@ -120,6 +121,7 @@ public class JSONMessage implements KVMessage, Serializable {
 
     public void setMetadata(Metadata metadata) {
         if (metadata != null) {
+            Gson gson = new Gson();
             this.metadataStr = gson.toJson(metadata);
         }
     }
@@ -128,138 +130,130 @@ public class JSONMessage implements KVMessage, Serializable {
         this.metadataStr = metadata;
     }
 
+    public String getMetadataStr(){
+        return this.metadataStr;
+    }
+
     public Metadata getMetadata() {
+        logger.info("IN GET METADATA");
         if (this.metadataStr == null) {
             return null;
         }
-        return gson.fromJson(this.metadataStr, Metadata.class);
+        logger.info("BOUT TO GSON: " + this.metadataStr);
+        Gson gson = new Gson();
+        Metadata rval = gson.fromJson(this.metadataStr, Metadata.class);
+        return rval;
     }
-
-    // public void setECSMessage(ECSMessage ecsMessage) {
-    //     if (ecsMessage != null) {
-    //         this.ecsMessageStr = gson.toJson(ecsMessage);
-    //     }
-    // }
-
-    // public void setECSMessageStr(String ecsMessage) {
-    //     this.ecsMessageStr = ecsMessage;
-    // }
-
-    // public ECSMessage getECSMessage() {
-    //     if (this.ecsMessageStr == null) {
-    //         return null;
-    //     }
-    //     return gson.fromJson(this.ecsMessageStr, ECSMessage.class);
-    // }
 
     public String serialize() {
-        // initialize string builder to create mutable string
-        StringBuilder strMessage = new StringBuilder();
+        Gson gson = new Gson();
+        this.json = gson.toJson(this);
+        return this.json;
 
-        // Beginning chars
-        strMessage.append("{");
-        String statusEntry = ("\"status\":\"" + this.status.name() + "\",");
-        strMessage.append(statusEntry);
-        if (this.value == null) {
-            this.value = "";
-        }
-        if (!this.value.trim().isEmpty()) {
-            String KVEntry = ("\"" + this.key + "\":\"" + this.value + "\",");
-            strMessage.append(KVEntry);
-        } else {
-            String KVEntry = ("\"" + this.key + "\":\"\"");
-            strMessage.append(KVEntry);
-        }
-
-        if (!this.metadataStr.trim().isEmpty()) {
-            String KVEntry = ("\"metadata\":\"" + this.metadataStr + "\",");
-            strMessage.append(KVEntry);
-        } else {
-            String KVEntry = ("\"metadata\":\"\"");
-            strMessage.append(KVEntry);
-        }
-        // if (!this.ecsMessageStr.trim().isEmpty()) {
-        //     String KVEntry = ("\"ecs\":\"" + this.ecsMessageStr + "\",");
-        //     strMessage.append(KVEntry);
-        // } else {
-        //     String KVEntry = ("\"ecs\":\"\"");
-        //     strMessage.append(KVEntry);
-        // }
-        strMessage.append("}");
-
-        this.json = strMessage.toString();
-
-        return strMessage.toString();
     }
-
     public void deserialize(String inJSON) {
-        // trim newlines
+        logger.info("IN DESERIALIZE: " + inJSON);
         inJSON = inJSON.trim();
         this.json = inJSON;
 
-        StringTokenizer messageTokens = new StringTokenizer(inJSON, "{}:,\"");
+        Gson gson = new Gson();
+        JSONMessage msg = gson.fromJson(inJSON, JSONMessage.class);
 
-        // create Array object
-        String[] tokens = null;
-        tokens = new String[messageTokens.countTokens()];
-
-        // iterate through StringTokenizer tokens
-        int count = 0;
-        while (messageTokens.hasMoreTokens()) {
-            // add tokens to Array
-            String nextTok = messageTokens.nextToken();
-            tokens[count++] = nextTok;
-        }
-
-        String status = tokens[1];
-        String key = tokens[2];
-        String value;
-        String metadataStr;
-        String ecsMessageStr;
-
-        int buffer = 0;
-
-        if (tokens[3] != "metadata") {
-            // This means token[3] is the value to "value"
-            value = tokens[3];
-        } else {
-            // This means there's no value for "value", so token[3] is the key "metadata"
-            value = "";
-            buffer++;
-        }
-        try {
-            metadataStr = tokens[5 - buffer];
-        } catch (Exception iobe) {
-            metadataStr = null;
-        }
+        logger.info("new message created" + msg.getKey() + msg.getValue() + "?" + msg.getMetadataStr() + "?");
 
 
-        // if (tokens[5 - buffer] != "ecs") {
-        //     // This means token[5 - buffer] is the value to "metadata"
-        //     metadataStr = tokens[5 - buffer];
-        // } else {
-        //     // This means there's no value for "metadata"
-        //     metadataStr = null;
-        //     buffer++;
-        // }
-        // try {
-        //     ecsMessageStr = tokens[7 - buffer];
-        // } catch (Exception iobe) {
-        //     ecsMessageStr = null;
-        // }
+        String key = msg.getKey();
+        String val = msg.getValue();
+        String metadataStr = msg.getMetadataStr();
+        StatusType status = msg.getStatus();
 
-        // // In a DELETE or GET, there is no tokens[3], so we set it to ""
-        // try {
-        // value = tokens[3];
-        // } catch (Exception iobe) {
-        // value = "";
-        // }
-
-        setStatus(status);
+        setStatus(status.name());
         setKey(key);
-        setValue(value);
+        setValue(val);
         setMetadataStr(metadataStr);
-        // setECSMessageStr(ecsMessageStr);
     }
 
+     // public String serialize() {
+    //     // initialize string builder to create mutable string
+    //     StringBuilder strMessage = new StringBuilder();
+
+    //     // Beginning chars
+    //     strMessage.append("{");
+    //     String statusEntry = ("\"status\":\"" + this.status.name() + "\",");
+    //     strMessage.append(statusEntry);
+    //     if (this.value == null) {
+    //         this.value = "";
+    //     }
+    //     if (!this.value.trim().isEmpty()) {
+    //         String KVEntry = ("\"" + this.key + "\":\"" + this.value + "\",");
+    //         strMessage.append(KVEntry);
+    //     } else {
+    //         String KVEntry = ("\"" + this.key + "\":\"\"");
+    //         strMessage.append(KVEntry);
+    //     }
+
+    //     if (!this.metadataStr.trim().isEmpty()) {
+    //         String KVEntry = ("\"metadata\":\"" + this.metadataStr + "\",");
+    //         strMessage.append(KVEntry);
+    //     } else {
+    //         String KVEntry = ("\"metadata\":\"\"");
+    //         strMessage.append(KVEntry);
+    //     }
+    //     strMessage.append("}");
+
+    //     this.json = strMessage.toString();
+
+    //     return strMessage.toString();
+    // }
+
+
+    // public void deserialize(String inJSON) {
+    //     // trim newlines
+    //     inJSON = inJSON.trim();
+    //     this.json = inJSON;
+
+    //     StringTokenizer messageTokens = new StringTokenizer(inJSON, "{}:,\"");
+
+    //     // create Array object
+    //     String[] tokens = null;
+    //     tokens = new String[messageTokens.countTokens()];
+
+    //     // iterate through StringTokenizer tokens
+    //     int count = 0;
+    //     while (messageTokens.hasMoreTokens()) {
+    //         // add tokens to Array
+    //         String nextTok = messageTokens.nextToken();
+    //         tokens[count++] = nextTok;
+    //     }
+
+    //     logger.debug(">>>>>>> TOKENS " + Arrays.toString(tokens));
+
+    //     String status = tokens[1];
+    //     String key = tokens[2];
+    //     String value;
+    //     String metadataStr;
+
+    //     // {"status":"SET_METADATA","blah":"blah","metadata":"{"status":"SET_METADATA","order":{"joy5":147707126048829537208107172202006208560},"receiverNodePort":0}",}
+
+    //     int buffer = 0;
+
+    //     if (tokens[3] != "metadata") {
+    //         // This means token[3] is the value to "value"
+    //         value = tokens[3];
+    //     } else {
+    //         // This means there's no value for "value", so token[3] is the key "metadata"
+    //         value = "";
+    //         buffer++;
+    //     }
+    //     try {
+    //         metadataStr = tokens[5 - buffer];
+    //     } catch (Exception iobe) {
+    //         metadataStr = null;
+    //     }
+
+    //     setStatus(status);
+    //     setKey(key);
+    //     setValue(value);
+    //     setMetadataStr(metadataStr);
+    // }
 }

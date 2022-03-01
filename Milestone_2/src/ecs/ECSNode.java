@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 
 import app_kvECS.ECSConnection;
 import shared.messages.Metadata;
-
+import shared.messages.JSONMessage;
 
 public class ECSNode implements IECSNode {
 
@@ -55,6 +55,15 @@ public class ECSNode implements IECSNode {
         this.hash = inHash;
     }
 
+    public ECSNode(String name, String host, int port, BigInteger inHash, BigInteger endHash){
+        // initializing a node just to be used for temporary node in KVStore
+        this.name = name;
+        this.host = host;
+        this.port = port;
+        this.hash = inHash;
+        this.endHash = endHash;
+    }
+
     public void setStatus(NodeStatus inStatus){
         this.status = inStatus;
     }
@@ -73,6 +82,15 @@ public class ECSNode implements IECSNode {
         } catch (Exception e){
             logger.info("Unable to send message: " + e);
         }
+    }
+
+    public JSONMessage receiveMessage(){
+        try{
+            return this.ecsConnection.receiveJSONMessage();
+        } catch (Exception e){
+            logger.info("Unable to receive message: " + e);
+        }
+        return null;
     }
 
     public void setStatus(String inStatus){

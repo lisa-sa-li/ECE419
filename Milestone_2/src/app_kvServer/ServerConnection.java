@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.security.InvalidKeyException;
 
 import org.apache.log4j.*;
+import org.apache.log4j.Logger;
+import logging.ServerLogSetup;
 
 import shared.exceptions.KeyValueTooLongException;
 import shared.exceptions.UnexpectedValueException;
@@ -41,6 +43,8 @@ public class ServerConnection implements IServerConnection, Runnable {
 	 * @param serverSocket the Socket object for the server connection.
 	 */
 	public ServerConnection(Socket serverSocket, KVServer kvServer) throws Exception {
+		new ServerLogSetup("logs/serverConnection.log", Level.ALL);
+
 		this.serverSocket = serverSocket;
 		this.isOpen = true;
 		this.kvServer = kvServer;
@@ -56,13 +60,15 @@ public class ServerConnection implements IServerConnection, Runnable {
 			logger.info("Connected to " + this.serverSocket.getInetAddress().getHostName() + " on port "
 					+ this.serverSocket.getPort());
 		} catch (IOException e) {
-			logger.error("Error! Unable to establish server connection. \n", e);
+			logger.error("Error! Unable to establish server connection. \n" + e);
 		}
 	}
 
 	@Override
 	public void sendJSONMessage(JSONMessage json) throws IOException {
+		logger.info("Fbout to get json bytes");
 		byte[] jsonBytes = json.getJSONByte();
+		logger.info("after json byte");
 		output.write(jsonBytes, 0, jsonBytes.length);
 		output.flush();
 		logger.info("SEND \t<" + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getPort() + ">: '"
@@ -139,19 +145,22 @@ public class ServerConnection implements IServerConnection, Runnable {
 		// Build final Object and convert from bytes to string
 		JSONMessage json = new JSONMessage();
 		String jsonStr = json.byteToString(msgBytes);
-		logger.info("RECEIVED MESSAGE: " + jsonStr);
 
 		if (jsonStr == null || jsonStr.trim().isEmpty()) {
 			logger.debug("jsonStr is null in ServerConnection");
 			return null;
 		}
+
+		logger.info("IN DRECEIVE JSON SERVER CONN : " +  jsonStr);
 		json.deserialize(jsonStr);
+		logger.info("RECIEVE " + json.getKey() + json.getValue());
 		logger.info("RECEIVE \t<" + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getPort()
-				+ ">: '" + json.getJSON().trim() + "'");
+		+ ">: '" + json.getJSON().trim() + "'");
 		return json;
 	}
 
 	private JSONMessage handleMessage(JSONMessage msg) throws IOException {
+		logger.info("In HANDLE MESSAGE: " + msg);
 		String key = msg.getKey();
 		String value = msg.getValue();
 		StatusType status = msg.getStatus();
@@ -159,6 +168,13 @@ public class ServerConnection implements IServerConnection, Runnable {
 		String handleMessageValue = value; // For PUT or DELETE, send the original value back
 		StatusType handleMessageStatus = StatusType.NO_STATUS;
 		JSONMessage handleMessage = new JSONMessage();
+
+
+		System.out.println("1key " + key);
+		System.out.println("1value " + value + status);
+		logger.debug("1key " + key);
+		logger.debug("1value " + value + status);
+		
 
 		switch (status) {
 			case PUT:
@@ -225,8 +241,11 @@ public class ServerConnection implements IServerConnection, Runnable {
 
 	 private JSONMessage handleMetadataMessage(Metadata message) {
 		// String handleMessageValue = value; // For PUT or DELETE, send the original value back
+		logger.info("IN HANDLE METADATAMESSAGE");
 		StatusType handleMessageStatus = StatusType.NO_STATUS;
 		JSONMessage handleMessage = new JSONMessage();
+		String key="";
+		String value="";
 
         try {
             switch (message.getStatus()) {
@@ -246,6 +265,8 @@ public class ServerConnection implements IServerConnection, Runnable {
 					this.kvServer.unLockWrite();
 					break;
 				case SET_METADATA:
+					key = "receieved";
+					value = "message";
 					this.kvServer.update(message);
 					break;
 				case MOVE_DATA:
@@ -261,11 +282,10 @@ public class ServerConnection implements IServerConnection, Runnable {
 					break;
 			}
         } catch (Exception e) {
-            logger.error("Unkown Error: " + e.getMessage());
+            logger.error("Unknown Error: " + e.getMessage());
         }
-				// handleMessage.setMessage(handleMessageStatus.name(), "blah", "blah");
+		handleMessage.setMessage(handleMessageStatus.name(), key, value);
 		return handleMessage;
-
     }
 
 
@@ -274,24 +294,33 @@ public class ServerConnection implements IServerConnection, Runnable {
 		try {
 			while (this.isOpen) {
 				try {
-					logger.info("LISTENING");
-					JSONMessage recievedMessage = receiveJSONMessage();
-					logger.info("LISTENING AFTER");
-					if (recievedMessage != null) {
+					JSONMessage receivedMessage = receiveJSONMessage();
+					logger.info("LISTENING AFTER " + receivedMessage.getValue());
+					// 2022-02-28 22:05:14,636 INFO  [Thread-0] root: RECEIVED MESSAGE: status
+					if (receivedMessage != null) {
 						JSONMessage sendMessage;
 
-						Metadata metadata = recievedMessage.getMetadata();
+						logger.info("RECEIVED MESSAGE: " + receivedMessage.getMetadataStr());
+						
+						Metadata metadata = receivedMessage.getMetadata();
 
 
 						if (metadata == null) {
-							sendMessage = handleMessage(recievedMessage);
+							logger.info("Going into handle message: " + receivedMessage.getKey() + receivedMessage.getValue());
+							sendMessage = handleMessage(receivedMessage);
 						} else {
+							logger.info("Going into handleMetadatamessage");
 							sendMessage = handleMetadataMessage(metadata);
+							logger.info("handled metadata message");
+
 						}
+						
+						logger.info("send message");
 						sendJSONMessage(sendMessage);
+						logger.info("after send message");
 					}
 				} catch (IOException e) {
-					logger.error("Server connection lost: ", e);
+					logger.error("Server connection lost: " + e);
 					this.isOpen = false;
 				} catch (Exception e) {
 					logger.error(e);
@@ -307,7 +336,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 					serverSocket.close();
 				}
 			} catch (IOException ioe) {
-				logger.error("Error! Unable to tear down connection!", ioe);
+				logger.error("Error! Unable to tear down connection!" + ioe);
 			}
 		}
 	}

@@ -18,6 +18,13 @@ public class Metadata {
     // public String data;
     // public ECSNode receiverNode;
     public int receiverNodePort;
+    public String receiverNodeName;
+    public String receiverNodeHost;
+    public BigInteger receiveNodeHash;
+    public BigInteger receiveNodeEndHash;
+
+    public String receiverNodeStr;
+
 
     public enum MessageType {
         SET_METADATA, 
@@ -42,11 +49,17 @@ public class Metadata {
         // DIE,           // KVServer is decommissioned
     }
 
+
+
     public Metadata(MessageType status, HashMap<String, BigInteger> order, ECSNode receiverNode) {
         this.status = status;
         this.order = order;
         if (receiverNode != null){
+            this.receiverNodeName = receiverNode.getNodeName();
             this.receiverNodePort = receiverNode.getNodePort();
+            this.receiverNodeHost = receiverNode.getNodeHost();
+            this.receiveNodeHash = receiverNode.getHash();
+            this.receiveNodeEndHash = receiverNode.getEndHash();
         }
     }
 
@@ -62,9 +75,9 @@ public class Metadata {
         this.status = status;
     }
 
-    // public ECSNode getReceiverNode() {
-    //     return this.receiverNode;
-    // }
+    public ECSNode getReceiverNode() {
+        return new ECSNode(receiverNodeName, receiverNodeHost, receiverNodePort, receiveNodeHash, receiveNodeEndHash);
+    }
 
     @Override
     public String toString(){

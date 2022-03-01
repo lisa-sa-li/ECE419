@@ -88,13 +88,7 @@ public class KVServer implements IKVServer, Runnable {
 		this.zkPort = zkPort;
 
 		logger.debug("HERE2");
-		try {
-			initHeartbeat("127.0.0.1",port, "BLAH", this);
-		} catch (Exception e) {
-			logger.error("HELLO" + e);
-		}
-	// 	// ecsConnection = new ECSConnection(clientSocket, this);
-	// 	this.ecsConnection = new ECSConnection(zkHost, zkPort, serverName, this);
+		// initHeartbeat();
 	}
 
 	public KVServer(int port, int cacheSize, String strategy, boolean test) {
@@ -109,36 +103,42 @@ public class KVServer implements IKVServer, Runnable {
 		}
 	}
 
-	public void initHeartbeat(String zkHost, int zkPort, String serverName, KVServer kvServer) throws Exception {
-		// this.kvServer = kvServer;
+	public void initHeartbeat() {
 		// CREATE HEARTBEART
+		logger.debug("HERE3 " + ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH +  zkPort + zkHost);
 
-		// zkApp = new ZooKeeperApplication(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, zkPort, zkHost);
-		// try {
-		// 	zk = zkApp.connect(zkHost + ":" + String.valueOf(zkPort), zkTimeout);
-		// } catch (InterruptedException | IOException e) {
-		// 	logger.error("Cannot connect to ZK server!", e);
-		// 	System.exit(1);
-		// }
+		zkApp = new ZooKeeperApplication(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, zkPort, zkHost);
+		logger.debug("HERE4");
+		try {
+			zk = zkApp.connect(zkHost + ":" + String.valueOf(zkPort), zkTimeout);
+			logger.debug("HERE5");
+		} catch (InterruptedException | IOException e) {
+			logger.debug("HERE6");
+			logger.error("Cannot connect to ZK server!", e);
+			System.exit(1);
+		}
 
-		// try {
-		// 	if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH, false) == null) {
-		// 		logger.error("ZK does not exist, has not been initialized yet");
-		// 		System.exit(1);
-		// 	}
-		// } catch (KeeperException | InterruptedException e) {
-		// 	logger.error(e);
-		// 	System.exit(1);
-		// } catch (Exception e) {
-		// 	logger.error(e);
-		// 	System.exit(1);
-		// }
+		try {
+			if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH, false) == null) {
+				logger.error("ZK does not exist, has not been initialized yet");
+				System.exit(1);
+			}
+			logger.debug("HERE7");
+		} catch (KeeperException | InterruptedException e) {
+			logger.error(e);
+			System.exit(1);
+		} catch (Exception e) {
+			logger.error(e);
+			System.exit(1);
+		}
+		logger.debug("HERE9");
 
 		// try {
 		// 	if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + serverName, false) == null) {
 		// 		logger.error("This node has not been added to ZK yet????");
 		// 		System.exit(1);
 		// 	}
+		// 			logger.debug("HERE10");
 		// } catch (KeeperException | InterruptedException e) {
 		// 	logger.error(e);
 		// 	System.exit(1);
@@ -146,12 +146,14 @@ public class KVServer implements IKVServer, Runnable {
 		// 	logger.error(e);
 		// 	System.exit(1);
 		// }
+		// 		logger.debug("HER11");
 
 		// try {
 		// 	String heartbeatPath = ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH + "/" + serverName;
 		// 	zkApp.create(heartbeatPath, "heartbeat", CreateMode.EPHEMERAL);
 		// 	// Set heartbeat here
 		// 	zk.exists(heartbeatPath, new HeartbeatApplication(this, zk, serverName));
+		// 			logger.debug("HERE12");
 		// } catch (KeeperException | InterruptedException e) {
 		// 	logger.error(e);
 		// 	System.exit(1);
@@ -432,10 +434,10 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	public static void main(String[] args) {
-		logger.debug(">>>>>>> ARGS " + Arrays.toString(args));
 		try {
 			new LogSetup("logs/server.log", Level.ALL);
-			if (args.length != 1) {
+			logger.debug(">>>>>>> ARGS " + Arrays.toString(args));
+			if (args.length != 1 && args.length != 4 ) {
 				System.out.println("Error! Invalid number of arguments!");
 				System.out.println("Usage: Server <port>!");
 			} else if (args.length == 4) {

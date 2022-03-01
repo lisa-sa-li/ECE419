@@ -77,7 +77,7 @@ public class ECSConnection {
 				+ json.getJSON() + "'");
 	}
 
-	public JSONMessage receiveMetadataMessage() throws IOException {
+	public JSONMessage receiveJSONMessage() throws IOException {
 		int index = 0;
 		byte[] msgBytes = null, tmp = null;
 		byte[] bufferBytes = new byte[BUFFER_SIZE];

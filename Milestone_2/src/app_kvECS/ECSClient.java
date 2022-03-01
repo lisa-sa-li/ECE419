@@ -281,7 +281,6 @@ public class ECSClient implements IECSClient, Runnable {
             return null;
         }
 
-        System.out.println("HASHRING IS EMPTY?: "+hashRing.isEmpty());
         // if (hashRing.isEmpty()) {
         //     try {
         //         System.out.println("EMPTY, go here:");
@@ -309,10 +308,10 @@ public class ECSClient implements IECSClient, Runnable {
             
             // Start the KVServer by issuing an SSH call to the machine
             // System.out.print("System.getProperty(user.dir)" + System.getProperty("user.dir"));
-            String cmd = "java -jar " + System.getProperty("user.dir")+ "/" +  SERVER_JAR + " " + String.valueOf(node.getNodePort());
-            // String cmd = "java -jar " + System.getProperty("user.dir") + "/" + SERVER_JAR + " "
-            //     + String.valueOf(node.getNodePort()) + " " + serverName + " " + zkHost + " "
-            //     + String.valueOf(zkPort);
+            // String cmd = "java -jar " + System.getProperty("user.dir")+ "/" +  SERVER_JAR + " " + String.valueOf(node.getNodePort());
+            String cmd = "java -jar " + System.getProperty("user.dir") + "/" + SERVER_JAR + " "
+                + String.valueOf(node.getNodePort()) + " " + serverName + " " + zkHost + " "
+                + String.valueOf(zkPort);
 
             // java -jar /Users/irenapetkovic/OneDrive/Uni_Year_5/ECE419/ECE419/Milestone_2/m2-server.jar 8004 joy5 127.0.0.1 2181
             // System.out.println("THIS IS THE CMD " + cmd);
