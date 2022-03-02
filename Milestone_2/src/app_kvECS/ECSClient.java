@@ -449,6 +449,7 @@ public class ECSClient implements IECSClient, Runnable {
     private void handleCommand(String cmdLine) {
         String[] tokens = cmdLine.trim().split("\\s+");
         String action = tokens[0];
+
         try {
             switch (action) {
                 case "start":
@@ -493,6 +494,7 @@ public class ECSClient implements IECSClient, Runnable {
                     break;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("Unkown Error: " + e.getMessage());
         }
     }

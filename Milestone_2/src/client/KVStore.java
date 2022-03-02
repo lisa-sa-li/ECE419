@@ -252,7 +252,9 @@ public class KVStore implements KVCommInterface, Runnable {
 			if (isNodeResponsibleForKey) {
 				this.currentNode = this.ECSNodeOrdered.get(i);
 				this.address = this.currentNode.getNodeHost();
+				System.out.println("this.currentNode.getNodePort();" + this.currentNode.getNodePort());
 				this.port = this.currentNode.getNodePort();
+				break;
 			}
 		}
 		logger.debug("leaving updateToCorrectNodeFromList");
@@ -275,12 +277,17 @@ public class KVStore implements KVCommInterface, Runnable {
 				}
 			}
 		});
+
+		// populate the end hash
 		logger.debug("2");
 
-		for (Entry<String, BigInteger> entry : metadataList) {
+		// for (Entry<String, BigInteger> entry : metadataList) {
+		for (int i = 0; i < metadataList.size(); i++) {
+			Entry<String, BigInteger> entry = metadataList.get(i);
+
 			String[] keyList = entry.getKey().split(":");
 			logger.debug("4 keylist: " + Arrays.toString(keyList));
-			if (keyList.length != 2) {
+			if (keyList.length != 3) {
 				logger.error("Key from order is not in the format host:port");
 				continue;
 			}
@@ -288,8 +295,15 @@ public class KVStore implements KVCommInterface, Runnable {
 			String serverName = keyList[0];
 			int serverPort = Integer.valueOf(keyList[1]);
 			String serverHost = keyList[2];
-			logger.debug("7");
-			this.ECSNodeOrdered.add(new ECSNode(serverHost, serverPort, entry.getValue()));
+			logger.debug("7 entry.getValue() " + entry.getValue());
+
+			BigInteger endHash;
+			if (i == metadataList.size() - 1) {
+				endHash = metadataList.get(0).getValue();
+			} else {
+				endHash = metadataList.get(i + 1).getValue();
+			}
+			this.ECSNodeOrdered.add(new ECSNode(serverName, serverHost, serverPort, entry.getValue(), endHash));
 			logger.debug("8");
 		}
 		logger.debug("LEAVING orderMetadataIntoECSNodeList");
