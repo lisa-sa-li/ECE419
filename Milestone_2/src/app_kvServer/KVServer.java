@@ -77,7 +77,7 @@ public class KVServer implements IKVServer, Runnable {
 	 * @param port      given port for storage server to operate
 	 * @param cacheSize specifies how many key-value pairs the server is allowed
 	 *                  to keep in-memory
-	 * @param algo  specifies the cache replacement strategy in case the cache
+	 * @param algo      specifies the cache replacement strategy in case the cache
 	 *                  is full and there is a GET- or PUT-request on a key that is
 	 *                  currently not contained in the cache. Options are "FIFO",
 	 *                  "LRU", and "LFU".
@@ -92,16 +92,19 @@ public class KVServer implements IKVServer, Runnable {
 			this.cache = null;
 		} else { // allocate cache
 			try {
-				Constructor<?> constructorCache = Class.forName("cache." + this.cacheAlgo + "Cache").getConstructor(Integer.class);
+				Constructor<?> constructorCache = Class.forName("cache." + this.cacheAlgo + "Cache")
+						.getConstructor(Integer.class);
 				this.cache = (Cache) constructorCache.newInstance(cacheSize);
-			} catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+			} catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException
+					| InvocationTargetException e) {
 				logger.error(e);
 			}
 		}
 		logger.debug("HERE1");
 	}
 
-	public KVServer(int port, String serverName, String zkHost, int zkPort, String cacheStrategy, int cacheSize) throws InterruptedException, KeeperException {
+	public KVServer(int port, String serverName, String zkHost, int zkPort, String cacheStrategy, int cacheSize)
+			throws InterruptedException, KeeperException {
 		this.port = port;
 		this.serverName = serverName;
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
@@ -117,9 +120,11 @@ public class KVServer implements IKVServer, Runnable {
 			this.cache = null;
 		} else { // allocate cache
 			try {
-				Constructor<?> constructorCache = Class.forName("cache." + this.cacheAlgo + "Cache").getConstructor(Integer.class);
+				Constructor<?> constructorCache = Class.forName("cache." + this.cacheAlgo + "Cache")
+						.getConstructor(Integer.class);
 				this.cache = (Cache) constructorCache.newInstance(cacheSize);
-			} catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+			} catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException
+					| InvocationTargetException e) {
 				logger.error(e);
 			}
 		}
@@ -138,9 +143,11 @@ public class KVServer implements IKVServer, Runnable {
 			this.cache = null;
 		} else { // allocate cache
 			try {
-				Constructor<?> constructorCache = Class.forName("cache." + this.cacheAlgo + "Cache").getConstructor(Integer.class);
+				Constructor<?> constructorCache = Class.forName("cache." + this.cacheAlgo + "Cache")
+						.getConstructor(Integer.class);
 				this.cache = (Cache) constructorCache.newInstance(cacheSize);
-			} catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+			} catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException
+					| InvocationTargetException e) {
 				logger.error(e);
 			}
 		}
@@ -298,16 +305,21 @@ public class KVServer implements IKVServer, Runnable {
 			logger.debug("BEFORE GET DATA IN RANGE die " + die);
 			String dataInRange = persistantStorage.getDataInRange(hash, endHash, die);
 
-			// Socket socket = new Socket(hostOfReceiver, portOfReceiver);
-			// OutputStream output = socket.getOutputStream();
+			Socket socket = new Socket(hostOfReceiver, portOfReceiver);
+			OutputStream output = socket.getOutputStream();
+			// InputStream input = socket.getInputStream();
 
-			// JSONMessage json = new JSONMessage();
-			// json.setMessage(StatusType.PUT_MANY.name(), "put_many", dataInRange, null);
-			// byte[] jsonBytes = json.getJSONByte();
+			JSONMessage json = new JSONMessage();
+			json.setMessage(StatusType.PUT_MANY.name(), "put_many", dataInRange, null);
+			byte[] jsonBytes = json.getJSONByte();
 
-			// output.write(jsonBytes, 0, jsonBytes.length);
-			// output.flush();
-			// output.close();
+			output.write(jsonBytes, 0, jsonBytes.length);
+			output.flush();
+			output.close();
+			socket.close();
+			// ????
+			// listen for put success
+			// then close socket
 			logger.info("Send data to node " + nameOfReceiver);
 		} catch (Exception e) {
 			logger.error("Unable to send data to node " + nameOfReceiver + ", " + e);
@@ -437,7 +449,7 @@ public class KVServer implements IKVServer, Runnable {
 
 	@Override
 	public StatusType putKV(String key, String value) throws Exception {
-		if (this.cache != null){
+		if (this.cache != null) {
 			this.cache.put(key, value);
 		}
 		return this.persistantStorage.put(key, value);
@@ -458,7 +470,7 @@ public class KVServer implements IKVServer, Runnable {
 	@Override
 	public void clearStorage() {
 		this.persistantStorage.clearStorage();
-		if (this.cache != null){
+		if (this.cache != null) {
 			this.cache.clear();
 		}
 	}

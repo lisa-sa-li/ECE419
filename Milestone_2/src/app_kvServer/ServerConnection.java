@@ -229,6 +229,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 				// When another KVServer passes this server data due to the hashring changing
 				try {
 					handleMessageStatus = this.kvServer.appendToStorage(value);
+					handleMessageStatus = null;
 					logger.info("APPEND TO STORAGE SUCCESS");
 				} catch (Exception e) {
 					handleMessageStatus = StatusType.PUT_ERROR;
@@ -272,7 +273,9 @@ public class ServerConnection implements IServerConnection, Runnable {
 
 		// logger.info("handleMessageStatus " + handleMessageStatus.name());
 
-		if (handleMessageStatus == StatusType.SERVER_NOT_RESPONSIBLE) {
+		if (handleMessageStatus == null) {
+			return null;
+		} else if (handleMessageStatus == StatusType.SERVER_NOT_RESPONSIBLE) {
 			logger.info("SERVER_NOT_RESPONSIBLE");
 			// ECSNode node = null;
 			Metadata metadata = new Metadata(MessageType.SERVER_NOT_RESPONSIBLE, order, null);
@@ -332,7 +335,8 @@ public class ServerConnection implements IServerConnection, Runnable {
 					break;
 			}
 		} catch (Exception e) {
-			logger.error("Unknown Error: " + e.getMessage());
+			logger.error("Unknown Error IN SERVER: " + e.getStackTrace());
+			logger.error("Unknown Error IN SERVER: " + e.getMessage());
 		}
 		handleMessage.setMessage(handleMessageStatus.name(), key, value);
 		return handleMessage;
@@ -342,6 +346,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		// while connection is open, listen for messages
 		try {
 			while (this.isOpen) {
+				// add thread here
 				try {
 					logger.info("before recieveJSONMessage serverName " + this.kvServer.serverName);
 					JSONMessage receivedMessage = receiveJSONMessage();
@@ -361,9 +366,12 @@ public class ServerConnection implements IServerConnection, Runnable {
 							sendMessage = handleMetadataMessage(metadata);
 						}
 
-						logger.info("before sendJSONMessage serverName " + this.kvServer.serverName);
-						sendJSONMessage(sendMessage);
-						logger.info("after sendJSONMessage serverName " + this.kvServer.serverName);
+						if (sendMessage != null) {
+							logger.info("before sendJSONMessage serverName " + this.kvServer.serverName);
+							sendJSONMessage(sendMessage);
+							logger.info("after sendJSONMessage serverName " + this.kvServer.serverName);
+						}
+
 					}
 				} catch (IOException e) {
 					logger.error("Server connection lost: " + e);

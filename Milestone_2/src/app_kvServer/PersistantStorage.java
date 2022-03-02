@@ -13,7 +13,7 @@ import shared.messages.JSONMessage;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.FileNotFoundException;
-
+import shared.Utils;
 import ecs.HashRing;
 
 public class PersistantStorage implements IPersistantStorage {
@@ -22,11 +22,14 @@ public class PersistantStorage implements IPersistantStorage {
     private String pathToFile;
     private String dir = "./storage";
     private HashRing hashRing;
+    private Utils utils;
 
     public PersistantStorage(String name) {
         this.fileName = name.trim() + "_storage.txt";
         this.pathToFile = dir + "/" + this.fileName;
         this.hashRing = new HashRing();
+        this.utils = new Utils();
+
         try {
             initFile();
         } catch (Exception e) {
@@ -226,16 +229,17 @@ public class PersistantStorage implements IPersistantStorage {
         }
     }
 
-    private boolean isKeyInRange(BigInteger hash, BigInteger endHash, String key) {
-        if (hash != null && endHash == null) {
-            return true;
-        }
+    // private boolean isKeyInRange(BigInteger hash, BigInteger endHash, String key)
+    // {
+    // if (hash != null && endHash == null) {
+    // return true;
+    // }
 
-        BigInteger keyHash = hashRing.getHash(key);
-        int left = hash.compareTo(keyHash);
-        int right = endHash.compareTo(keyHash);
-        return (left >= 0 && right < 0);
-    }
+    // BigInteger keyHash = hashRing.getHash(key);
+    // int left = hash.compareTo(keyHash);
+    // int right = endHash.compareTo(keyHash);
+    // return (left >= 0 && right < 0);
+    // }
 
     @Override
     public String getDataInRange(BigInteger hash, BigInteger endHash, Boolean die) {
@@ -261,7 +265,7 @@ public class PersistantStorage implements IPersistantStorage {
                 if (die == true) {
                     outputBuffer.append(line);
                     outputBuffer.append('\n');
-                } else if (isKeyInRange(hash, endHash, keyFromFile)) {
+                } else if (utils.isKeyInRange(hash, endHash, keyFromFile)) {
                     // We have to move this to a new server, write it to an output string buffer
                     outputBuffer.append(line);
                     outputBuffer.append('\n');
