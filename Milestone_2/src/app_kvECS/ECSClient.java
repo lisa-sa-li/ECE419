@@ -302,6 +302,7 @@ public class ECSClient implements IECSClient, Runnable {
             ECSNode node = allServerMap.get(serverName);
 
             node.setStatus(NodeStatus.STARTING); // Not sure about the status
+            node.setCacheInfo(cacheSize, cacheStrategy);
             allServerMap.put(serverName, node);
             currServerMap.put(serverName, node);
             nameArr.add(node);
@@ -386,6 +387,7 @@ public class ECSClient implements IECSClient, Runnable {
             Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
             String name = pair.getKey().toString();
             ECSNode node = pair.getValue();
+            node.setCacheInfo(cacheSize, cacheStrategy);
             NodeStatus status = node.getStatus();
 
             if (status == NodeStatus.OFFLINE) { // NOT SURE
@@ -465,7 +467,7 @@ public class ECSClient implements IECSClient, Runnable {
                     break;
                 case "addnode":
                     System.out.println("Adding node");
-                    addNode("None", 0);
+                    addNode(tokens[1], Integer.parseInt(tokens[2]));
                     break;
                 case "addnodes":
                     if (tokens.length > 3) {
@@ -473,7 +475,7 @@ public class ECSClient implements IECSClient, Runnable {
                     } else {
                         System.out.println("Adding nodes");
                         int count = Integer.parseInt(tokens[1]);
-                        addNodes(count, "None", 0);
+                        addNodes(count, tokens[1], Integer.parseInt(tokens[2]));
                     }
                     break;
                 case "removenode":

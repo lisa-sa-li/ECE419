@@ -26,7 +26,7 @@
   <property name="ecsmain.class" value="app_kvECS.ECSClient"/>
 
   <!-- Configuration for performance test -->
-  <property name="performancetest.file"      value="m1-performance-test.jar"/>
+  <property name="performancetest.file"      value="m2-performance-test.jar"/>
   <property name="performancetestmanifest.file" value="PERFORMANCE_TEST_MANIFEST.MF"/>
   <property name="performancetestmain.class" value="testing.PerformanceTest"/>
 

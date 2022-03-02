@@ -99,6 +99,7 @@ public class PerformanceTest {
 
     public static void main(String[] args) {
         new PerformanceTest().runTests();
+
     }
 
 }
