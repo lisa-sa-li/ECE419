@@ -107,8 +107,7 @@ public class ECSClient implements IECSClient, Runnable {
             node.setConnection(ecsConnection);
 
             logger.info("Server " + serverName + " connected to " + clientSocket.getInetAddress().getHostName()
-                    + " on port "
-                    + clientSocket.getPort());
+                    + " on port " + clientSocket.getPort());
         } catch (IOException e) {
             logger.error("ERROR MAKING NEW CONNECTION IN ECSCLIENT");
             throw e;
@@ -300,8 +299,8 @@ public class ECSClient implements IECSClient, Runnable {
             // String cmd = "java -jar " + System.getProperty("user.dir") + "/" + SERVER_JAR
             // + " "
             // + String.valueOf(node.getNodePort());
-            //
-            String cmd = "java -jar " + System.getProperty("user.dir") + "/" + SERVER_JAR
+            // + System.getProperty("user.dir") + "/"
+            String cmd = "java -jar " + SERVER_JAR
                     + " "
                     + String.valueOf(node.getNodePort()) + " " + serverName + " " + zkHost + " "
                     + String.valueOf(zkPort);

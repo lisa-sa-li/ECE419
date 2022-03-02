@@ -10,7 +10,6 @@ import org.apache.log4j.*;
 import com.google.gson.Gson;
 
 import shared.messages.Metadata;
-// import shared.messages.ECSMessage;
 
 public class JSONMessage implements KVMessage, Serializable {
 
@@ -168,7 +167,7 @@ public class JSONMessage implements KVMessage, Serializable {
     }
 
     public void deserialize(String inJSON) {
-        // logger.info("IN DESERIALIZE: " + inJSON);
+        logger.info("IN DESERIALIZE");
         inJSON = inJSON.trim();
         this.json = inJSON;
 
@@ -184,6 +183,7 @@ public class JSONMessage implements KVMessage, Serializable {
         setKey(key);
         setValue(val);
         setMetadataStr(metadataStr);
+        logger.info("LEAVING DESERIALIZE");
     }
 
     // public String serialize() {

@@ -66,9 +66,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 
 	@Override
 	public void sendJSONMessage(JSONMessage json) throws IOException {
-		logger.info("Fbout to get json bytes");
 		byte[] jsonBytes = json.getJSONByte();
-		logger.info("after json byte");
 		output.write(jsonBytes, 0, jsonBytes.length);
 		output.flush();
 		logger.info("SEND \t<" + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getPort() + ">: '"
@@ -77,8 +75,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 
 	@Override
 	public JSONMessage receiveJSONMessage() throws IOException {
-		logger.info("HEARD");
-
 		int index = 0;
 		byte[] msgBytes = null, tmp = null;
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
@@ -147,13 +143,12 @@ public class ServerConnection implements IServerConnection, Runnable {
 		String jsonStr = json.byteToString(msgBytes);
 
 		if (jsonStr == null || jsonStr.trim().isEmpty()) {
-			logger.debug("jsonStr is null in ServerConnection");
 			return null;
 		}
 
-		logger.info("IN DRECEIVE JSON SERVER CONN : " + jsonStr);
+		logger.info("IN RECEIVE JSON SERVER CONNECTION : " + jsonStr);
 		json.deserialize(jsonStr);
-		logger.info("RECIEVE " + json.getKey() + json.getValue());
+		// logger.info("RECIEVE " + json.getKey() + json.getValue());
 		logger.info("RECEIVE \t<" + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getPort()
 				+ ">: '" + json.getJSON().trim() + "'");
 		return json;
@@ -265,8 +260,10 @@ public class ServerConnection implements IServerConnection, Runnable {
 					this.kvServer.update(message);
 					break;
 				case MOVE_DATA:
-					logger.debug("MOVE DATA HERE");
 					this.kvServer.moveData(message);
+					handleMessageStatus = StatusType.DONE;
+					key = "moved";
+					value = "data";
 					break;
 				case CLEAR_STORAGE:
 					this.kvServer.clearStorage();
@@ -290,8 +287,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 			while (this.isOpen) {
 				try {
 					JSONMessage receivedMessage = receiveJSONMessage();
-					logger.info("LISTENING AFTER " + receivedMessage.getValue());
-					// 2022-02-28 22:05:14,636 INFO [Thread-0] root: RECEIVED MESSAGE: status
 					if (receivedMessage != null) {
 						JSONMessage sendMessage;
 
@@ -300,19 +295,12 @@ public class ServerConnection implements IServerConnection, Runnable {
 						Metadata metadata = receivedMessage.getMetadata();
 
 						if (metadata == null) {
-							logger.info("Going into handle message: " + receivedMessage.getKey()
-									+ receivedMessage.getValue());
 							sendMessage = handleMessage(receivedMessage);
 						} else {
-							logger.info("Going into handleMetadatamessage");
 							sendMessage = handleMetadataMessage(metadata);
-							logger.info("handled metadata message");
 
 						}
-
-						logger.info("send message");
 						sendJSONMessage(sendMessage);
-						logger.info("after send message");
 					}
 				} catch (IOException e) {
 					logger.error("Server connection lost: " + e);
