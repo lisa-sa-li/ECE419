@@ -7,7 +7,10 @@ public interface KVMessage {
 		GET_ERROR, /* requested tuple (i.e. value) not found */
 		GET_SUCCESS, /* requested tuple (i.e. value) found */
 		PUT, /* Put - request */
-		PUT_MANY, /* Put - request, given a bunch of keys at once, seperated by \n, used for ECS data transfers */
+		PUT_MANY, /*
+					 * Put - request, given a bunch of keys at once, seperated by \n, used for ECS
+					 * data transfers
+					 */
 		PUT_SUCCESS, /* Put - request successful, tuple inserted */
 		PUT_UPDATE, /* Put - request successful, i.e. value updated */
 		PUT_ERROR, /* Put - request not successful */
@@ -18,6 +21,7 @@ public interface KVMessage {
 		SERVER_NOT_RESPONSIBLE, /* the server is not responsible for the key */
 		SET_METADATA, /* the server is not responsible for the key */
 		MOVE_DATA, /* the server is not responsible for the key */
+		DONE, /* the server is not responsible for the key */
 	}
 
 	/**

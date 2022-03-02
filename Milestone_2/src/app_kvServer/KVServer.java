@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.BindException;
 import java.util.*;
 import java.math.BigInteger;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -52,13 +53,13 @@ public class KVServer implements IKVServer, Runnable {
 	private int zkPort;
 
 	private int zkTimeout = 1000;
-    private ZooKeeper zk;
-    private ZooKeeperApplication zkApp;
+	private ZooKeeper zk;
+	private ZooKeeperApplication zkApp;
 
 	// hashring variables
 	private BigInteger hash;
-    private BigInteger endHash;
-    private HashMap<String, BigInteger> hashRing;
+	private BigInteger endHash;
+	private HashMap<String, BigInteger> hashRing;
 
 	// caching variables
 	private int cacheSize;
@@ -104,6 +105,7 @@ public class KVServer implements IKVServer, Runnable {
 		this.zkHost = zkHost;
 		this.zkPort = zkPort;
 
+		/*
 		// String zkRootPath = ZooKeeperApplication.ZK_ROOT_PATH + "/" + serverName; // ZK_SERVER_ROOT = "/kv_servers"
 		// cache setup using information received from Zookeeper node
 		try {
@@ -124,8 +126,10 @@ public class KVServer implements IKVServer, Runnable {
 				logger.error(e);
 			}
 		}
+		*/
+
 		logger.debug("HERE2");
-		// initHeartbeat();
+		initHeartbeat();
 	}
 
 	public KVServer(int port, int cacheSize, String algo, boolean test) {
@@ -151,16 +155,10 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	public void initHeartbeat() {
-		// CREATE HEARTBEART
-		logger.debug("HERE3 " + ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH +  zkPort + zkHost);
-
 		zkApp = new ZooKeeperApplication(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, zkPort, zkHost);
-		logger.debug("HERE4");
 		try {
 			zk = zkApp.connect(zkHost + ":" + String.valueOf(zkPort), zkTimeout);
-			logger.debug("HERE5");
 		} catch (InterruptedException | IOException e) {
-			logger.debug("HERE6");
 			logger.error("Cannot connect to ZK server!", e);
 			System.exit(1);
 		}
@@ -170,7 +168,6 @@ public class KVServer implements IKVServer, Runnable {
 				logger.error("ZK does not exist, has not been initialized yet");
 				System.exit(1);
 			}
-			logger.debug("HERE7");
 		} catch (KeeperException | InterruptedException e) {
 			logger.error(e);
 			System.exit(1);
@@ -178,37 +175,34 @@ public class KVServer implements IKVServer, Runnable {
 			logger.error(e);
 			System.exit(1);
 		}
-		logger.debug("HERE9");
 
-		// try {
-		// 	if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + serverName, false) == null) {
-		// 		logger.error("This node has not been added to ZK yet????");
-		// 		System.exit(1);
-		// 	}
-		// 			logger.debug("HERE10");
-		// } catch (KeeperException | InterruptedException e) {
-		// 	logger.error(e);
-		// 	System.exit(1);
-		// } catch (Exception e) {
-		// 	logger.error(e);
-		// 	System.exit(1);
-		// }
-		// 		logger.debug("HER11");
+		try {
+			if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + serverName,
+					false) == null) {
+				logger.error("This node has not been added to ZK yet????");
+				System.exit(1);
+			}
+		} catch (KeeperException | InterruptedException e) {
+			logger.error("Cannot check if ZK node for server " + serverName + " already exists", e);
+			System.exit(1);
+		} catch (Exception e) {
+			logger.error("Cannot check if ZK node for server " + serverName + " already exists", e);
+			System.exit(1);
+		}
 
-		// try {
-		// 	String heartbeatPath = ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH + "/" + serverName;
-		// 	zkApp.create(heartbeatPath, "heartbeat", CreateMode.EPHEMERAL);
-		// 	// Set heartbeat here
-		// 	zk.exists(heartbeatPath, new HeartbeatApplication(this, zk, serverName));
-		// 			logger.debug("HERE12");
-		// } catch (KeeperException | InterruptedException e) {
-		// 	logger.error(e);
-		// 	System.exit(1);
-		// } catch (Exception e) {
-		// 	logger.error(e);
-		// 	System.exit(1);
-		// }
-
+		try {
+			String heartbeatPath = ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH + "/" +
+					serverName;
+			zkApp.create(heartbeatPath, "heartbeat", CreateMode.EPHEMERAL);
+			// Set heartbeat here
+			zk.exists(heartbeatPath, new HeartbeatApplication(this, zk, serverName));
+		} catch (KeeperException | InterruptedException e) {
+			logger.error("Cannot create heartbeat for server " + serverName, e);
+			System.exit(1);
+		} catch (Exception e) {
+			logger.error("Cannot create heartbeat for server " + serverName, e);
+			System.exit(1);
+		}
 	}
 
 	public void initKVServer(String metadata) {
@@ -243,15 +237,18 @@ public class KVServer implements IKVServer, Runnable {
 		this.serverStatus = ServerStatus.OPEN;
 	}
 
-	public boolean inHashRing(){
+	public boolean inHashRing() {
+		logger.info("is " + this.serverName + " in hashring " + hashRing.keySet() + "?: "
+				+ hashRing.get(this.serverName) != null);
 		return (hashRing.get(this.serverName) != null);
 	}
 
-	public void getHashRange(){
-		if (inHashRing() == false){
+	public Boolean getHashRange() {
+		if (inHashRing() == false) {
+			// This detects that it's not in the hashring anymore, thus it needs to die
 			this.hash = null;
 			this.endHash = null;
-			return;
+			return true;
 		}
 
 		Collection<BigInteger> keys = hashRing.values();
@@ -259,17 +256,23 @@ public class KVServer implements IKVServer, Runnable {
 		Collections.sort(orderedKeys);
 
 		this.hash = hashRing.get(this.serverName);
-		if (orderedKeys.size() == 1){
+		if (orderedKeys.size() == 1) {
 			this.endHash = null;
-			return;
-		} 
+			return false;
+		}
 		Integer nextIdx = orderedKeys.indexOf(this.hash);
-		nextIdx = (nextIdx+1)%orderedKeys.size();
+		nextIdx = (nextIdx + 1) % orderedKeys.size();
 
 		this.endHash = orderedKeys.get(nextIdx);
+		return false;
 	}
 
 	public void moveData(Metadata metadata) { // range, server
+		update(metadata);
+
+		// figoure out new endHash HERE
+		Boolean die = getHashRange();
+
 		// Transfer a subset (range) of the KVServer's data to another KVServer
 		// (reallocation before removing this server or adding a new KVServer to the
 		// ring);
@@ -283,9 +286,20 @@ public class KVServer implements IKVServer, Runnable {
 		BigInteger hash = receiverNode.getHash();
 		BigInteger endHash = receiverNode.getEndHash();
 
+		// logger.debug("> " + hostOfReceiver + nameOfReceiver + "?" + hash + "?" +
+		// endHash);
+
+		if (nameOfReceiver == this.serverName) {
+			unLockWrite();
+			return;
+		}
+
 		try {
-			// This is the data being remove from this server and being moved to the reciever server
-			String dataInRange = persistantStorage.getDataInRange(hash, endHash);
+			// This is the data being remove from this server and being moved to the
+			// reciever server
+			logger.debug("BEFORE GET DATA IN RANGE die " + die);
+			String dataInRange = persistantStorage.getDataInRange(hash, endHash, die);
+			logger.debug("AFTER GET DATA IN RANGE " + dataInRange);
 
 			Socket socket = new Socket(hostOfReceiver, portOfReceiver);
 			OutputStream output = socket.getOutputStream();
@@ -299,28 +313,36 @@ public class KVServer implements IKVServer, Runnable {
 			output.close();
 			logger.info("Send data to node " + nameOfReceiver);
 		} catch (Exception e) {
-			logger.error("Unable to send data to node " + nameOfReceiver + ", "+ e);
+			logger.error("Unable to send data to node " + nameOfReceiver + ", " + e);
 		}
 
 		unLockWrite();
+		if (die == true) {
+			try {
+				TimeUnit.SECONDS.sleep(5);
+				kill();
+			} catch (Exception e) {
+				logger.error("Unable to kill server");
+			}
+		}
 	}
 
 	public void update(Metadata metadata) {
 		// Update the metadata repository of this server
 		this.hashRing = metadata.order;
-		getHashRange();
+		Boolean tmp = getHashRange();
 	}
 
-	public boolean isMe(BigInteger toHash){
-		if (this.endHash == null){
+	public boolean isMe(BigInteger toHash) {
+		if (this.endHash == null) {
 			// only server in the ring
 			return true;
 		}
 
 		int isEndHashLarger = this.endHash.compareTo(this.hash);
 		// a.compareTo(b)
-		//  0 = equal
-		//  1 = a > b
+		// 0 = equal
+		// 1 = a > b
 		// -1 = a < b
 
 		int left = this.hash.compareTo(toHash);
@@ -381,7 +403,7 @@ public class KVServer implements IKVServer, Runnable {
 					this.cache.put(key, value);
 				} else {
 					logger.warn("Key " + key + " is not found");
-					throw new Exception("Key is not found")
+					throw new Exception("Key is not found");
 				}
 				return value;
 			}
@@ -491,6 +513,7 @@ public class KVServer implements IKVServer, Runnable {
 				logger.error("Error! Unable to close socket on port: " + port, e);
 			}
 		}
+		System.exit(1);
 	}
 
 	@Override
@@ -510,8 +533,7 @@ public class KVServer implements IKVServer, Runnable {
 	public static void main(String[] args) {
 		try {
 			new LogSetup("logs/server.log", Level.ALL);
-			logger.debug(">>>>>>> ARGS " + Arrays.toString(args));
-			if (args.length != 1 && args.length != 4 ) {
+			if (args.length != 1 && args.length != 4) {
 				System.out.println("Error! Invalid number of arguments!");
 				System.out.println("Usage: Server <port>!");
 			} else if (args.length == 4) {

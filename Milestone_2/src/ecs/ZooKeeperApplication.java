@@ -28,14 +28,13 @@ public class ZooKeeperApplication implements Watcher {
     private static int ZKPORT = 2181;
     private static String ZKHOST = "127.0.0.1";
 
-
     private String ZK_ROOT_PATH;
-    private int ZK_PORT;    
+    private int ZK_PORT;
     private String ZK_HOST;
 
     public ZooKeeperApplication(String zkRootPath, int zkPort, String zkHost) {
         this.ZK_ROOT_PATH = zkRootPath;
-        this.ZK_PORT = zkPort;    
+        this.ZK_PORT = zkPort;
         this.ZK_HOST = zkHost;
     }
 
@@ -120,19 +119,17 @@ public class ZooKeeperApplication implements Watcher {
         _zooKeeper.create(path, data.getBytes(), ZooDefs.Ids.OPEN_ACL_UNSAFE, mode);
     }
 
-
     public void setData(String path, String data) throws KeeperException, InterruptedException {
         _zooKeeper.setData(path, data.getBytes(), -1);
     }
 
     public void createOrSetData(String path, String data) throws KeeperException, InterruptedException {
-        if (_zooKeeper.exists(ZK_ROOT_PATH, false) == null) {
+        if (_zooKeeper.exists(path, false) == null) {
             create(path, data);
         } else {
             setData(path, data);
         }
     }
-
 
     // RETURN CHILDREN ZNODES
     void getWorkers() throws KeeperException,
@@ -205,10 +202,10 @@ public class ZooKeeperApplication implements Watcher {
             // new LogSetup("logs/ecs-client.log", Level.INFO);
             demo = new ZooKeeperApplication(ZK_NODE_ROOT_PATH, ZKPORT, ZKHOST);
             demo.run();
-        // } catch (IOException e) {
-        //     System.out.println("Error! Unable to initialize logger!");
-        //     e.printStackTrace();
-        //     System.exit(1);
+            // } catch (IOException e) {
+            // System.out.println("Error! Unable to initialize logger!");
+            // e.printStackTrace();
+            // System.exit(1);
         } catch (Exception ex) {
             System.out.println("Unknown error!");
             ex.printStackTrace();

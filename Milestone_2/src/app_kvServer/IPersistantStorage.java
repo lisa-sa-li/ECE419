@@ -39,8 +39,8 @@ public interface IPersistantStorage {
 
 	public void clearStorage();
 
-	public String getDataInRange(BigInteger hash, BigInteger endHash);
+	public String getDataInRange(BigInteger hash, BigInteger endHash, Boolean die);
 
-    public StatusType appendToStorage(String keyValues) throws Exception;
+	public StatusType appendToStorage(String keyValues) throws Exception;
 
 }

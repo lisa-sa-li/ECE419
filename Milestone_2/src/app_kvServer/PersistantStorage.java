@@ -26,6 +26,7 @@ public class PersistantStorage implements IPersistantStorage {
     public PersistantStorage(String name) {
         this.fileName = name.trim() + "_storage.txt";
         this.pathToFile = dir + "/" + this.fileName;
+        this.hashRing = new HashRing();
         try {
             initFile();
         } catch (Exception e) {
@@ -59,7 +60,7 @@ public class PersistantStorage implements IPersistantStorage {
 
     }
 
-    public BigInteger getHash(String value){
+    public BigInteger getHash(String value) {
         try {
             // get message bytes
             byte[] byteVal = value.getBytes("UTF-8");
@@ -72,7 +73,8 @@ public class PersistantStorage implements IPersistantStorage {
             // convert to string
             StringBuilder stringHash = new StringBuilder();
             for (byte b : mdDigest) {
-                // code below: modified code from https://stackoverflow.com/questions/11380062/what-does-value-0xff-do-in-java
+                // code below: modified code from
+                // https://stackoverflow.com/questions/11380062/what-does-value-0xff-do-in-java
                 stringHash.append(Integer.toHexString((b & 0xFF) | 0x100), 1, 3);
             }
             // return stringHash.toString();
@@ -86,11 +88,9 @@ public class PersistantStorage implements IPersistantStorage {
 
     @Override
     public StatusType put(String key, String value) throws Exception {
+        logger.debug("IN PS PUT");
+
         try {
-            logger.debug("hi" + key);
-            logger.debug("hi2 " + value);
-
-
             // Below is slightly modified logic from
             // https://stackoverflow.com/questions/20039980/java-replace-line-in-text-file
             BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
@@ -100,10 +100,6 @@ public class PersistantStorage implements IPersistantStorage {
             boolean foundKey = false;
             JSONMessage json;
             StatusType putStatus = StatusType.NO_STATUS;
-
-
-            logger.debug("2key " + key);
-            logger.debug("2value " + value);
 
             while ((line = file.readLine()) != null) {
                 // Covert each line to a JSON so we can read the key and value
@@ -121,7 +117,7 @@ public class PersistantStorage implements IPersistantStorage {
                         putStatus = StatusType.DELETE_SUCCESS;
                     } else {
                         json.setValue(value);
-                        line = json.serialize();
+                        line = json.serialize(false);
                         inputBuffer.append(line);
                         inputBuffer.append('\n');
                         putStatus = StatusType.PUT_UPDATE;
@@ -148,7 +144,7 @@ public class PersistantStorage implements IPersistantStorage {
                 } else {
                     json = new JSONMessage();
                     json.setMessage("NO_STATUS", key, value); // We don't care about status here
-                    line = json.serialize();
+                    line = json.serialize(false);
                     inputBuffer.append(line);
                     inputBuffer.append('\n');
                     putStatus = StatusType.PUT_SUCCESS;
@@ -230,18 +226,21 @@ public class PersistantStorage implements IPersistantStorage {
         }
     }
 
+    private boolean isKeyInRange(BigInteger hash, BigInteger endHash, String key) {
 
-	private boolean isKeyInRange(BigInteger hash, BigInteger endHash, String key){
+        if (hash != null && endHash == null) {
+            return true;
+        }
+
         BigInteger keyHash = hashRing.getHash(key);
-		int left = hash.compareTo(keyHash);
-		int right = endHash.compareTo(keyHash);
-
-		return (left >= 0 && right < 0);
-	}
+        int left = hash.compareTo(keyHash);
+        int right = endHash.compareTo(keyHash);
+        return (left >= 0 && right < 0);
+    }
 
     @Override
-    public String getDataInRange(BigInteger hash, BigInteger endHash) {
-    try {
+    public String getDataInRange(BigInteger hash, BigInteger endHash, Boolean die) {
+        try {
             BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
             StringBuffer inputBuffer = new StringBuffer();
             StringBuffer outputBuffer = new StringBuffer();
@@ -251,14 +250,19 @@ public class PersistantStorage implements IPersistantStorage {
             JSONMessage json;
             StatusType putStatus = StatusType.NO_STATUS;
 
-
             while ((line = file.readLine()) != null) {
                 // Covert each line to a JSON so we can read the key and value
                 json = new JSONMessage();
                 json.deserialize(line);
                 keyFromFile = json.getKey();
 
-                if (isKeyInRange(hash, endHash, keyFromFile)) {
+                // logger.info("isKeyInRange? " + keyFromFile + " " + isKeyInRange(hash,
+                // endHash, keyFromFile));
+
+                if (die == true) {
+                    outputBuffer.append(line);
+                    outputBuffer.append('\n');
+                } else if (isKeyInRange(hash, endHash, keyFromFile)) {
                     // We have to move this to a new server, write it to an output string buffer
                     outputBuffer.append(line);
                     outputBuffer.append('\n');
@@ -276,7 +280,6 @@ public class PersistantStorage implements IPersistantStorage {
             fileOut.write(inputBuffer.toString().getBytes());
             fileOut.close();
 
-            logger.info("Split server storage data");
             return outputBuffer.toString();
         } catch (Exception e) {
             logger.error("Problem reading file to put.");
@@ -286,12 +289,18 @@ public class PersistantStorage implements IPersistantStorage {
 
     @Override
     public StatusType appendToStorage(String keyValues) throws Exception {
+        logger.debug("appendToStorage here " + keyValues != "" + "?");
         try {
             BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
             StringBuffer inputBuffer = new StringBuffer();
-  
+            String line;
+
+            while ((line = file.readLine()) != null) {
+                inputBuffer.append(line);
+                inputBuffer.append('\n');
+            }
             inputBuffer.append(keyValues);
-  
+
             file.close();
             // Overwrite file with the string buffer data
             FileOutputStream fileOut = new FileOutputStream(this.pathToFile);
