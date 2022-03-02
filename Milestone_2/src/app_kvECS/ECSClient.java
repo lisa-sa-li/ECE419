@@ -46,6 +46,7 @@ public class ECSClient implements IECSClient, Runnable {
 
     private HashMap<String, ECSNode> allServerMap = new HashMap<String, ECSNode>();
     private HashMap<String, ECSNode> currServerMap = new HashMap<String, ECSNode>();
+    private HashMap<String, String> serverInfo = new HashMap<String, String>();
     private HashRing hashRing;
 
     private int zkPort = 2181;
@@ -73,7 +74,7 @@ public class ECSClient implements IECSClient, Runnable {
         // load servers from config file
         getServerMap();
 
-        hashRing = new HashRing();
+        hashRing = new HashRing(this.serverInfo);
         zkApp = new ZooKeeperApplication(ZooKeeperApplication.ZK_NODE_ROOT_PATH, zkPort, zkHost);
         try {
             zk = zkApp.connect(zkHost + ":" + String.valueOf(zkPort), zkTimeout);
@@ -134,6 +135,7 @@ public class ECSClient implements IECSClient, Runnable {
                 ECSNode serverNode = new ECSNode(serverInfo[0], port, serverInfo[1], ECSNode.NodeStatus.OFFLINE);
                 // add to all server map <3
                 allServerMap.put(serverInfo[0], serverNode);
+                this.serverInfo.put(serverInfo[0], serverInfo[2] + ":" + serverInfo[1]);
             }
         } catch (Exception e) {
             logger.error("Could not read from file");
@@ -307,7 +309,7 @@ public class ECSClient implements IECSClient, Runnable {
                     + String.valueOf(zkPort) + " " + cacheStrategy + " "
                     + String.valueOf(cacheSize);
 
-            // System.out.println("THIS IS THE CMD " + cmd);
+            System.out.println("THIS IS THE CMD " + cmd);
             try {
                 Process p = Runtime.getRuntime().exec(cmd);
                 // p.waitFor();

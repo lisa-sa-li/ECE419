@@ -23,12 +23,14 @@ import com.google.gson.Gson;
 import shared.messages.KVMessage.StatusType;
 import shared.messages.Metadata;
 import shared.messages.JSONMessage;
+import shared.Utils;
 
 import logging.LogSetup;
 import app_kvServer.PersistantStorage;
 import app_kvServer.ServerConnection;
 import app_kvECS.ECSConnection;
 import ecs.ECSNode;
+import ecs.HashRing;
 import ecs.ZooKeeperApplication;
 import ecs.HeartbeatApplication;
 import cache.Cache;
@@ -48,7 +50,7 @@ public class KVServer implements IKVServer, Runnable {
 	private ServerSocket serverSocket;
 
 	private ECSConnection ecsConnection;
-	private String serverName;
+	public String serverName;
 	private String zkHost;
 	private int zkPort;
 
@@ -60,6 +62,9 @@ public class KVServer implements IKVServer, Runnable {
 	private BigInteger hash;
 	private BigInteger endHash;
 	private HashMap<String, BigInteger> hashRing;
+	// private HashRing hashRingClass = new HashRing();
+
+	private Utils utils = new Utils();
 
 	// caching variables
 	private int cacheSize;
@@ -230,8 +235,8 @@ public class KVServer implements IKVServer, Runnable {
 
 	public boolean inHashRing() {
 		logger.info("is " + this.serverName + " in hashring " + hashRing.keySet() + "?: "
-				+ hashRing.get(this.serverName) != null);
-		return (hashRing.get(this.serverName) != null);
+				+ hashRing.get(getNamePortHost()) != null);
+		return (hashRing.get(getNamePortHost()) != null);
 	}
 
 	public Boolean getHashRange() {
@@ -246,7 +251,7 @@ public class KVServer implements IKVServer, Runnable {
 		ArrayList<BigInteger> orderedKeys = new ArrayList<>(keys);
 		Collections.sort(orderedKeys);
 
-		this.hash = hashRing.get(this.serverName);
+		this.hash = hashRing.get(getNamePortHost());
 		if (orderedKeys.size() == 1) {
 			this.endHash = null;
 			return false;
@@ -261,7 +266,7 @@ public class KVServer implements IKVServer, Runnable {
 	public void moveData(Metadata metadata) { // range, server
 		update(metadata);
 
-		// figoure out new endHash HERE
+		// figure out new endHash HERE
 		Boolean die = getHashRange();
 
 		// Transfer a subset (range) of the KVServer's data to another KVServer
@@ -277,6 +282,8 @@ public class KVServer implements IKVServer, Runnable {
 		BigInteger hash = receiverNode.getHash();
 		BigInteger endHash = receiverNode.getEndHash();
 
+		logger.info("ABOUT TO MOVE DATA TO: " + nameOfReceiver + ":" + portOfReceiver + ":" + hostOfReceiver);
+
 		// logger.debug("> " + hostOfReceiver + nameOfReceiver + "?" + hash + "?" +
 		// endHash);
 
@@ -290,18 +297,17 @@ public class KVServer implements IKVServer, Runnable {
 			// reciever server
 			logger.debug("BEFORE GET DATA IN RANGE die " + die);
 			String dataInRange = persistantStorage.getDataInRange(hash, endHash, die);
-			logger.debug("AFTER GET DATA IN RANGE " + dataInRange);
 
-			Socket socket = new Socket(hostOfReceiver, portOfReceiver);
-			OutputStream output = socket.getOutputStream();
+			// Socket socket = new Socket(hostOfReceiver, portOfReceiver);
+			// OutputStream output = socket.getOutputStream();
 
-			JSONMessage json = new JSONMessage();
-			json.setMessage(StatusType.PUT_MANY.name(), "put_many", dataInRange, null);
-			byte[] jsonBytes = json.getJSONByte();
+			// JSONMessage json = new JSONMessage();
+			// json.setMessage(StatusType.PUT_MANY.name(), "put_many", dataInRange, null);
+			// byte[] jsonBytes = json.getJSONByte();
 
-			output.write(jsonBytes, 0, jsonBytes.length);
-			output.flush();
-			output.close();
+			// output.write(jsonBytes, 0, jsonBytes.length);
+			// output.flush();
+			// output.close();
 			logger.info("Send data to node " + nameOfReceiver);
 		} catch (Exception e) {
 			logger.error("Unable to send data to node " + nameOfReceiver + ", " + e);
@@ -324,28 +330,42 @@ public class KVServer implements IKVServer, Runnable {
 		Boolean tmp = getHashRange();
 	}
 
-	public boolean isMe(BigInteger toHash) {
-		if (this.endHash == null) {
-			// only server in the ring
-			return true;
-		}
+	public HashMap<String, BigInteger> getOrder() {
+		return this.hashRing;
+	}
 
-		int isEndHashLarger = this.endHash.compareTo(this.hash);
-		// a.compareTo(b)
-		// 0 = equal
-		// 1 = a > b
-		// -1 = a < b
+	public boolean isMe(String toHash) {
+		return utils.isKeyInRange(this.hash, this.endHash, toHash);
+		// logger.debug("IN ISME");
+		// if (this.endHash == null) {
+		// // only server in the ring
+		// return true;
+		// }
 
-		int left = this.hash.compareTo(toHash);
-		int right = this.endHash.compareTo(toHash);
+		// BigInteger hashed = hashRingClass.getHash(toHash);
 
-		if (isEndHashLarger > 0) {
-			// left = 12, right = 20, tohash 18
-			return (left <= 0 && right > 0);
-		} else {
-			// left = 99, right = 2, tohash 1
-			return (left <= 0 || right > 0);
-		}
+		// int isEndHashLarger = this.endHash.compareTo(this.hash);
+		// // a.compareTo(b)
+		// // 0 = equal
+		// // 1 = a > b
+		// // -1 = a < b
+
+		// int left = this.hash.compareTo(hashed);
+		// int right = this.endHash.compareTo(hashed);
+
+		// logger.debug("LEFT " + left + " right " + right);
+		// logger.debug("this.hash " + this.hash + " this.endHash " + this.endHash + "
+		// hashed " + hashed);
+
+		// if (isEndHashLarger > 0) {
+		// // left = 12, right = 20, tohash 18
+		// logger.debug("isEndHashLarger > 0 " + (left <= 0 && right > 0));
+		// return (left <= 0 && right > 0);
+		// } else {
+		// // left = 99, right = 2, tohash 1
+		// logger.debug("isEndHashLarger <= 0 " + (left <= 0 || right > 0));
+		// return (left <= 0 || right > 0);
+		// }
 	}
 
 	@Override
@@ -356,6 +376,13 @@ public class KVServer implements IKVServer, Runnable {
 	@Override
 	public String getHostname() {
 		return serverSocket.getInetAddress().getHostName();
+	}
+
+	public String getNamePortHost() {
+		String rval = this.serverName + ":" + getPort() + ":" + "127.0.0.1";
+		// getHostname();
+		logger.info("THIS IS NAME PORT HOST: " + rval);
+		return rval;
 	}
 
 	@Override

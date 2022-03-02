@@ -136,11 +136,11 @@ public class JSONMessage implements KVMessage, Serializable {
     }
 
     public Metadata getMetadata() {
-        logger.info("IN GET METADATA");
+        // logger.info("IN GET METADATA");
         if (this.metadataStr == null) {
             return null;
         }
-        logger.info("BOUT TO GSON: " + this.metadataStr);
+        // logger.info("BOUT TO GSON: " + this.metadataStr);
         Gson gson = new Gson();
         Metadata rval = gson.fromJson(this.metadataStr, Metadata.class);
         return rval;
@@ -167,7 +167,7 @@ public class JSONMessage implements KVMessage, Serializable {
     }
 
     public void deserialize(String inJSON) {
-        logger.info("IN DESERIALIZE");
+        // logger.info("IN DESERIALIZE");
         inJSON = inJSON.trim();
         this.json = inJSON;
 
@@ -183,7 +183,7 @@ public class JSONMessage implements KVMessage, Serializable {
         setKey(key);
         setValue(val);
         setMetadataStr(metadataStr);
-        logger.info("LEAVING DESERIALIZE");
+        // logger.info("LEAVING DESERIALIZE");
     }
 
     // public String serialize() {
