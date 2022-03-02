@@ -32,6 +32,7 @@ public class LFUCache extends Cache {
             entry = (Map.Entry)iteratorFrequency.next();
             counter = (int)entry.getValue();
             leastFrequentlyUsedKey = (String)entry.getKey();
+            // System.out.println(leastFrequentlyUsedKey);
             while (iteratorFrequency.hasNext()) {
                 entry = (Map.Entry)iteratorFrequency.next();
                 if ((int)entry.getValue() < counter) {
@@ -40,7 +41,10 @@ public class LFUCache extends Cache {
                 }
             }
             this.cacheMap.remove(leastFrequentlyUsedKey);
+            // System.out.println(leastFrequentlyUsedKey);
             this.frequencyMap.remove(leastFrequentlyUsedKey);
+            // System.out.println(this.cacheMap.size());
+            // System.out.println(this.frequencyMap.size());
         }
         counter = 1;
         this.frequencyMap.put(key, counter);
