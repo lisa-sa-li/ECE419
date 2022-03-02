@@ -103,7 +103,7 @@ public class KVServer implements IKVServer, Runnable {
 		logger.debug("HERE1");
 	}
 
-	public KVServer(int port, String serverName, String zkHost, int zkPort)
+	public KVServer(int port, String serverName, String zkHost, int zkPort, String cacheStrategy, int cacheSize)
 			throws InterruptedException, KeeperException {
 		this.port = port;
 		this.serverName = serverName;
@@ -113,34 +113,21 @@ public class KVServer implements IKVServer, Runnable {
 		this.zkHost = zkHost;
 		this.zkPort = zkPort;
 
-		/*
-		 * // String zkRootPath = ZooKeeperApplication.ZK_ROOT_PATH + "/" + serverName;
-		 * // ZK_SERVER_ROOT = "/kv_servers"
-		 * // cache setup using information received from Zookeeper node
-		 * try {
-		 * // If there is cache info in zookeeper, retrieve it here and initialize cache
-		 * // TO DO
-		 * } catch (InterruptedException | KeeperException e) {
-		 * logger.
-		 * error("Unable to retrieve cache info from zookeeper node, so initialize cache with default values"
-		 * );
-		 * this.cacheAlgo = CacheStrategy.FIFO;
-		 * this.cacheSize = 100;
-		 * }
-		 * if (this.cacheAlgo == CacheStrategy.None) {
-		 * this.cache = null;
-		 * } else { // allocate cache
-		 * try {
-		 * Constructor<?> constructorCache = Class.forName("cache." + this.cacheAlgo +
-		 * "Cache").getConstructor(Integer.class);
-		 * this.cache = (Cache) constructorCache.newInstance(cacheSize);
-		 * } catch (ClassNotFoundException | NoSuchMethodException |
-		 * InstantiationException | IllegalAccessException | InvocationTargetException
-		 * e) {
-		 * logger.error(e);
-		 * }
-		 * }
-		 */
+		this.cacheSize = cacheSize;
+		this.cacheAlgo = CacheStrategy.valueOf(cacheStrategy);
+
+		if (this.cacheAlgo == CacheStrategy.None) {
+			this.cache = null;
+		} else { // allocate cache
+			try {
+				Constructor<?> constructorCache = Class.forName("cache." + this.cacheAlgo + "Cache")
+						.getConstructor(Integer.class);
+				this.cache = (Cache) constructorCache.newInstance(cacheSize);
+			} catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException
+					| InvocationTargetException e) {
+				logger.error(e);
+			}
+		}
 
 		logger.debug("HERE2");
 		initHeartbeat();
@@ -576,15 +563,17 @@ public class KVServer implements IKVServer, Runnable {
 	public static void main(String[] args) {
 		try {
 			new LogSetup("logs/server.log", Level.ALL);
-			if (args.length != 1 && args.length != 4) {
+			if (args.length != 1 && args.length != 6) {
 				System.out.println("Error! Invalid number of arguments!");
 				System.out.println("Usage: Server <port>!");
-			} else if (args.length == 4) {
+			} else if (args.length == 6) {
 				int port = Integer.parseInt(args[0]);
 				String serverName = args[1];
 				String zkHost = args[2];
 				int zkPort = Integer.parseInt(args[3]);
-				new KVServer(port, serverName, zkHost, zkPort).run();
+				String cacheStrategy = args[4];
+				int cacheSize = Integer.parseInt(args[5]);
+				new KVServer(port, serverName, zkHost, zkPort, cacheStrategy, cacheSize).run();
 			} else {
 				int port = Integer.parseInt(args[0]);
 				// System.out.println("args", args);

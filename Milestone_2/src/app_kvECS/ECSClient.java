@@ -306,7 +306,8 @@ public class ECSClient implements IECSClient, Runnable {
             String cmd = "java -jar " + SERVER_JAR
                     + " "
                     + String.valueOf(node.getNodePort()) + " " + serverName + " " + zkHost + " "
-                    + String.valueOf(zkPort);
+                    + String.valueOf(zkPort) + " " + cacheStrategy + " "
+                    + String.valueOf(cacheSize);
 
             System.out.println("THIS IS THE CMD " + cmd);
             try {
