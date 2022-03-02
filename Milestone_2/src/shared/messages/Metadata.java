@@ -10,7 +10,7 @@ import com.google.gson.Gson;
 
 // public class Metadata implements Serializable {
 public class Metadata {
-    
+
     public MessageType status;
     // public BigInteger hash;
     // public BigInteger endHash; // non-inclusive
@@ -25,36 +25,34 @@ public class Metadata {
 
     public String receiverNodeStr;
 
-
     public enum MessageType {
-        SET_METADATA, 
+        SET_METADATA,
         MOVE_DATA,
 
         START, // start KVServer,
-        STOP,  // stop KVServer
+        STOP, // stop KVServer
         SHUTDOWN,
         LOCKED,
         UNLOCK, // unlock
         CLEAR_STORAGE, // clears persistant storage
         DELETE_STORAGE, // deletes persistant storage
 
-        
-        // TBD,                // placeholder status
-        // ACK,                // Acknowledgment
-        // DONE,                // Done data transfer
-        // UPDATE,             // needs to update metadata (new server added next to it)
-		// DATA,               // data transfer
-        // STOP,               // Stop KVServer
-        // SHUTDOWN,           // KVServer is stopped, respond to neither ECS nor KVClient 
-        // DIE,           // KVServer is decommissioned
+        SERVER_NOT_RESPONSIBLE,
+
+        // TBD, // placeholder status
+        // ACK, // Acknowledgment
+        // DONE, // Done data transfer
+        // UPDATE, // needs to update metadata (new server added next to it)
+        // DATA, // data transfer
+        // STOP, // Stop KVServer
+        // SHUTDOWN, // KVServer is stopped, respond to neither ECS nor KVClient
+        // DIE, // KVServer is decommissioned
     }
-
-
 
     public Metadata(MessageType status, HashMap<String, BigInteger> order, ECSNode receiverNode) {
         this.status = status;
         this.order = order;
-        if (receiverNode != null){
+        if (receiverNode != null) {
             this.receiverNodeName = receiverNode.getNodeName();
             this.receiverNodePort = receiverNode.getNodePort();
             this.receiverNodeHost = receiverNode.getNodeHost();
@@ -67,7 +65,7 @@ public class Metadata {
         return this.status;
     }
 
-    public HashMap<String, BigInteger> getOrder(){
+    public HashMap<String, BigInteger> getOrder() {
         return this.order;
     }
 
@@ -80,7 +78,7 @@ public class Metadata {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         // Gson gsonObj = new Gson();
         // return gsonObj.toJson(this);
         return "Status: " + this.status

@@ -21,48 +21,58 @@ public class HashRing {
     private static final Logger logger = Logger.getLogger("hashring");
     private ArrayList<BigInteger> hashOrder = new ArrayList<>();
     private HashMap<String, BigInteger> hashRing = new HashMap<String, BigInteger>();
+    private HashMap<String, String> serverInfo = new HashMap<String, String>();
     private HashMap<BigInteger, ECSNode> hashServers = new HashMap<BigInteger, ECSNode>();
     private int numServers = 0;
 
-    public void createHashRing(HashMap<String, ECSNode> currServers) throws Exception {
-        // this function should only be called once per execution
-        if (hashOrder.size() != 0 || hashRing.size() != 0) {
-            System.out.println("CANNOT CALL HASHRING TWICE");
-            throw new UnexpectedValueException("This function cannot be called twice");
-        }
-        int numCurrServers = currServers.size();
-
-        if (numCurrServers == 0) {
-            // no active nodes
-            logger.info("No current servers to construct hashring");
-            return;
-        }
-
-        // construct the ring from name hash values
-        for (ECSNode node : currServers.values()) {
-            String name = node.getNodeName();
-
-            // hash ip:port
-            String toHash = node.getNodeHost() + ":" + Integer.toString(node.getNodePort());
-            BigInteger hashed = getHash(toHash);
-
-            // let the server know its hash
-            node.setHash(hashed);
-
-            // append to hashOrder + hashRing + hashServers
-            hashOrder.add(hashed);
-            hashRing.put(toHash, hashed);
-            hashServers.put(hashed, node);
-        }
-        // sort the hashes
-        Collections.sort(hashOrder);
-
-        // set ranges
-        updateAll();
-
-        // set size
-        this.numServers = hashOrder.size();
+    public HashRing(HashMap<String, String> serverInfo) {
+        this.serverInfo = serverInfo;
     }
+
+    public HashRing() {
+    }
+
+    // public void createHashRing(HashMap<String, ECSNode> currServers) throws
+    // Exception {
+    // // this function should only be called once per execution
+    // if (hashOrder.size() != 0 || hashRing.size() != 0) {
+    // System.out.println("CANNOT CALL HASHRING TWICE");
+    // throw new UnexpectedValueException("This function cannot be called twice");
+    // }
+    // int numCurrServers = currServers.size();
+
+    // if (numCurrServers == 0) {
+    // // no active nodes
+    // logger.info("No current servers to construct hashring");
+    // return;
+    // }
+
+    // // construct the ring from name hash values
+    // for (ECSNode node : currServers.values()) {
+    // String name = node.getNodeName();
+
+    // // hash ip:port
+    // String toHash = node.getNodeHost() + ":" +
+    // Integer.toString(node.getNodePort());
+    // BigInteger hashed = getHash(toHash);
+
+    // // let the server know its hash
+    // node.setHash(hashed);
+
+    // // append to hashOrder + hashRing + hashServers
+    // hashOrder.add(hashed);
+    // hashRing.put(toHash, hashed);
+    // hashServers.put(hashed, node);
+    // }
+    // // sort the hashes
+    // Collections.sort(hashOrder);
+
+    // // set ranges
+    // updateAll();
+
+    // // set size
+    // this.numServers = hashOrder.size();
+    // }
 
     public void addNode(ECSNode newNode) {
         String name = newNode.getNodeName();
@@ -74,7 +84,7 @@ public class HashRing {
         // update lists + reorder
         hashOrder.add(hashed);
         Collections.sort(hashOrder);
-        hashRing.put(name, hashed);
+        hashRing.put(name + ":" + newNode.getNodePort() + ":" + newNode.getNodeHost(), hashed);
         hashServers.put(hashed, newNode);
 
         numServers += 1;
@@ -93,22 +103,26 @@ public class HashRing {
             prevNode.setHashRange(prevNode.getHash(), hashed);
 
             newNode.setHashRange(hashed, prevNode.getHash());
-            // send metadata to servers
-            Metadata update = new Metadata(MessageType.MOVE_DATA, hashRing, newNode);
-            System.out.println(
-                    "IN HASHRING, sending to prevnode: " + prevNode.getNodePort() + ":" + prevNode.getNodeName());
-            System.out.println("newnode is: " + newNode.getNodePort() + ":" + newNode.getNodeName());
-            prevNode.sendMessage(update);
-            JSONMessage msg = prevNode.receiveMessage();
-
-            // set hash
-            updateAll(prevNode.getHash());
+            // send metadata to servers when there's more than 1 server operating
+            if (numServers > 1) {
+                Metadata update = new Metadata(MessageType.MOVE_DATA, hashRing, newNode);
+                System.out.println(
+                        "IN HASHRING, sending to prevnode: " + prevNode.getNodePort() + ":" + prevNode.getNodeName());
+                System.out.println("newnode is: " + newNode.getNodePort() + ":" + newNode.getNodeName());
+                prevNode.sendMessage(update);
+                JSONMessage msg = prevNode.receiveMessage();
+                // set hash
+                updateAll(prevNode.getHash());
+            } else {
+                updateAll();
+            }
         }
-
-        Metadata updateNewNode = new Metadata(MessageType.SET_METADATA, hashRing, null);
-        newNode.sendMessage(updateNewNode);
-        JSONMessage msg = newNode.receiveMessage();
     }
+
+    // Metadata updateNewNode = new Metadata(MessageType.SET_METADATA, hashRing,
+    // null);
+    // newNode.sendMessage(updateNewNode);
+    // JSONMessage msg = newNode.receiveMessage();
 
     public void addNodes(ArrayList<ECSNode> nodes) throws Exception {
         for (ECSNode node : nodes) {
@@ -121,8 +135,9 @@ public class HashRing {
     }
 
     public void removeNode(String name) {
+        String portHost = serverInfo.get(name);
         // get hash from array list
-        BigInteger removeHash = hashRing.get(name);
+        BigInteger removeHash = hashRing.get(name + ":" + portHost);
         if (removeHash == null) {
             throw new NullPointerException("Invalid node name");
         }
@@ -137,7 +152,7 @@ public class HashRing {
         prevNode.setHashRange(prevNode.getHash(), finalEndHash);
         // remove values from lists
         hashOrder.remove(removeHash);
-        hashRing.remove(name);
+        hashRing.remove(name + ":" + portHost);
         hashServers.remove(removeHash);
 
         // send metadata to servers
@@ -175,6 +190,7 @@ public class HashRing {
             Metadata metadata = new Metadata(MessageType.SET_METADATA, hashRing, null);
             // send server info
             currNode.sendMessage(metadata);
+            // currNode.receiveMessage();
         }
     }
 
@@ -186,7 +202,7 @@ public class HashRing {
         while (it.hasNext()) {
             Map.Entry<String, BigInteger> pair = (Map.Entry) it.next();
 
-            String name = pair.getKey().toString();
+            String name = pair.getKey().toString().split(":")[0];
             BigInteger hash = pair.getValue();
             ECSNode node = hashServers.get(hash);
             hashRingtoServers.put(name, node);

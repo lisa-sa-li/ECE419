@@ -227,7 +227,6 @@ public class PersistantStorage implements IPersistantStorage {
     }
 
     private boolean isKeyInRange(BigInteger hash, BigInteger endHash, String key) {
-
         if (hash != null && endHash == null) {
             return true;
         }

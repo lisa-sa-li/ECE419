@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.security.InvalidKeyException;
+import java.util.HashMap;
+import java.math.BigInteger;
 
 import org.apache.log4j.*;
 import org.apache.log4j.Logger;
 import logging.ServerLogSetup;
+import ecs.ECSNode;
 
 import shared.exceptions.KeyValueTooLongException;
 import shared.exceptions.UnexpectedValueException;
@@ -75,13 +78,26 @@ public class ServerConnection implements IServerConnection, Runnable {
 
 	@Override
 	public JSONMessage receiveJSONMessage() throws IOException {
+		logger.debug("recieve1");
 		int index = 0;
 		byte[] msgBytes = null, tmp = null;
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
+		logger.debug("recieve2");
 
+		byte read = 0;
 		// Read first char from stream
-		byte read = (byte) input.read();
+		try {
+			logger.debug("recieve2.1");
+			read = (byte) input.read();
+			logger.debug("recieve2.2");
+		} catch (Exception e) {
+			logger.debug("recieve2.3", e);
+		}
+
+		logger.debug("recieve2.1");
 		boolean reading = true;
+
+		logger.debug("recieve3");
 
 		// Check if stream is closed (read returns -1)
 		if (read == -1) {
@@ -89,14 +105,18 @@ public class ServerConnection implements IServerConnection, Runnable {
 			json.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "disconnected");
 			return json;
 		}
+		// logger.debug("recieve4");
 
 		int endChar = 0;
 		while (reading && endChar < 3 && read != -1) {
+			// logger.debug("recieve5");
 			// Keep a count of EOMs to know when to stop reading
 			// 13 = CR, 10 = LF/NL
 			if (read == 13 || read == 10) {
 				endChar++;
 			}
+
+			// logger.debug("recieve6");
 
 			// If buffer filled, copy to msg array
 			if (index == BUFFER_SIZE) {
@@ -109,23 +129,30 @@ public class ServerConnection implements IServerConnection, Runnable {
 					System.arraycopy(bufferBytes, 0, tmp, msgBytes.length, BUFFER_SIZE);
 				}
 
+				// logger.debug("recieve6.1");
 				msgBytes = tmp;
 				bufferBytes = new byte[BUFFER_SIZE];
 				index = 0;
 			}
+			// logger.debug("recieve7");
 
 			// Only read valid characters, i.e. letters and constants
 			bufferBytes[index] = read;
 			index++;
+
+			// logger.debug("recieve8");
 
 			// Stop reading is DROP_SIZE is reached
 			if (msgBytes != null && msgBytes.length + index >= DROP_SIZE) {
 				reading = false;
 			}
 
+			// logger.debug("recieve9");
 			// Read next char from stream
 			read = (byte) input.read();
+			// logger.debug("recieve10");
 		}
+		// logger.debug("recieve11");
 
 		if (msgBytes == null) {
 			tmp = new byte[index];
@@ -136,8 +163,11 @@ public class ServerConnection implements IServerConnection, Runnable {
 			System.arraycopy(bufferBytes, 0, tmp, msgBytes.length, index);
 		}
 
+		// logger.debug("recieve12");
+
 		msgBytes = tmp;
 
+		// logger.debug("recieve13");
 		// Build final Object and convert from bytes to string
 		JSONMessage json = new JSONMessage();
 		String jsonStr = json.byteToString(msgBytes);
@@ -146,8 +176,11 @@ public class ServerConnection implements IServerConnection, Runnable {
 			return null;
 		}
 
-		logger.info("IN RECEIVE JSON SERVER CONNECTION : " + jsonStr);
+		// logger.debug("recieve14");
+
+		// logger.info("IN RECEIVE JSON SERVER CONNECTION : " + jsonStr);
 		json.deserialize(jsonStr);
+		// logger.debug("recieve15");
 		// logger.info("RECIEVE " + json.getKey() + json.getValue());
 		logger.info("RECEIVE \t<" + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getPort()
 				+ ">: '" + json.getJSON().trim() + "'");
@@ -155,7 +188,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 	}
 
 	private JSONMessage handleMessage(JSONMessage msg) throws IOException {
-		logger.info("In HANDLE MESSAGE: " + msg);
 		String key = msg.getKey();
 		String value = msg.getValue();
 		StatusType status = msg.getStatus();
@@ -164,9 +196,18 @@ public class ServerConnection implements IServerConnection, Runnable {
 		StatusType handleMessageStatus = StatusType.NO_STATUS;
 		JSONMessage handleMessage = new JSONMessage();
 
+		HashMap<String, BigInteger> order = null;
+
 		switch (status) {
 			case PUT:
 				try {
+					// logger.info("IS ME?: " + this.serverSocket.getPort() + " " + resp);
+					if (!this.kvServer.isMe(key)) {
+						handleMessageStatus = StatusType.SERVER_NOT_RESPONSIBLE;
+						// send back metadata
+						order = this.kvServer.getOrder();
+						break;
+					}
 					// check key, value length
 					if (key.length() > 20) {
 						throw new KeyValueTooLongException("Key too long: " + key);
@@ -188,14 +229,19 @@ public class ServerConnection implements IServerConnection, Runnable {
 				// When another KVServer passes this server data due to the hashring changing
 				try {
 					handleMessageStatus = this.kvServer.appendToStorage(value);
-					// logger.info(handleMessageStatus.name() + ": key " + key + " & value " +
-					// value);
+					logger.info("APPEND TO STORAGE SUCCESS");
 				} catch (Exception e) {
 					handleMessageStatus = StatusType.PUT_ERROR;
 					// logger.info("PUT_ERROR: key " + key + " & value " + value);
 				}
 				break;
 			case GET:
+				if (!this.kvServer.isMe(key)) {
+					handleMessageStatus = StatusType.SERVER_NOT_RESPONSIBLE;
+					order = this.kvServer.getOrder();
+					// send back metadata
+					break;
+				}
 				try {
 					if (key.length() > 20) {
 						throw new KeyValueTooLongException("Key too long: " + key);
@@ -224,7 +270,18 @@ public class ServerConnection implements IServerConnection, Runnable {
 				break;
 		}
 
-		handleMessage.setMessage(handleMessageStatus.name(), key, handleMessageValue);
+		// logger.info("handleMessageStatus " + handleMessageStatus.name());
+
+		if (handleMessageStatus == StatusType.SERVER_NOT_RESPONSIBLE) {
+			logger.info("SERVER_NOT_RESPONSIBLE");
+			// ECSNode node = null;
+			Metadata metadata = new Metadata(MessageType.SERVER_NOT_RESPONSIBLE, order, null);
+			handleMessage.setMessage(handleMessageStatus.name(), key, handleMessageValue, metadata);
+		} else {
+			logger.info("SERVER is RESPONSIBLE");
+			handleMessage.setMessage(handleMessageStatus.name(), key, handleMessageValue);
+		}
+		logger.info("return handleMessage");
 		return handleMessage;
 	}
 
@@ -286,31 +343,39 @@ public class ServerConnection implements IServerConnection, Runnable {
 		try {
 			while (this.isOpen) {
 				try {
+					logger.info("before recieveJSONMessage serverName " + this.kvServer.serverName);
 					JSONMessage receivedMessage = receiveJSONMessage();
+					logger.info("after recieveJSONMessage serverName " + this.kvServer.serverName);
 					if (receivedMessage != null) {
 						JSONMessage sendMessage;
 
-						logger.info("RECEIVED MESSAGE: " + receivedMessage.getMetadataStr());
+						// logger.info("RECEIVED MESSAGE: " + receivedMessage.getMetadataStr());
 
 						Metadata metadata = receivedMessage.getMetadata();
 
 						if (metadata == null) {
+							logger.info("before handleMessage serverName " + this.kvServer.serverName);
 							sendMessage = handleMessage(receivedMessage);
 						} else {
+							logger.info("before handleMetaMessage serverName " + this.kvServer.serverName);
 							sendMessage = handleMetadataMessage(metadata);
-
 						}
+
+						logger.info("before sendJSONMessage serverName " + this.kvServer.serverName);
 						sendJSONMessage(sendMessage);
+						logger.info("after sendJSONMessage serverName " + this.kvServer.serverName);
 					}
 				} catch (IOException e) {
 					logger.error("Server connection lost: " + e);
 					this.isOpen = false;
 				} catch (Exception e) {
-					logger.error(e);
+					logger.error("Server connection failed: " + e);
 				}
 			}
 		} finally {
+			// logger.info("run4");
 			try {
+				logger.info("run5");
 				// close connection
 				if (serverSocket != null) {
 					// Send message????
