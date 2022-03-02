@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.BindException;
 import java.util.*;
 import java.math.BigInteger;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -187,14 +188,17 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	public boolean inHashRing() {
+		logger.info("is " + this.serverName + " in hashring " + hashRing.keySet() + "?: "
+				+ hashRing.get(this.serverName) != null);
 		return (hashRing.get(this.serverName) != null);
 	}
 
-	public void getHashRange() {
+	public Boolean getHashRange() {
 		if (inHashRing() == false) {
+			// This detects that it's not in the hashring anymore, thus it needs to die
 			this.hash = null;
 			this.endHash = null;
-			return;
+			return true;
 		}
 
 		Collection<BigInteger> keys = hashRing.values();
@@ -204,15 +208,21 @@ public class KVServer implements IKVServer, Runnable {
 		this.hash = hashRing.get(this.serverName);
 		if (orderedKeys.size() == 1) {
 			this.endHash = null;
-			return;
+			return false;
 		}
 		Integer nextIdx = orderedKeys.indexOf(this.hash);
 		nextIdx = (nextIdx + 1) % orderedKeys.size();
 
 		this.endHash = orderedKeys.get(nextIdx);
+		return false;
 	}
 
 	public void moveData(Metadata metadata) { // range, server
+		update(metadata);
+
+		// figoure out new endHash HERE
+		Boolean die = getHashRange();
+
 		// Transfer a subset (range) of the KVServer's data to another KVServer
 		// (reallocation before removing this server or adding a new KVServer to the
 		// ring);
@@ -226,13 +236,19 @@ public class KVServer implements IKVServer, Runnable {
 		BigInteger hash = receiverNode.getHash();
 		BigInteger endHash = receiverNode.getEndHash();
 
-		logger.debug("> " + hostOfReceiver + nameOfReceiver + "?" + hash + "?" + endHash);
+		// logger.debug("> " + hostOfReceiver + nameOfReceiver + "?" + hash + "?" +
+		// endHash);
+
+		if (nameOfReceiver == this.serverName) {
+			unLockWrite();
+			return;
+		}
 
 		try {
 			// This is the data being remove from this server and being moved to the
 			// reciever server
-			logger.debug("BEFORE GET DATA IN RANGE");
-			String dataInRange = persistantStorage.getDataInRange(hash, endHash);
+			logger.debug("BEFORE GET DATA IN RANGE die " + die);
+			String dataInRange = persistantStorage.getDataInRange(hash, endHash, die);
 			logger.debug("AFTER GET DATA IN RANGE " + dataInRange);
 
 			Socket socket = new Socket(hostOfReceiver, portOfReceiver);
@@ -251,12 +267,20 @@ public class KVServer implements IKVServer, Runnable {
 		}
 
 		unLockWrite();
+		if (die == true) {
+			try {
+				TimeUnit.SECONDS.sleep(5);
+				kill();
+			} catch (Exception e) {
+				logger.error("Unable to kill server");
+			}
+		}
 	}
 
 	public void update(Metadata metadata) {
 		// Update the metadata repository of this server
 		this.hashRing = metadata.order;
-		getHashRange();
+		Boolean tmp = getHashRange();
 	}
 
 	public boolean isMe(BigInteger toHash) {
@@ -412,6 +436,7 @@ public class KVServer implements IKVServer, Runnable {
 				logger.error("Error! Unable to close socket on port: " + port, e);
 			}
 		}
+		System.exit(1);
 	}
 
 	@Override
@@ -431,7 +456,6 @@ public class KVServer implements IKVServer, Runnable {
 	public static void main(String[] args) {
 		try {
 			new LogSetup("logs/server.log", Level.ALL);
-			logger.debug(">>>>>>> ARGS " + Arrays.toString(args));
 			if (args.length != 1 && args.length != 4) {
 				System.out.println("Error! Invalid number of arguments!");
 				System.out.println("Usage: Server <port>!");
