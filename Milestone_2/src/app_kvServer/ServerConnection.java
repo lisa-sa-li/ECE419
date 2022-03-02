@@ -151,11 +151,11 @@ public class ServerConnection implements IServerConnection, Runnable {
 			return null;
 		}
 
-		logger.info("IN DRECEIVE JSON SERVER CONN : " +  jsonStr);
+		logger.info("IN DRECEIVE JSON SERVER CONN : " + jsonStr);
 		json.deserialize(jsonStr);
 		logger.info("RECIEVE " + json.getKey() + json.getValue());
 		logger.info("RECEIVE \t<" + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getPort()
-		+ ">: '" + json.getJSON().trim() + "'");
+				+ ">: '" + json.getJSON().trim() + "'");
 		return json;
 	}
 
@@ -168,13 +168,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 		String handleMessageValue = value; // For PUT or DELETE, send the original value back
 		StatusType handleMessageStatus = StatusType.NO_STATUS;
 		JSONMessage handleMessage = new JSONMessage();
-
-
-		System.out.println("1key " + key);
-		System.out.println("1value " + value + status);
-		logger.debug("1key " + key);
-		logger.debug("1value " + value + status);
-		
 
 		switch (status) {
 			case PUT:
@@ -197,10 +190,11 @@ public class ServerConnection implements IServerConnection, Runnable {
 				}
 				break;
 			case PUT_MANY:
-				// When another KVServer passes this server data due to the hashring changing 
+				// When another KVServer passes this server data due to the hashring changing
 				try {
 					handleMessageStatus = this.kvServer.appendToStorage(value);
-					// logger.info(handleMessageStatus.name() + ": key " + key + " & value " + value);
+					// logger.info(handleMessageStatus.name() + ": key " + key + " & value " +
+					// value);
 				} catch (Exception e) {
 					handleMessageStatus = StatusType.PUT_ERROR;
 					// logger.info("PUT_ERROR: key " + key + " & value " + value);
@@ -239,17 +233,18 @@ public class ServerConnection implements IServerConnection, Runnable {
 		return handleMessage;
 	}
 
-	 private JSONMessage handleMetadataMessage(Metadata message) {
-		// String handleMessageValue = value; // For PUT or DELETE, send the original value back
-		logger.info("IN HANDLE METADATAMESSAGE");
+	private JSONMessage handleMetadataMessage(Metadata message) {
+		// String handleMessageValue = value; // For PUT or DELETE, send the original
+		// value back
+		logger.info("IN HANDLE METADATAMESSAGE status: " + message.getStatus());
 		StatusType handleMessageStatus = StatusType.NO_STATUS;
 		JSONMessage handleMessage = new JSONMessage();
-		String key="";
-		String value="";
+		String key = "";
+		String value = "";
 
-        try {
-            switch (message.getStatus()) {
-                case START:
+		try {
+			switch (message.getStatus()) {
+				case START:
 					this.kvServer.start();
 					break;
 				case STOP:
@@ -270,6 +265,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 					this.kvServer.update(message);
 					break;
 				case MOVE_DATA:
+					logger.debug("MOVE DATA HERE");
 					this.kvServer.moveData(message);
 					break;
 				case CLEAR_STORAGE:
@@ -281,13 +277,12 @@ public class ServerConnection implements IServerConnection, Runnable {
 				default:
 					break;
 			}
-        } catch (Exception e) {
-            logger.error("Unknown Error: " + e.getMessage());
-        }
+		} catch (Exception e) {
+			logger.error("Unknown Error: " + e.getMessage());
+		}
 		handleMessage.setMessage(handleMessageStatus.name(), key, value);
 		return handleMessage;
-    }
-
+	}
 
 	public void run() {
 		// while connection is open, listen for messages
@@ -296,17 +291,17 @@ public class ServerConnection implements IServerConnection, Runnable {
 				try {
 					JSONMessage receivedMessage = receiveJSONMessage();
 					logger.info("LISTENING AFTER " + receivedMessage.getValue());
-					// 2022-02-28 22:05:14,636 INFO  [Thread-0] root: RECEIVED MESSAGE: status
+					// 2022-02-28 22:05:14,636 INFO [Thread-0] root: RECEIVED MESSAGE: status
 					if (receivedMessage != null) {
 						JSONMessage sendMessage;
 
 						logger.info("RECEIVED MESSAGE: " + receivedMessage.getMetadataStr());
-						
+
 						Metadata metadata = receivedMessage.getMetadata();
 
-
 						if (metadata == null) {
-							logger.info("Going into handle message: " + receivedMessage.getKey() + receivedMessage.getValue());
+							logger.info("Going into handle message: " + receivedMessage.getKey()
+									+ receivedMessage.getValue());
 							sendMessage = handleMessage(receivedMessage);
 						} else {
 							logger.info("Going into handleMetadatamessage");
@@ -314,7 +309,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 							logger.info("handled metadata message");
 
 						}
-						
+
 						logger.info("send message");
 						sendJSONMessage(sendMessage);
 						logger.info("after send message");

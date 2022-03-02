@@ -85,7 +85,7 @@ public class ECSClient implements IECSClient, Runnable {
             if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH, false) == null) {
                 zkApp.create(ZooKeeperApplication.ZK_NODE_ROOT_PATH, "root_node");
             }
-			if (zk.exists(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, false) == null) {
+            if (zk.exists(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, false) == null) {
                 zkApp.create(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, "heartbeat");
             }
         } catch (KeeperException | InterruptedException e) {
@@ -97,25 +97,18 @@ public class ECSClient implements IECSClient, Runnable {
 
     public void newConnection(ECSNode node) throws Exception {
         try {
-            System.out.println("NEW CONNECTION");
             int port = node.getNodePort();
             String serverName = node.getNodeName();
-            System.out.println("NEW CONNECTION " + port +" " + this.hostname + " " + serverName);
 
             Socket clientSocket = new Socket(this.hostname, port);
 
-            System.out.println("NEW CONNECTION3");
             ECSConnection ecsConnection = new ECSConnection(clientSocket);
-            System.out.println("NEW CONNECTION4");
             // set socket in ecsConnection
             node.setConnection(ecsConnection);
-            System.out.println("NEW CONNECTION5");
 
-            logger.info("Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
+            logger.info("Server " + serverName + " connected to " + clientSocket.getInetAddress().getHostName()
+                    + " on port "
                     + clientSocket.getPort());
-
-            
-            System.out.println("NEW CONNECTION6");
         } catch (IOException e) {
             logger.error("ERROR MAKING NEW CONNECTION IN ECSCLIENT");
             throw e;
@@ -271,6 +264,19 @@ public class ECSClient implements IECSClient, Runnable {
 
     @Override
     public Collection<ECSNode> addNodes(int count, String cacheStrategy, int cacheSize) {
+        /*
+         * Randomly choose <numberOfNodes> servers from the available machines and start
+         * the KVServer by issuing an SSH call to the respective machine.
+         * This call launches the storage server with the specified cache size and
+         * replacement strategy. For simplicity, locate the KVServer.jar in the same
+         * directory as the ECS. All storage servers are initialized with the metadata
+         * and any persisted data, and remain in state stopped.
+         * NOTE: Must call setupNodes before the SSH calls to start the servers and must
+         * call awaitNodes before returning
+         * 
+         * @return set of strings containing the names of the nodes
+         */
+
         ArrayList<String> availServers = getAvailableServers();
 
         if (availServers.size() == 0) {
@@ -281,72 +287,43 @@ public class ECSClient implements IECSClient, Runnable {
             return null;
         }
 
-        // if (hashRing.isEmpty()) {
-        //     try {
-        //         System.out.println("EMPTY, go here:");
-        //         hashRing.createHashRing(currServerMap);
-        //         System.out.println("FINISHED HASHRING");
-        //     } catch (Exception e){
-        //         logger.error("Unable to initialize hashring");
-        //         return null;
-        //     }
-        // }
+        ArrayList<ECSNode> nodes = setupNodes(count, cacheStrategy, cacheSize);
+        ArrayList<ECSNode> nodesAdded = new ArrayList<ECSNode>();
 
-        ArrayList<ECSNode> nameArr = new ArrayList<ECSNode>();
-
-        for (int i = 0; i < count; i++) {
-            // Choose a random server, also remove it from availServers so it can't be used
-            // again in this loop
-            int int_random = rand.nextInt(availServers.size());
-            String serverName = availServers.remove(int_random);
-            ECSNode node = allServerMap.get(serverName);
-
+        for (ECSNode node : nodes) {
+            String serverName = node.getNodeName();
             node.setStatus(NodeStatus.STARTING); // Not sure about the status
             allServerMap.put(serverName, node);
             currServerMap.put(serverName, node);
-            nameArr.add(node);
-            
-            // Start the KVServer by issuing an SSH call to the machine
-            // System.out.print("System.getProperty(user.dir)" + System.getProperty("user.dir"));
-            // String cmd = "java -jar " + System.getProperty("user.dir")+ "/" +  SERVER_JAR + " " + String.valueOf(node.getNodePort());
-            String cmd = "java -jar " + System.getProperty("user.dir") + "/" + SERVER_JAR + " "
-                + String.valueOf(node.getNodePort()) + " " + serverName + " " + zkHost + " "
-                + String.valueOf(zkPort);
 
-            // java -jar /Users/irenapetkovic/OneDrive/Uni_Year_5/ECE419/ECE419/Milestone_2/m2-server.jar 8004 joy5 127.0.0.1 2181
+            // Start the KVServer by issuing an SSH call to the machine
+            // String cmd = "java -jar " + System.getProperty("user.dir") + "/" + SERVER_JAR
+            // + " "
+            // + String.valueOf(node.getNodePort());
+            //
+            String cmd = "java -jar " + System.getProperty("user.dir") + "/" + SERVER_JAR
+                    + " "
+                    + String.valueOf(node.getNodePort()) + " " + serverName + " " + zkHost + " "
+                    + String.valueOf(zkPort);
+
             // System.out.println("THIS IS THE CMD " + cmd);
-            // // 
             try {
                 Process p = Runtime.getRuntime().exec(cmd);
                 // p.waitFor();
                 // create new connection :*
                 // MAKE SURE THIS HAPPENS AFTER ABOVE CALL - MAYBE DELAY NEEDED?
-                TimeUnit.SECONDS.sleep(1);
+
+                awaitNodes(1, 1);
 
                 newConnection(node);
                 hashRing.addNode(node);
+                nodesAdded.add(node);
             } catch (Exception e) {
                 System.out.println("THIS IS SSH error: " + e);
-
                 logger.error("Cannot start the server through an SSH call", e);
             }
-
         }
-        /*
-         * Randomly choose <numberOfNodes> servers from the available machines and start
-         * the KVServer by issuing an SSH call to the respective machine.
-         * This call launches the storage server with the specified cache size and
-         * replacement strategy. For simplicity, locate the KVServer.jar in the same
-         * directory
-         * as the ECS. All storage servers are initialized with the metadata and any
-         * persisted data,
-         * and remain in state stopped.
-         * NOTE: Must call setupNodes before the SSH calls to start the servers and must
-         * call awaitNodes before returning
-         * 
-         * @return set of strings containing the names of the nodes
-         */
-        return nameArr;
+        return nodesAdded;
     }
 
     @Override
@@ -367,8 +344,8 @@ public class ECSClient implements IECSClient, Runnable {
     }
 
     @Override
-    public Collection<ECSNode> setupNodes(int count, String cacheStrategy, int cacheSize) {
-        /**
+    public ArrayList<ECSNode> setupNodes(int count, String cacheStrategy, int cacheSize) {
+        /*
          * Sets up `count` servers with the ECS (in this case Zookeeper)
          * 
          * @return array of strings, containing unique names of servers
@@ -379,29 +356,39 @@ public class ECSClient implements IECSClient, Runnable {
             return null;
         }
 
-        ArrayList<String> nodes = new ArrayList<String>();
+        ArrayList<String> availServers = getAvailableServers();
+        ArrayList<ECSNode> nodes = new ArrayList<ECSNode>();
 
-        Iterator<Map.Entry<String, ECSNode>> it = allServerMap.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
-            String name = pair.getKey().toString();
-            ECSNode node = pair.getValue();
-            NodeStatus status = node.getStatus();
+        for (int i = 0; i < count; i++) {
+            // Choose a random server, also remove it from availServers so it can't be used
+            // again in this loop
+            int int_random = rand.nextInt(availServers.size());
+            String serverName = availServers.remove(int_random);
+            ECSNode node = allServerMap.get(serverName);
 
-            if (status == NodeStatus.OFFLINE) { // NOT SURE
-                continue;
-            }
-
-            String znodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + name;
-
+            String znodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + serverName;
             try {
-                zkApp.createOrSetData(znodePath, "UNSURE WHAT MESSAGE TO SEND");
-                nodes.add(name);
+                zkApp.createOrSetData(znodePath, serverName);
             } catch (KeeperException | InterruptedException e) {
                 logger.error(e);
             }
+
+            nodes.add(node);
         }
-        return null;
+
+        // Check for the heartbeat launching?
+
+        // Iterator<Map.Entry<String, ECSNode>> it = allServerMap.entrySet().iterator();
+        // while (it.hasNext()) {
+        // Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
+        // String name = pair.getKey().toString();
+        // ECSNode node = pair.getValue();
+        // NodeStatus status = node.getStatus();
+
+        // if (status == NodeStatus.OFFLINE) { // NOT SURE
+        // continue;
+        // }
+        return nodes;
     }
 
     @Override
@@ -414,6 +401,13 @@ public class ECSClient implements IECSClient, Runnable {
          * @param timeout the timeout in milliseconds
          * @return true if all nodes reported successfully, false otherwise
          */
+
+        try {
+            TimeUnit.SECONDS.sleep(count * timeout);
+            return true;
+        } catch (Exception e) {
+            logger.error("Unable to await node(s)", e);
+        }
 
         return false;
     }
@@ -543,16 +537,15 @@ public class ECSClient implements IECSClient, Runnable {
             new ECSLogSetup("logs/ecs.log", Level.ALL);
             ECSClient ecsClient = new ECSClient();
             ecsClient.run();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             System.out.println("Error! Unable to initialize logger!");
             e.printStackTrace();
             System.exit(1);
-        } 
+        }
         // catch (Exception e) {
-        //     System.out.println("Error! Unable to initialize logger!");
-        //     e.printStackTrace();
-        //     System.exit(1);
+        // System.out.println("Error! Unable to initialize logger!");
+        // e.printStackTrace();
+        // System.exit(1);
         // }
     }
 }
