@@ -24,6 +24,9 @@ public class ECSNode implements IECSNode {
     
     public NodeStatus status;
 
+    private String cacheAlgo;
+    private int cacheSize;
+
     public ECSNode(String name, int port, String host){
         // initializing a node
         this.name = name;
@@ -143,6 +146,19 @@ public class ECSNode implements IECSNode {
 
     public void setHash(BigInteger hashVal){
         this.hash = hashVal;
+    }
+
+    public void setCacheInfo(int cacheSize, String cacheAlgo){
+        this.cacheSize = cacheSize;
+        this.cacheAlgo = cacheAlgo;
+    }
+
+    public int getCacheSize(){
+        return this.cacheSize;
+    }
+
+    public String getCacheStrategy() {
+        return this.cacheAlgo;
     }
 
 }

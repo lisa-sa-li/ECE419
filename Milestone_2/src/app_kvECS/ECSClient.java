@@ -294,6 +294,7 @@ public class ECSClient implements IECSClient, Runnable {
         for (ECSNode node : nodes) {
             String serverName = node.getNodeName();
             node.setStatus(NodeStatus.STARTING); // Not sure about the status
+            node.setCacheInfo(cacheSize, cacheStrategy);
             allServerMap.put(serverName, node);
             currServerMap.put(serverName, node);
 
@@ -361,12 +362,12 @@ public class ECSClient implements IECSClient, Runnable {
         ArrayList<ECSNode> nodes = new ArrayList<ECSNode>();
 
         for (int i = 0; i < count; i++) {
-            // Choose a random server, also remove it from availServers so it can't be used
+            // Choose a random server, also remove it from availServers, so it can't be used
             // again in this loop
             int int_random = rand.nextInt(availServers.size());
             String serverName = availServers.remove(int_random);
             ECSNode node = allServerMap.get(serverName);
-
+            node.setCacheInfo(cacheSize, cacheStrategy);
             String znodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + serverName;
             try {
                 zkApp.createOrSetData(znodePath, serverName);
@@ -460,7 +461,7 @@ public class ECSClient implements IECSClient, Runnable {
                     break;
                 case "addnode":
                     System.out.println("Adding node");
-                    addNode("None", 0);
+                    addNode(tokens[1], Integer.parseInt(tokens[2]));
                     break;
                 case "addnodes":
                     if (tokens.length > 3) {
@@ -468,7 +469,7 @@ public class ECSClient implements IECSClient, Runnable {
                     } else {
                         System.out.println("Adding nodes");
                         int count = Integer.parseInt(tokens[1]);
-                        addNodes(count, "None", 0);
+                        addNodes(count, tokens[1], Integer.parseInt(tokens[2]));
                     }
                     break;
                 case "removenode":

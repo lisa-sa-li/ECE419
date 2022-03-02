@@ -1,5 +1,6 @@
 package app_kvServer;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.io.OutputStream;
@@ -32,13 +33,14 @@ import ecs.ECSNode;
 import ecs.HashRing;
 import ecs.ZooKeeperApplication;
 import ecs.HeartbeatApplication;
+import cache.Cache;
+import java.lang.reflect.Constructor;
 
 public class KVServer implements IKVServer, Runnable {
 
 	private static Logger logger = Logger.getRootLogger();
 
 	private int port;
-	private int cacheSize;
 	private PersistantStorage persistantStorage;
 	private Socket client;
 	private boolean running;
@@ -64,27 +66,42 @@ public class KVServer implements IKVServer, Runnable {
 
 	private Utils utils = new Utils();
 
+	// caching variables
+	private int cacheSize;
+	private CacheStrategy cacheAlgo;
+	private Cache cache;
+
 	/**
 	 * Start KV Server at given port
 	 * 
 	 * @param port      given port for storage server to operate
 	 * @param cacheSize specifies how many key-value pairs the server is allowed
 	 *                  to keep in-memory
-	 * @param strategy  specifies the cache replacement strategy in case the cache
+	 * @param algo  specifies the cache replacement strategy in case the cache
 	 *                  is full and there is a GET- or PUT-request on a key that is
 	 *                  currently not contained in the cache. Options are "FIFO",
 	 *                  "LRU", and "LFU".
 	 */
-	public KVServer(int port, int cacheSize, String strategy) {
+	public KVServer(int port, int cacheSize, String algo) {
 		this.port = port;
 		this.cacheSize = cacheSize;
+		this.cacheAlgo = CacheStrategy.valueOf(algo);
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
 		this.threads = new ArrayList<Thread>();
-
+		if (this.cacheAlgo == CacheStrategy.None) {
+			this.cache = null;
+		} else { // allocate cache
+			try {
+				Constructor<?> constructorCache = Class.forName("cache." + this.cacheAlgo + "Cache").getConstructor(Integer.class);
+				this.cache = (Cache) constructorCache.newInstance(cacheSize);
+			} catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+				logger.error(e);
+			}
+		}
 		logger.debug("HERE1");
 	}
 
-	public KVServer(int port, String serverName, String zkHost, int zkPort) {
+	public KVServer(int port, String serverName, String zkHost, int zkPort) throws InterruptedException, KeeperException {
 		this.port = port;
 		this.serverName = serverName;
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
@@ -93,16 +110,49 @@ public class KVServer implements IKVServer, Runnable {
 		this.zkHost = zkHost;
 		this.zkPort = zkPort;
 
+		/*
+		// String zkRootPath = ZooKeeperApplication.ZK_ROOT_PATH + "/" + serverName; // ZK_SERVER_ROOT = "/kv_servers"
+		// cache setup using information received from Zookeeper node
+		try {
+			// If there is cache info in zookeeper, retrieve it here and initialize cache
+			// TO DO
+		} catch (InterruptedException | KeeperException e) {
+			logger.error("Unable to retrieve cache info from zookeeper node, so initialize cache with default values");
+			this.cacheAlgo = CacheStrategy.FIFO;
+			this.cacheSize = 100;
+		}
+		if (this.cacheAlgo == CacheStrategy.None) {
+			this.cache = null;
+		} else { // allocate cache
+			try {
+				Constructor<?> constructorCache = Class.forName("cache." + this.cacheAlgo + "Cache").getConstructor(Integer.class);
+				this.cache = (Cache) constructorCache.newInstance(cacheSize);
+			} catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+				logger.error(e);
+			}
+		}
+		*/
+
 		logger.debug("HERE2");
 		initHeartbeat();
 	}
 
-	public KVServer(int port, int cacheSize, String strategy, boolean test) {
+	public KVServer(int port, int cacheSize, String algo, boolean test) {
 		this.port = port;
 		this.cacheSize = cacheSize;
+		this.cacheAlgo = CacheStrategy.valueOf(algo);
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
 		this.threads = new ArrayList<Thread>();
-
+		if (this.cacheAlgo == CacheStrategy.None) {
+			this.cache = null;
+		} else { // allocate cache
+			try {
+				Constructor<?> constructorCache = Class.forName("cache." + this.cacheAlgo + "Cache").getConstructor(Integer.class);
+				this.cache = (Cache) constructorCache.newInstance(cacheSize);
+			} catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+				logger.error(e);
+			}
+		}
 		if (test) {
 			Thread testThread = new Thread(this);
 			testThread.start();
@@ -346,8 +396,7 @@ public class KVServer implements IKVServer, Runnable {
 
 	@Override
 	public CacheStrategy getCacheStrategy() {
-		// TODO Auto-generated method stub
-		return IKVServer.CacheStrategy.None;
+		return this.cacheAlgo;
 	}
 
 	@Override
@@ -362,22 +411,44 @@ public class KVServer implements IKVServer, Runnable {
 
 	@Override
 	public boolean inCache(String key) {
-		// TODO Auto-generated method stub
-		return false;
+		if (this.cache != null) {
+			return this.cache.containsKey(key);
+		} else {
+			return false;
+		}
 	}
 
 	@Override
 	public String getKV(String key) throws Exception {
-		String value = this.persistantStorage.get(key);
-		if (value == null) {
-			logger.warn("Key " + key + " is not found");
-			throw new Exception("Key is not found");
+		if (this.cache != null) {
+			if (this.inCache(key)) {
+				return this.cache.get(key);
+			} else {
+				// The key is not in cache, so read from persistent storage and update cache
+				String value = this.persistantStorage.get(key);
+				if (value != null) {
+					this.cache.put(key, value);
+				} else {
+					logger.warn("Key " + key + " is not found");
+					throw new Exception("Key is not found");
+				}
+				return value;
+			}
+		} else {
+			String value = this.persistantStorage.get(key);
+			if (value == null) {
+				logger.warn("Key " + key + " is not found");
+				throw new Exception("Key is not found");
+			}
+			return value;
 		}
-		return value;
 	}
 
 	@Override
 	public StatusType putKV(String key, String value) throws Exception {
+		if (this.cache != null){
+			this.cache.put(key, value);
+		}
 		return this.persistantStorage.put(key, value);
 	}
 
@@ -387,12 +458,18 @@ public class KVServer implements IKVServer, Runnable {
 
 	@Override
 	public void clearCache() {
-		// TODO Auto-generated method stub
+		if (this.cache != null) {
+			this.cache.clear();
+		}
+		logger.info("Cache cleared");
 	}
 
 	@Override
 	public void clearStorage() {
 		this.persistantStorage.clearStorage();
+		if (this.cache != null){
+			this.cache.clear();
+		}
 	}
 
 	@Override
