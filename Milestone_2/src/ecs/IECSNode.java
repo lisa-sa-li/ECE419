@@ -6,7 +6,6 @@ public interface IECSNode {
         OFFLINE, // not added
         STARTING, // added, waiting to be written to
         WRITELOCK, // added but being written to
-        READY, // ready
         STOPPED, // removed but not yet offline
     }
 
