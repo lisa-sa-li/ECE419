@@ -136,11 +136,9 @@ public class JSONMessage implements KVMessage, Serializable {
     }
 
     public Metadata getMetadata() {
-        // logger.info("IN GET METADATA");
         if (this.metadataStr == null) {
             return null;
         }
-        // logger.info("BOUT TO GSON: " + this.metadataStr);
         Gson gson = new Gson();
         Metadata rval = gson.fromJson(this.metadataStr, Metadata.class);
         return rval;
@@ -167,7 +165,6 @@ public class JSONMessage implements KVMessage, Serializable {
     }
 
     public void deserialize(String inJSON) {
-        // logger.info("IN DESERIALIZE");
         inJSON = inJSON.trim();
         this.json = inJSON;
 
@@ -183,90 +180,5 @@ public class JSONMessage implements KVMessage, Serializable {
         setKey(key);
         setValue(val);
         setMetadataStr(metadataStr);
-        // logger.info("LEAVING DESERIALIZE");
     }
-
-    // public String serialize() {
-    // // initialize string builder to create mutable string
-    // StringBuilder strMessage = new StringBuilder();
-
-    // // Beginning chars
-    // strMessage.append("{");
-    // String statusEntry = ("\"status\":\"" + this.status.name() + "\",");
-    // strMessage.append(statusEntry);
-    // if (this.value == null) {
-    // this.value = "";
-    // }
-    // if (!this.value.trim().isEmpty()) {
-    // String KVEntry = ("\"" + this.key + "\":\"" + this.value + "\",");
-    // strMessage.append(KVEntry);
-    // } else {
-    // String KVEntry = ("\"" + this.key + "\":\"\"");
-    // strMessage.append(KVEntry);
-    // }
-
-    // if (!this.metadataStr.trim().isEmpty()) {
-    // String KVEntry = ("\"metadata\":\"" + this.metadataStr + "\",");
-    // strMessage.append(KVEntry);
-    // } else {
-    // String KVEntry = ("\"metadata\":\"\"");
-    // strMessage.append(KVEntry);
-    // }
-    // strMessage.append("}");
-
-    // this.json = strMessage.toString();
-
-    // return strMessage.toString();
-    // }
-
-    // public void deserialize(String inJSON) {
-    // // trim newlines
-    // inJSON = inJSON.trim();
-    // this.json = inJSON;
-
-    // StringTokenizer messageTokens = new StringTokenizer(inJSON, "{}:,\"");
-
-    // // create Array object
-    // String[] tokens = null;
-    // tokens = new String[messageTokens.countTokens()];
-
-    // // iterate through StringTokenizer tokens
-    // int count = 0;
-    // while (messageTokens.hasMoreTokens()) {
-    // // add tokens to Array
-    // String nextTok = messageTokens.nextToken();
-    // tokens[count++] = nextTok;
-    // }
-
-    // logger.debug(">>>>>>> TOKENS " + Arrays.toString(tokens));
-
-    // String status = tokens[1];
-    // String key = tokens[2];
-    // String value;
-    // String metadataStr;
-
-    // //
-    // {"status":"SET_METADATA","blah":"blah","metadata":"{"status":"SET_METADATA","order":{"joy5":147707126048829537208107172202006208560},"receiverNodePort":0}",}
-
-    // int buffer = 0;
-
-    // if (tokens[3] != "metadata") {
-    // // This means token[3] is the value to "value"
-    // value = tokens[3];
-    // } else {
-    // // This means there's no value for "value", so token[3] is the key "metadata"
-    // value = "";
-    // buffer++;
-    // }
-    // try {
-    // metadataStr = tokens[5 - buffer];
-    // } catch (Exception iobe) {
-    // metadataStr = null;
-    // }
-
-    // setStatus(status);
-    // setKey(key);
-    // setValue(value);
-    // setMetadataStr(metadataStr);
-    // }
 }

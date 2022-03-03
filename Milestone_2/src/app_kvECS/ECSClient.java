@@ -491,6 +491,9 @@ public class ECSClient implements IECSClient, Runnable {
                     System.out.println("Shutting down");
                     shutdown();
                     break;
+                default:
+                    logger.error("Unknown command.");
+                    break;
             }
         } catch (Exception e) {
             e.printStackTrace();

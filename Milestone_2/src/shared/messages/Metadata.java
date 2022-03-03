@@ -38,15 +38,6 @@ public class Metadata {
         DELETE_STORAGE, // deletes persistant storage
 
         SERVER_NOT_RESPONSIBLE,
-
-        // TBD, // placeholder status
-        // ACK, // Acknowledgment
-        // DONE, // Done data transfer
-        // UPDATE, // needs to update metadata (new server added next to it)
-        // DATA, // data transfer
-        // STOP, // Stop KVServer
-        // SHUTDOWN, // KVServer is stopped, respond to neither ECS nor KVClient
-        // DIE, // KVServer is decommissioned
     }
 
     public Metadata(MessageType status, HashMap<String, BigInteger> order, ECSNode receiverNode) {

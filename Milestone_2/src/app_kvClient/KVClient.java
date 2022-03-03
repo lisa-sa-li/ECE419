@@ -1,7 +1,7 @@
 package app_kvClient;
 
 import client.KVStore;
-import shared.messages.JSONMessage;
+
 import logging.LogSetup;
 import java.net.UnknownHostException;
 import java.io.IOException;
@@ -10,6 +10,9 @@ import org.apache.log4j.Level;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.SocketException;
+
+import shared.messages.JSONMessage;
+import shared.messages.KVMessage.StatusType;
 
 public class KVClient implements IKVClient, Runnable {
     private static Logger logger = Logger.getRootLogger();
@@ -47,14 +50,29 @@ public class KVClient implements IKVClient, Runnable {
         }
     }
 
+    private void printMsgFromServer(JSONMessage msg) {
+        String key = msg.getKey();
+        String value = msg.getValue();
+        StatusType status = msg.getStatus();
+
+        if (status == StatusType.SERVER_STOPPED) {
+            System.out.println("The server is closed and can't be written to or read from.");
+        } else if (value == null || value.isEmpty()) {
+            System.out
+                    .println(status + "\t key: " + key);
+        } else {
+            System.out
+                    .println(status + "\t key: " + key + " & value: "
+                            + value);
+        }
+
+    }
+
     private void handleCommand(String cmdLine) {
-        // Shorthand to connect (easter egg)
-        // if (cmdLine.equals("-1")) {
-        //     cmdLine = "connect 127.0.0.1 8080\n";
-        // }
         String[] tokens = cmdLine.trim().split("\\s+");
 
         if (tokens[0].equals("-1")) {
+            // Shorthand to connect (easter egg)
             if (tokens.length == 2) {
                 cmdLine = "connect 127.0.0.1 " + tokens[1] + "\n";
             } else {
@@ -106,14 +124,12 @@ public class KVClient implements IKVClient, Runnable {
                                 if (valStr.length() <= 120000) {
                                     try {
                                         JSONMessage msg = this.kvStore.put(tokens[1], valStr);
-                                        System.out.println(msg.getStatus() + "\t key: " + msg.getKey() + " & value: "
-                                                + msg.getValue());
+                                        printMsgFromServer(msg);
                                     } catch (SocketException se) {
                                         try {
                                             this.kvStore.connect();
                                             JSONMessage msg = this.kvStore.put(tokens[1], valStr);
-                                            System.out.println(msg.getStatus() + "\t key: " + msg.getKey()
-                                                    + " & value: " + msg.getValue());
+                                            printMsgFromServer(msg);
                                         } catch (Exception e) {
                                             System.out.println("Socket connection to server is closed.");
                                         }
@@ -127,12 +143,12 @@ public class KVClient implements IKVClient, Runnable {
                                 // DELETE key, value pair
                                 try {
                                     JSONMessage msg = this.kvStore.put(tokens[1], "");
-                                    System.out.println(msg.getStatus() + "\t key: " + msg.getKey());
+                                    printMsgFromServer(msg);
                                 } catch (SocketException se) {
                                     try {
                                         this.kvStore.connect();
                                         JSONMessage msg = this.kvStore.put(tokens[1], "");
-                                        System.out.println(msg.getStatus() + "\t key: " + msg.getKey());
+                                        printMsgFromServer(msg);
                                     } catch (Exception e) {
                                         System.out.println("Socket connection to server is closed.");
                                     }
@@ -159,14 +175,12 @@ public class KVClient implements IKVClient, Runnable {
                             if (key.length() <= 20 && key.length() > 0) {
                                 try {
                                     JSONMessage msg = this.kvStore.get(key);
-                                    System.out.println(msg.getStatus() + "\t key: " + msg.getKey() + " & value: "
-                                            + msg.getValue());
+                                    printMsgFromServer(msg);
                                 } catch (SocketException se) {
                                     try {
                                         this.kvStore.connect();
                                         JSONMessage msg = this.kvStore.get(key);
-                                        System.out.println(msg.getStatus() + "\t key: " + msg.getKey() + " & value: "
-                                                + msg.getValue());
+                                        printMsgFromServer(msg);
                                     } catch (Exception e) {
                                         System.out.println("Socket connection to server is closed.");
                                     }

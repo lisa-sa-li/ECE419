@@ -118,7 +118,6 @@ public class KVStore implements KVCommInterface, Runnable {
 		if ((this.currentNode == null) || (this.ECSNodeOrdered == null)) { // when initializing, first need to get
 																			// metadata
 			this.clientConnection.sendJSONMessage(jsonMessage);
-			logger.debug("after send message");
 			JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
 			// Want to make sure it can successfully call function before stopping this
 			// method

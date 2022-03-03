@@ -24,7 +24,6 @@ public interface KVMessage {
 		DONE, /* the server is not responsible for the key */
 		START, /* the server is not responsible for the key */
 		SERVER_STOPPED // Server has not been started by the ECS, cannot process client commands
-
 	}
 
 	/**

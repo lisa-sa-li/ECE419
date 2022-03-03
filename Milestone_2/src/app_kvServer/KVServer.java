@@ -88,18 +88,8 @@ public class KVServer implements IKVServer, Runnable {
 		this.cacheAlgo = CacheStrategy.valueOf(algo);
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
 		this.threads = new ArrayList<Thread>();
-		if (this.cacheAlgo == CacheStrategy.None) {
-			this.cache = null;
-		} else { // allocate cache
-			try {
-				Constructor<?> constructorCache = Class.forName("cache." + this.cacheAlgo + "Cache")
-						.getConstructor(Integer.class);
-				this.cache = (Cache) constructorCache.newInstance(cacheSize);
-			} catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException
-					| InvocationTargetException e) {
-				logger.error(e);
-			}
-		}
+
+		initCache();
 	}
 
 	public KVServer(int port, String serverName, String zkHost, int zkPort, String cacheStrategy, int cacheSize)
@@ -109,28 +99,13 @@ public class KVServer implements IKVServer, Runnable {
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
 		this.threads = new ArrayList<Thread>();
 
-		// initialize it as closed
-		this.serverStatus = ServerStatus.CLOSED;
-
 		this.zkHost = zkHost;
 		this.zkPort = zkPort;
 
 		this.cacheSize = cacheSize;
 		this.cacheAlgo = CacheStrategy.valueOf(cacheStrategy);
 
-		if (this.cacheAlgo == CacheStrategy.None) {
-			this.cache = null;
-		} else { // allocate cache
-			try {
-				Constructor<?> constructorCache = Class.forName("cache." + this.cacheAlgo + "Cache")
-						.getConstructor(Integer.class);
-				this.cache = (Cache) constructorCache.newInstance(cacheSize);
-			} catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException
-					| InvocationTargetException e) {
-				logger.error(e);
-			}
-		}
-
+		initCache();
 		initHeartbeat();
 	}
 
@@ -140,6 +115,16 @@ public class KVServer implements IKVServer, Runnable {
 		this.cacheAlgo = CacheStrategy.valueOf(algo);
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
 		this.threads = new ArrayList<Thread>();
+
+		initCache();
+
+		if (test) {
+			Thread testThread = new Thread(this);
+			testThread.start();
+		}
+	}
+
+	private void initCache() {
 		if (this.cacheAlgo == CacheStrategy.None) {
 			this.cache = null;
 		} else { // allocate cache
@@ -152,13 +137,10 @@ public class KVServer implements IKVServer, Runnable {
 				logger.error(e);
 			}
 		}
-		if (test) {
-			Thread testThread = new Thread(this);
-			testThread.start();
-		}
+
 	}
 
-	public void initHeartbeat() {
+	private void initHeartbeat() {
 		zkApp = new ZooKeeperApplication(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, zkPort, zkHost);
 		try {
 			zk = zkApp.connect(zkHost + ":" + String.valueOf(zkPort), zkTimeout);
@@ -209,11 +191,12 @@ public class KVServer implements IKVServer, Runnable {
 		}
 	}
 
-	public void initKVServer(String metadata) {
+	public void initKVServer(Metadata metadata) {
 		// Initialize the KVServer with the metadata and block it for client requests,
 		// i.e., all client requests are rejected with an SERVER_STOPPED error message;
 		// ECS requests have to be processed.
-
+		this.serverStatus = ServerStatus.CLOSED;
+		update(metadata);
 	}
 
 	@Override
