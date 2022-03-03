@@ -179,7 +179,7 @@ public class KVServer implements IKVServer, Runnable {
 		try {
 			String heartbeatPath = ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH + "/" +
 					serverName;
-			zkApp.create(heartbeatPath, "heartbeat", CreateMode.EPHEMERAL);
+			zkApp.create(heartbeatPath, serverName + " heartbeat", CreateMode.EPHEMERAL);
 			// Set heartbeat here
 			zk.exists(heartbeatPath, new HeartbeatApplication(this, zk, serverName));
 		} catch (KeeperException | InterruptedException e) {

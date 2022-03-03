@@ -285,7 +285,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 					}
 					key = "receieved";
 					value = "message";
-
 					break;
 				case MOVE_DATA:
 					this.kvServer.moveData(message);

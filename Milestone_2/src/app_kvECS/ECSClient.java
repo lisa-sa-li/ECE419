@@ -22,6 +22,7 @@ import java.lang.Runtime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.ZooKeeper;
@@ -87,12 +88,10 @@ public class ECSClient implements IECSClient, Runnable {
                 zkApp.create(ZooKeeperApplication.ZK_NODE_ROOT_PATH, "root_node");
             }
             if (zk.exists(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, false) == null) {
-                zkApp.create(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, "heartbeat");
+                zkApp.create(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, "heartbeat_node");
             }
         } catch (KeeperException | InterruptedException e) {
             logger.error("Cannot create root or heartbeat paths in ZK! " + e);
-        } catch (Exception e) {
-            logger.error("Hi2 " + e);
         }
     }
 
@@ -102,7 +101,6 @@ public class ECSClient implements IECSClient, Runnable {
             String serverName = node.getNodeName();
 
             Socket clientSocket = new Socket(this.hostname, port);
-
             ECSConnection ecsConnection = new ECSConnection(clientSocket);
             // set socket in ecsConnection
             node.setConnection(ecsConnection);
@@ -112,7 +110,6 @@ public class ECSClient implements IECSClient, Runnable {
         } catch (IOException e) {
             logger.error("ERROR MAKING NEW CONNECTION IN ECSCLIENT");
             throw e;
-
         }
     }
 
@@ -177,7 +174,6 @@ public class ECSClient implements IECSClient, Runnable {
         }
 
         hashRing.startAll();
-
         return startSuccess;
     }
 
@@ -185,8 +181,7 @@ public class ECSClient implements IECSClient, Runnable {
     public boolean stop() {
         /**
          * Stops the service; all participating KVServers are stopped for processing
-         * client
-         * requests but the processes remain running.
+         * client requests but the processes remain running.
          * 
          * @throws Exception some meaningfull exception on failure
          * @return true on success, false on failure
@@ -201,7 +196,7 @@ public class ECSClient implements IECSClient, Runnable {
 
             String zNodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + name;
             try {
-                zkApp.createOrSetData(zNodePath, "Some Stop message tbd");
+                zkApp.createOrSetData(zNodePath, name);
             } catch (KeeperException | InterruptedException e) {
                 stopSuccess = false;
                 logger.error("Cannot stop ZK " + e);
@@ -214,10 +209,10 @@ public class ECSClient implements IECSClient, Runnable {
 
             node.setStatus(NodeStatus.STOPPED);
             allServerMap.put(name, node);
-            // WILL UPDATING THE MAP WHILE ITERATING THROUGH IT MESS IT UP?
             currServerMap.put(name, node);
         }
 
+        hashRing.stopAll();
         return stopSuccess;
     }
 
@@ -228,32 +223,46 @@ public class ECSClient implements IECSClient, Runnable {
         Iterator<Map.Entry<String, ECSNode>> it = currServerMap.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
-            String name = pair.getKey().toString();
+            final String name = pair.getKey().toString();
             ECSNode node = pair.getValue();
 
-            String zNodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + name;
+            final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+            String heartbeatPath = ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH + "/" + name;
             try {
-                zkApp.createOrSetData(zNodePath, "Some offline message tbd");
+                zk.exists(heartbeatPath, new Watcher() {
+                    @Override
+                    public void process(WatchedEvent event) {
+                        if (event == null) {
+                            return;
+                        }
+                        if (EventType.NodeDeleted == event.getType()) {
+                            logger.info("HEARTBEAT DELETED: Server " + name + " has been closed");
+                        }
+                        countDownLatch.countDown();
+                    }
+                });
             } catch (KeeperException | InterruptedException e) {
-                shutdownSuccess = false;
-                logger.error("Cannont shutdown ZK " + e);
-                continue;
-            } catch (Exception e) {
-                shutdownSuccess = false;
-                logger.error(e);
+                shutdownSuccess = shutdownSuccess & false;
+                logger.error("Cannot detect shutdown of server " + name + "by checking its heartbeat", e);
                 continue;
             }
 
-            node.setStatus(NodeStatus.OFFLINE);
-            allServerMap.put(name, node);
-            // WILL UPDATING THE MAP WHILE ITERATING THROUGH IT MESS IT UP? YES, BUT THEY
-            // MAKE ITERATORS FOR THIS SPECIFIC CASE
-            currServerMap.put(name, node);
-            hashRing.removeNode(name);
+            try {
+                boolean complete = countDownLatch.await(2L, TimeUnit.SECONDS);
+                shutdownSuccess = shutdownSuccess & complete;
+
+                node.setStatus(NodeStatus.OFFLINE);
+                allServerMap.put(name, node);
+                currServerMap.put(name, node);
+                hashRing.removeNode(name);
+            } catch (Exception e) {
+                shutdownSuccess = shutdownSuccess & false;
+                logger.error("Cannot detect shutdown of server " + name + "by checking its heartbeat", e);
+            }
         }
 
         currServerMap.clear();
-        // System.exit(0);
         return shutdownSuccess;
     }
 
@@ -273,7 +282,7 @@ public class ECSClient implements IECSClient, Runnable {
          * directory as the ECS. All storage servers are initialized with the metadata
          * and any persisted data, and remain in state stopped.
          * NOTE: Must call setupNodes before the SSH calls to start the servers and must
-         * call awaitNodes before returning
+         * call awaitNode before returning
          * 
          * @return set of strings containing the names of the nodes
          */
@@ -312,17 +321,12 @@ public class ECSClient implements IECSClient, Runnable {
             // System.out.println("THIS IS THE CMD " + cmd);
             try {
                 Process p = Runtime.getRuntime().exec(cmd);
-                // p.waitFor();
-                // create new connection :*
-                // MAKE SURE THIS HAPPENS AFTER ABOVE CALL - MAYBE DELAY NEEDED?
-
-                awaitNodes(1, 1);
+                boolean completed = awaitNode(serverName);
 
                 newConnection(node);
                 hashRing.addNode(node);
                 nodesAdded.add(node);
             } catch (Exception e) {
-                System.out.println("THIS IS SSH error: " + e);
                 logger.error("Cannot start the server through an SSH call", e);
             }
         }
@@ -380,23 +384,11 @@ public class ECSClient implements IECSClient, Runnable {
         }
 
         // Check for the heartbeat launching?
-
-        // Iterator<Map.Entry<String, ECSNode>> it = allServerMap.entrySet().iterator();
-        // while (it.hasNext()) {
-        // Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
-        // String name = pair.getKey().toString();
-        // ECSNode node = pair.getValue();
-        // NodeStatus status = node.getStatus();
-
-        // if (status == NodeStatus.OFFLINE) { // NOT SURE
-        // continue;
-        // }
         return nodes;
     }
 
     @Override
-    public boolean awaitNodes(int count, int timeout) throws Exception {
-        // TODO
+    public boolean awaitNode(final String name) throws Exception {
         /**
          * Wait for all nodes to report status or until timeout expires
          * 
@@ -405,14 +397,41 @@ public class ECSClient implements IECSClient, Runnable {
          * @return true if all nodes reported successfully, false otherwise
          */
 
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+        String heartbeatPath = ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH + "/" + name;
         try {
-            TimeUnit.SECONDS.sleep(count * timeout);
-            return true;
-        } catch (Exception e) {
-            logger.error("Unable to await node(s)", e);
+            zk.exists(heartbeatPath, new Watcher() {
+                @Override
+                public void process(WatchedEvent event) {
+                    if (event == null) {
+                        return;
+                    }
+                    if (EventType.NodeCreated == event.getType()) {
+                        logger.info("HEARTBEAT DETECTED: Server " + name + " has been started");
+                    }
+                    countDownLatch.countDown();
+                }
+            });
+        } catch (KeeperException | InterruptedException e) {
+            logger.error("Cannot detect the start of server " + name + "by checking its heartbeat", e);
+            return false;
         }
 
-        return false;
+        try {
+            TimeUnit.SECONDS.sleep(1);
+            return countDownLatch.await(2L, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            logger.error("Cannot detect the start of server " + name + "by checking its heartbeat", e);
+            return false;
+        }
+
+        // try {
+        // TimeUnit.SECONDS.sleep(1);
+        // return true;
+        // } catch (Exception e) {
+        // logger.error("Unable to await node(s)", e);
+        // }
     }
 
     @Override
@@ -464,12 +483,12 @@ public class ECSClient implements IECSClient, Runnable {
                     addNode(tokens[1], Integer.parseInt(tokens[2]));
                     break;
                 case "addnodes":
-                    if (tokens.length > 3) {
+                    if (tokens.length != 4) {
                         logger.error("Invalid number of parameters! Missing number of nodes to add");
                     } else {
                         System.out.println("Adding nodes");
                         int count = Integer.parseInt(tokens[1]);
-                        addNodes(count, tokens[1], Integer.parseInt(tokens[2]));
+                        addNodes(count, tokens[2], Integer.parseInt(tokens[3]));
                     }
                     break;
                 case "removenode":

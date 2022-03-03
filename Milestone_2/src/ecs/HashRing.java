@@ -115,7 +115,6 @@ public class HashRing {
 
         // update all except dead node (which won't respond)
         updateAll(deadNode.getHash());
-
     }
 
     private void updateAll(BigInteger hashed) {
@@ -140,7 +139,6 @@ public class HashRing {
             Metadata metadata = new Metadata(MessageType.SET_METADATA, hashRing, null);
             // send server info
             currNode.sendMessage(metadata);
-            // currNode.receiveMessage();
         }
     }
 
@@ -151,7 +149,16 @@ public class HashRing {
             Metadata metadata = new Metadata(MessageType.START, hashRing, null);
             // send server info
             currNode.sendMessage(metadata);
-            // currNode.receiveMessage();
+        }
+    }
+
+    public void stopAll() {
+        // iterate through sorted key array
+        for (BigInteger key : hashOrder) {
+            ECSNode currNode = hashServers.get(key);
+            Metadata metadata = new Metadata(MessageType.STOP, hashRing, null);
+            // send server info
+            currNode.sendMessage(metadata);
         }
     }
 
@@ -174,7 +181,6 @@ public class HashRing {
 
     public boolean isEmpty() {
         return hashRing.size() == 0;
-        // || hashRing.size() != 0;
     }
 
     public BigInteger getHash(String value) {

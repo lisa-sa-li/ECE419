@@ -19,10 +19,11 @@ public interface KVMessage {
 		DISCONNECTED, /* Server or client is disconnected */
 		NO_STATUS, /* Equivalent to null */
 		SERVER_NOT_RESPONSIBLE, /* the server is not responsible for the key */
-		SET_METADATA, /* the server is not responsible for the key */
-		MOVE_DATA, /* the server is not responsible for the key */
-		DONE, /* the server is not responsible for the key */
-		START, /* the server is not responsible for the key */
+		SET_METADATA,
+		MOVE_DATA,
+		DONE,
+		START,
+		STOP,
 		SERVER_STOPPED // Server has not been started by the ECS, cannot process client commands
 	}
 
