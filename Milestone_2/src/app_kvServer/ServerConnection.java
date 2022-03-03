@@ -170,7 +170,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 		switch (status) {
 			case PUT:
 				try {
-					// logger.info("IS ME?: " + this.serverSocket.getPort() + " " + resp);
 					if (!this.kvServer.isMe(key)) {
 						handleMessageStatus = StatusType.SERVER_NOT_RESPONSIBLE;
 						// send back metadata
@@ -241,6 +240,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		}
 
 		if (handleMessageStatus == null) {
+			// This is a PUT_MANY success, do not send a message back to the sender node
 			return null;
 		} else if (handleMessageStatus == StatusType.SERVER_NOT_RESPONSIBLE) {
 			Metadata metadata = new Metadata(MessageType.SERVER_NOT_RESPONSIBLE, order, null);
@@ -278,9 +278,14 @@ public class ServerConnection implements IServerConnection, Runnable {
 					this.kvServer.unLockWrite();
 					break;
 				case SET_METADATA:
+					if (this.kvServer.getOrder() == null) {
+						this.kvServer.initKVServer(message);
+					} else {
+						this.kvServer.update(message);
+					}
 					key = "receieved";
 					value = "message";
-					this.kvServer.update(message);
+
 					break;
 				case MOVE_DATA:
 					this.kvServer.moveData(message);

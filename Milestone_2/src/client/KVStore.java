@@ -5,26 +5,20 @@ import org.apache.log4j.Logger;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.io.IOException;
+import java.util.Map.Entry;
+import java.util.*;
 
-import shared.exceptions.UnexpectedValueException;
-import shared.messages.JSONMessage;
-import shared.Utils;
-import shared.messages.KVMessage.StatusType;
 import ecs.HashRing;
 import ecs.ECSNode;
 import ecs.IECSNode.NodeStatus;
 
 import app_kvClient.ClientConnection;
-import shared.messages.Metadata;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.LinkedList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.*;
+import shared.messages.Metadata;
+import shared.messages.KVMessage.StatusType;
+import shared.messages.JSONMessage;
+import shared.exceptions.UnexpectedValueException;
+import shared.Utils;
 
 public class KVStore implements KVCommInterface, Runnable {
 	/**
@@ -115,68 +109,30 @@ public class KVStore implements KVCommInterface, Runnable {
 	public JSONMessage runPutGet(JSONMessage jsonMessage, String key) throws Exception {
 		JSONMessage finalMsg = null;
 		wasSuccessful = false;
-		if ((this.currentNode == null) || (this.ECSNodeOrdered == null)) { // when initializing, first need to get
-																			// metadata
-			this.clientConnection.sendJSONMessage(jsonMessage);
-			JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
-			// Want to make sure it can successfully call function before stopping this
-			// method
-			int retries = 0;
-			while (!wasSuccessful && retries < 3) {
-				try {
-					if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
-						this.updateToCorrectNodeInfo(returnMsg, key);
-						this.switchServer();
-						this.clientConnection.sendJSONMessage(jsonMessage);
-						returnMsg = this.clientConnection.receiveJSONMessage();
-					} else {
-						wasSuccessful = true;
-						finalMsg = returnMsg;
-					}
-				} catch (Exception e) {
-					logger.error(e);
+		if (this.currentNode != null && this.ECSNodeOrdered != null
+				&& !isECSNodeResponsibleForKey(key, this.currentNode)) {
+			// metadata already exists (might be stale)
+			this.updateToCorrectNodeFromList(key);
+		}
+
+		this.clientConnection.sendJSONMessage(jsonMessage);
+		JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
+		int retries = 0;
+		while (!wasSuccessful && retries < 3) {
+			try {
+				if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
+					this.updateToCorrectNodeInfo(returnMsg, key);
+					this.switchServer();
+					this.clientConnection.sendJSONMessage(jsonMessage);
+					returnMsg = this.clientConnection.receiveJSONMessage();
+				} else {
+					wasSuccessful = true;
+					finalMsg = returnMsg;
 				}
-				retries++;
+			} catch (Exception e) {
+				logger.error(e);
 			}
-		} else { // metadata already exists (might be stale)
-			if (!(isECSNodeResponsibleForKey(key, this.currentNode))) {
-				this.updateToCorrectNodeFromList(key);
-				this.clientConnection.sendJSONMessage(jsonMessage);
-				JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
-				while (!wasSuccessful) {
-					try {
-						if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
-							this.updateToCorrectNodeInfo(returnMsg, key);
-							this.switchServer();
-							this.clientConnection.sendJSONMessage(jsonMessage);
-							returnMsg = this.clientConnection.receiveJSONMessage();
-						} else {
-							wasSuccessful = true;
-							finalMsg = returnMsg;
-						}
-					} catch (Exception e) {
-						logger.error(e);
-					}
-				}
-			} else {
-				this.clientConnection.sendJSONMessage(jsonMessage);
-				JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
-				while (!wasSuccessful) {
-					try {
-						if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
-							this.updateToCorrectNodeInfo(returnMsg, key);
-							this.switchServer();
-							this.clientConnection.sendJSONMessage(jsonMessage);
-							returnMsg = this.clientConnection.receiveJSONMessage();
-						} else {
-							wasSuccessful = true;
-							finalMsg = returnMsg;
-						}
-					} catch (Exception e) {
-						logger.error(e);
-					}
-				}
-			}
+			retries++;
 		}
 		return finalMsg;
 	}
@@ -192,24 +148,10 @@ public class KVStore implements KVCommInterface, Runnable {
 
 	// Find out if the current ECSNode is responsible for the given key
 	public boolean isECSNodeResponsibleForKey(String key, ECSNode currNode) {
-		// BigInteger keyHash = hashRing.getHash(key);
 		BigInteger hash = currNode.getHash();
 		BigInteger endHash = currNode.getEndHash();
 
 		return utils.isKeyInRange(hash, endHash, key);
-
-		// Three cases where the node is responsible for the key
-		// Case 1: inHash <= key < endHash
-		// Case 2: inHash >= endHash and key >= inHash and key >= endHash
-		// Case 3: inHash >= endHash and key <= inHash and key <= endHash
-		// return ((hash.compareTo(endHash) != 1) && (hash.compareTo(keyHash) != 1) &&
-		// (endHash.compareTo(keyHash) != -1))
-		// ||
-		// ((hash.compareTo(endHash) != -1) && (hash.compareTo(keyHash) != 1) &&
-		// (endHash.compareTo(keyHash) != 1))
-		// ||
-		// ((hash.compareTo(endHash) != -1) && (hash.compareTo(keyHash) != -1)
-		// && (endHash.compareTo(keyHash) != -1));
 	}
 
 	// Update the server address and port to have the most recent responsible node's
@@ -259,7 +201,7 @@ public class KVStore implements KVCommInterface, Runnable {
 
 			String[] keyList = entry.getKey().split(":");
 			if (keyList.length != 3) {
-				logger.error("Key from order is not in the format host:port");
+				logger.error("Key from order is not in the format name:port:host");
 				continue;
 			}
 
