@@ -47,7 +47,5 @@ public class LFUCacheTest extends TestCase {
         assertTrue(this.cache.containsKey("5"));
         assertTrue(this.cache.containsKey("6"));
 
-
-
     }
 }

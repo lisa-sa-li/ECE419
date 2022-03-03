@@ -11,7 +11,7 @@ import shared.messages.JSONMessage;
 public class ECSNode implements IECSNode {
 
     private static Logger logger = Logger.getRootLogger();
-    
+
     private String name;
     private String host;
     private int id;
@@ -21,20 +21,20 @@ public class ECSNode implements IECSNode {
 
     private BigInteger hash;
     private BigInteger endHash;
-    
+
     public NodeStatus status;
 
     private String cacheAlgo;
     private int cacheSize;
 
-    public ECSNode(String name, int port, String host){
+    public ECSNode(String name, int port, String host) {
         // initializing a node
         this.name = name;
         this.host = host;
         this.port = port;
     }
 
-    public ECSNode(String name, int port, String host, NodeStatus inStatus){
+    public ECSNode(String name, int port, String host, NodeStatus inStatus) {
         // initializing a node
         this.name = name;
         this.host = host;
@@ -42,7 +42,7 @@ public class ECSNode implements IECSNode {
         this.status = inStatus;
     }
 
-    public ECSNode(String name, int port, String host, NodeStatus inStatus, int orderAdded){
+    public ECSNode(String name, int port, String host, NodeStatus inStatus, int orderAdded) {
         // initializing a node
         this.name = name;
         this.host = host;
@@ -51,14 +51,14 @@ public class ECSNode implements IECSNode {
         this.id = orderAdded;
     }
 
-    public ECSNode(String host, int port, BigInteger inHash){
+    public ECSNode(String host, int port, BigInteger inHash) {
         // initializing a node just to be used for temporary node in KVStore
         this.host = host;
         this.port = port;
         this.hash = inHash;
     }
 
-    public ECSNode(String name, String host, int port, BigInteger inHash, BigInteger endHash){
+    public ECSNode(String name, String host, int port, BigInteger inHash, BigInteger endHash) {
         // initializing a node just to be used for temporary node in KVStore
         this.name = name;
         this.host = host;
@@ -67,52 +67,52 @@ public class ECSNode implements IECSNode {
         this.endHash = endHash;
     }
 
-    public void setStatus(NodeStatus inStatus){
+    public void setStatus(NodeStatus inStatus) {
         this.status = inStatus;
     }
 
-    public NodeStatus getStatus(){
+    public NodeStatus getStatus() {
         return status;
     }
 
-    public void setConnection(ECSConnection ecsConnection){
+    public void setConnection(ECSConnection ecsConnection) {
         this.ecsConnection = ecsConnection;
     }
 
-    public void sendMessage(Metadata msg){
-        try{
+    public void sendMessage(Metadata msg) {
+        try {
             this.ecsConnection.sendJSONMessage(msg);
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.info("Unable to send message: " + e);
         }
     }
 
-    public JSONMessage receiveMessage(){
-        try{
+    public JSONMessage receiveMessage() {
+        try {
             return this.ecsConnection.receiveJSONMessage();
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.info("Unable to receive message: " + e);
         }
         return null;
     }
 
-    public void setStatus(String inStatus){
+    public void setStatus(String inStatus) {
         NodeStatus enumStatus = NodeStatus.valueOf(inStatus);
         this.status = enumStatus;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "ECSNode:\n"
-                +"name: " + name
-                +"\nport: " + port
-                +"\nstatus: " + status
-                +"\nhashrange: " + nodeHashRange;
+                + "name: " + name
+                + "\nport: " + port
+                + "\nstatus: " + status
+                + "\nhashrange: " + nodeHashRange;
     }
 
     @Override
     public String[] getNodeHashRange() {
-        //TODO get hash range
+        // TODO get hash range
         return null;
     }
 
@@ -139,21 +139,21 @@ public class ECSNode implements IECSNode {
         return endHash;
     }
 
-    public void setHashRange(BigInteger hashVal, BigInteger endVal){
+    public void setHashRange(BigInteger hashVal, BigInteger endVal) {
         this.hash = hashVal;
         this.endHash = endVal;
     }
 
-    public void setHash(BigInteger hashVal){
+    public void setHash(BigInteger hashVal) {
         this.hash = hashVal;
     }
 
-    public void setCacheInfo(int cacheSize, String cacheAlgo){
+    public void setCacheInfo(int cacheSize, String cacheAlgo) {
         this.cacheSize = cacheSize;
         this.cacheAlgo = cacheAlgo;
     }
 
-    public int getCacheSize(){
+    public int getCacheSize() {
         return this.cacheSize;
     }
 

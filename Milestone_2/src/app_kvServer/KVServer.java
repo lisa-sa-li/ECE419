@@ -264,6 +264,7 @@ public class KVServer implements IKVServer, Runnable {
 		update(metadata);
 
 		Boolean die = getHashRange();
+		logger.debug("die? " + die);
 		lockWrite();
 
 		ECSNode receiverNode = metadata.getReceiverNode();
@@ -274,6 +275,7 @@ public class KVServer implements IKVServer, Runnable {
 		BigInteger endHash = receiverNode.getEndHash();
 
 		if (nameOfReceiver == this.serverName) {
+			// If it's being told to move the data to itself, do nothing
 			unLockWrite();
 			return;
 		}
