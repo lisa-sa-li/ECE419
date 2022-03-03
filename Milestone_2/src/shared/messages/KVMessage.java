@@ -22,6 +22,9 @@ public interface KVMessage {
 		SET_METADATA, /* the server is not responsible for the key */
 		MOVE_DATA, /* the server is not responsible for the key */
 		DONE, /* the server is not responsible for the key */
+		START, /* the server is not responsible for the key */
+		SERVER_STOPPED // Server has not been started by the ECS, cannot process client commands
+
 	}
 
 	/**

@@ -87,6 +87,7 @@ public class KVStore implements KVCommInterface, Runnable {
 		try {
 			JSONMessage jsonMessage = new JSONMessage();
 			jsonMessage.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "disconnected", null);
+
 			this.clientConnection.sendJSONMessage(jsonMessage);
 			this.clientConnection.receiveJSONMessage();
 			this.clientConnection.close();
@@ -116,11 +117,9 @@ public class KVStore implements KVCommInterface, Runnable {
 		wasSuccessful = false;
 		if ((this.currentNode == null) || (this.ECSNodeOrdered == null)) { // when initializing, first need to get
 																			// metadata
-			logger.debug("before send message");
 			this.clientConnection.sendJSONMessage(jsonMessage);
 			logger.debug("after send message");
 			JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
-			logger.debug("before recieve message");
 			// Want to make sure it can successfully call function before stopping this
 			// method
 			int retries = 0;
@@ -129,11 +128,8 @@ public class KVStore implements KVCommInterface, Runnable {
 					if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
 						this.updateToCorrectNodeInfo(returnMsg, key);
 						this.switchServer();
-						logger.debug("before send message3");
 						this.clientConnection.sendJSONMessage(jsonMessage);
-						logger.debug("before send message33");
 						returnMsg = this.clientConnection.receiveJSONMessage();
-						logger.debug("before send message333");
 					} else {
 						wasSuccessful = true;
 						finalMsg = returnMsg;
@@ -146,21 +142,15 @@ public class KVStore implements KVCommInterface, Runnable {
 		} else { // metadata already exists (might be stale)
 			if (!(isECSNodeResponsibleForKey(key, this.currentNode))) {
 				this.updateToCorrectNodeFromList(key);
-				logger.debug("before send message1");
 				this.clientConnection.sendJSONMessage(jsonMessage);
-				logger.debug("before send message11");
 				JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
-				logger.debug("before send message111");
 				while (!wasSuccessful) {
 					try {
 						if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
 							this.updateToCorrectNodeInfo(returnMsg, key);
 							this.switchServer();
-							logger.debug("before send message4");
 							this.clientConnection.sendJSONMessage(jsonMessage);
-							logger.debug("before send message44");
 							returnMsg = this.clientConnection.receiveJSONMessage();
-							logger.debug("before send message444");
 						} else {
 							wasSuccessful = true;
 							finalMsg = returnMsg;
@@ -170,21 +160,15 @@ public class KVStore implements KVCommInterface, Runnable {
 					}
 				}
 			} else {
-				logger.debug("before send message2");
 				this.clientConnection.sendJSONMessage(jsonMessage);
-				logger.debug("before send message22");
 				JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
-				logger.debug("before send message222");
 				while (!wasSuccessful) {
 					try {
 						if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
 							this.updateToCorrectNodeInfo(returnMsg, key);
 							this.switchServer();
-							logger.debug("before send message5");
 							this.clientConnection.sendJSONMessage(jsonMessage);
-							logger.debug("before send message55");
 							returnMsg = this.clientConnection.receiveJSONMessage();
-							logger.debug("before send message555");
 						} else {
 							wasSuccessful = true;
 							finalMsg = returnMsg;
@@ -244,30 +228,22 @@ public class KVStore implements KVCommInterface, Runnable {
 	// Iterate over the Array of servers to find the responsible node and update the
 	// server address and server port
 	public void updateToCorrectNodeFromList(String key) {
-		logger.debug("updateToCorrectNodeFromList");
 		for (int i = 0; i < this.ECSNodeOrdered.size(); i++) {
-			logger.info("Checking for is node resoponsible");
-			logger.info("isNodeResponsibleForKey: " + this.ECSNodeOrdered.get(i));
 			boolean isNodeResponsibleForKey = isECSNodeResponsibleForKey(key, this.ECSNodeOrdered.get(i));
 			if (isNodeResponsibleForKey) {
 				this.currentNode = this.ECSNodeOrdered.get(i);
 				this.address = this.currentNode.getNodeHost();
-				System.out.println("this.currentNode.getNodePort();" + this.currentNode.getNodePort());
 				this.port = this.currentNode.getNodePort();
 				break;
 			}
 		}
-		logger.debug("leaving updateToCorrectNodeFromList");
 	}
 
 	public void orderMetadataIntoECSNodeList(final boolean ascending) {
-		logger.debug("orderMetadataIntoECSNodeList");
 		// From https://stackoverflow.com/questions/8119366/sorting-hashmap-by-values
 		this.ECSNodeOrdered = new ArrayList<>();
 		List<Entry<String, BigInteger>> metadataList = new LinkedList<Entry<String, BigInteger>>(
 				this.metadataOrder.entrySet());
-
-		logger.debug("1");
 		Collections.sort(metadataList, new Comparator<Entry<String, BigInteger>>() {
 			public int compare(Entry<String, BigInteger> o1, Entry<String, BigInteger> o2) {
 				if (ascending) {
@@ -279,14 +255,10 @@ public class KVStore implements KVCommInterface, Runnable {
 		});
 
 		// populate the end hash
-		logger.debug("2");
-
-		// for (Entry<String, BigInteger> entry : metadataList) {
 		for (int i = 0; i < metadataList.size(); i++) {
 			Entry<String, BigInteger> entry = metadataList.get(i);
 
 			String[] keyList = entry.getKey().split(":");
-			logger.debug("4 keylist: " + Arrays.toString(keyList));
 			if (keyList.length != 3) {
 				logger.error("Key from order is not in the format host:port");
 				continue;
@@ -295,7 +267,6 @@ public class KVStore implements KVCommInterface, Runnable {
 			String serverName = keyList[0];
 			int serverPort = Integer.valueOf(keyList[1]);
 			String serverHost = keyList[2];
-			logger.debug("7 entry.getValue() " + entry.getValue());
 
 			BigInteger endHash;
 			if (i == metadataList.size() - 1) {
@@ -304,9 +275,7 @@ public class KVStore implements KVCommInterface, Runnable {
 				endHash = metadataList.get(i + 1).getValue();
 			}
 			this.ECSNodeOrdered.add(new ECSNode(serverName, serverHost, serverPort, entry.getValue(), endHash));
-			logger.debug("8");
 		}
-		logger.debug("LEAVING orderMetadataIntoECSNodeList");
 	}
 
 	// for testing

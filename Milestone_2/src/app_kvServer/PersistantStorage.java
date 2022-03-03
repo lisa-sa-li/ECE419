@@ -91,8 +91,6 @@ public class PersistantStorage implements IPersistantStorage {
 
     @Override
     public StatusType put(String key, String value) throws Exception {
-        logger.debug("IN PS PUT");
-
         try {
             // Below is slightly modified logic from
             // https://stackoverflow.com/questions/20039980/java-replace-line-in-text-file
@@ -160,7 +158,7 @@ public class PersistantStorage implements IPersistantStorage {
             fileOut.write(inputBuffer.toString().getBytes());
             fileOut.close();
 
-            logger.info("Completed 'put' operation into storage server");
+            logger.info("Completed 'put' operation into storage server " + putStatus.name());
             return putStatus;
         } catch (Exception e) {
             logger.error("Problem reading file to put.");
@@ -229,18 +227,6 @@ public class PersistantStorage implements IPersistantStorage {
         }
     }
 
-    // private boolean isKeyInRange(BigInteger hash, BigInteger endHash, String key)
-    // {
-    // if (hash != null && endHash == null) {
-    // return true;
-    // }
-
-    // BigInteger keyHash = hashRing.getHash(key);
-    // int left = hash.compareTo(keyHash);
-    // int right = endHash.compareTo(keyHash);
-    // return (left >= 0 && right < 0);
-    // }
-
     @Override
     public String getDataInRange(BigInteger hash, BigInteger endHash, Boolean die) {
         try {
@@ -258,9 +244,6 @@ public class PersistantStorage implements IPersistantStorage {
                 json = new JSONMessage();
                 json.deserialize(line);
                 keyFromFile = json.getKey();
-
-                // logger.info("isKeyInRange? " + keyFromFile + " " + isKeyInRange(hash,
-                // endHash, keyFromFile));
 
                 if (die == true) {
                     outputBuffer.append(line);

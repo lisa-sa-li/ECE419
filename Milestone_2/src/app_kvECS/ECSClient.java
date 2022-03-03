@@ -161,10 +161,9 @@ public class ECSClient implements IECSClient, Runnable {
 
             String zNodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + name;
             try {
-                zkApp.createOrSetData(zNodePath, "Some Start message tbd");
+                zkApp.createOrSetData(zNodePath, name);
             } catch (KeeperException | InterruptedException e) {
                 startSuccess = false;
-                logger.error("Hi3" + e);
                 continue;
             } catch (Exception e) {
                 startSuccess = false;
@@ -174,9 +173,10 @@ public class ECSClient implements IECSClient, Runnable {
 
             node.setStatus(NodeStatus.STARTING);
             allServerMap.put(name, node);
-            // WILL UPDATING THE MAP WHILE ITERATING THROUGH IT MESS IT UP?
             currServerMap.put(name, node);
         }
+
+        hashRing.startAll();
 
         return startSuccess;
     }
@@ -309,7 +309,7 @@ public class ECSClient implements IECSClient, Runnable {
                     + String.valueOf(zkPort) + " " + cacheStrategy + " "
                     + String.valueOf(cacheSize);
 
-            System.out.println("THIS IS THE CMD " + cmd);
+            // System.out.println("THIS IS THE CMD " + cmd);
             try {
                 Process p = Runtime.getRuntime().exec(cmd);
                 // p.waitFor();
@@ -421,8 +421,6 @@ public class ECSClient implements IECSClient, Runnable {
             logger.error("You are removing too many nodes. There must be at least one active server.");
             return false;
         }
-        // Error check, make sure there is at least one active node
-        // TODO
         for (String name : nodeNames) {
             ECSNode serverNode = allServerMap.get(name);
             serverNode.setStatus(NodeStatus.OFFLINE);

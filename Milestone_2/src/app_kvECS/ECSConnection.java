@@ -68,7 +68,7 @@ public class ECSConnection {
 
 	public void sendJSONMessage(Metadata meta) throws IOException {
 		JSONMessage json = new JSONMessage();
-		json.setMessage(meta.getStatus().name(), "blah", "blah", meta);
+		json.setMessage(meta.getStatus().name(), "none", "none", meta);
 		byte[] jsonBytes = json.getJSONByte();
 		output.write(jsonBytes, 0, jsonBytes.length);
 		output.flush();

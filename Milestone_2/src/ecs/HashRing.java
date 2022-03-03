@@ -32,48 +32,6 @@ public class HashRing {
     public HashRing() {
     }
 
-    // public void createHashRing(HashMap<String, ECSNode> currServers) throws
-    // Exception {
-    // // this function should only be called once per execution
-    // if (hashOrder.size() != 0 || hashRing.size() != 0) {
-    // System.out.println("CANNOT CALL HASHRING TWICE");
-    // throw new UnexpectedValueException("This function cannot be called twice");
-    // }
-    // int numCurrServers = currServers.size();
-
-    // if (numCurrServers == 0) {
-    // // no active nodes
-    // logger.info("No current servers to construct hashring");
-    // return;
-    // }
-
-    // // construct the ring from name hash values
-    // for (ECSNode node : currServers.values()) {
-    // String name = node.getNodeName();
-
-    // // hash ip:port
-    // String toHash = node.getNodeHost() + ":" +
-    // Integer.toString(node.getNodePort());
-    // BigInteger hashed = getHash(toHash);
-
-    // // let the server know its hash
-    // node.setHash(hashed);
-
-    // // append to hashOrder + hashRing + hashServers
-    // hashOrder.add(hashed);
-    // hashRing.put(toHash, hashed);
-    // hashServers.put(hashed, node);
-    // }
-    // // sort the hashes
-    // Collections.sort(hashOrder);
-
-    // // set ranges
-    // updateAll();
-
-    // // set size
-    // this.numServers = hashOrder.size();
-    // }
-
     public void addNode(ECSNode newNode) {
         String name = newNode.getNodeName();
 
@@ -106,9 +64,6 @@ public class HashRing {
             // send metadata to servers when there's more than 1 server operating
             if (numServers > 1) {
                 Metadata update = new Metadata(MessageType.MOVE_DATA, hashRing, newNode);
-                System.out.println(
-                        "IN HASHRING, sending to prevnode: " + prevNode.getNodePort() + ":" + prevNode.getNodeName());
-                System.out.println("newnode is: " + newNode.getNodePort() + ":" + newNode.getNodeName());
                 prevNode.sendMessage(update);
                 JSONMessage msg = prevNode.receiveMessage();
                 // set hash
@@ -118,11 +73,6 @@ public class HashRing {
             }
         }
     }
-
-    // Metadata updateNewNode = new Metadata(MessageType.SET_METADATA, hashRing,
-    // null);
-    // newNode.sendMessage(updateNewNode);
-    // JSONMessage msg = newNode.receiveMessage();
 
     public void addNodes(ArrayList<ECSNode> nodes) throws Exception {
         for (ECSNode node : nodes) {
@@ -194,6 +144,17 @@ public class HashRing {
         }
     }
 
+    public void startAll() {
+        // iterate through sorted key array
+        for (BigInteger key : hashOrder) {
+            ECSNode currNode = hashServers.get(key);
+            Metadata metadata = new Metadata(MessageType.START, hashRing, null);
+            // send server info
+            currNode.sendMessage(metadata);
+            // currNode.receiveMessage();
+        }
+    }
+
     public HashMap<String, ECSNode> getHashRingMap() {
         // Convert the hash ring to {serverName: node}
         HashMap<String, ECSNode> hashRingtoServers = new HashMap<String, ECSNode>();
@@ -233,9 +194,6 @@ public class HashRing {
                 // https://stackoverflow.com/questions/11380062/what-does-value-0xff-do-in-java
                 stringHash.append(Integer.toHexString((b & 0xFF) | 0x100), 1, 3);
             }
-            // return stringHash.toString();
-            // return hex biginteger
-
             return new BigInteger(stringHash.toString(), 16);
 
         } catch (Exception e) {

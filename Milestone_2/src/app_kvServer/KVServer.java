@@ -46,7 +46,7 @@ public class KVServer implements IKVServer, Runnable {
 	private boolean running;
 	private String hostName;
 	private ArrayList<Thread> threads;
-	private ServerStatus serverStatus;
+	public ServerStatus serverStatus;
 	private ServerSocket serverSocket;
 
 	private ECSConnection ecsConnection;
@@ -100,7 +100,6 @@ public class KVServer implements IKVServer, Runnable {
 				logger.error(e);
 			}
 		}
-		logger.debug("HERE1");
 	}
 
 	public KVServer(int port, String serverName, String zkHost, int zkPort, String cacheStrategy, int cacheSize)
@@ -109,6 +108,9 @@ public class KVServer implements IKVServer, Runnable {
 		this.serverName = serverName;
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
 		this.threads = new ArrayList<Thread>();
+
+		// initialize it as closed
+		this.serverStatus = ServerStatus.CLOSED;
 
 		this.zkHost = zkHost;
 		this.zkPort = zkPort;
@@ -129,7 +131,6 @@ public class KVServer implements IKVServer, Runnable {
 			}
 		}
 
-		logger.debug("HERE2");
 		initHeartbeat();
 	}
 
@@ -241,12 +242,13 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	public boolean inHashRing() {
-		logger.info("is " + this.serverName + " in hashring " + hashRing.keySet() + "?: "
-				+ hashRing.get(getNamePortHost()) != null);
-		return (hashRing.get(getNamePortHost()) != null);
+		return hashRing.get(getNamePortHost()) != null;
 	}
 
 	public Boolean getHashRange() {
+		// Returns true if the node is no longer in the hashring, meaning it has been
+		// removed
+
 		if (inHashRing() == false) {
 			// This detects that it's not in the hashring anymore, thus it needs to die
 			this.hash = null;
@@ -270,16 +272,15 @@ public class KVServer implements IKVServer, Runnable {
 		return false;
 	}
 
-	public void moveData(Metadata metadata) { // range, server
+	public void moveData(Metadata metadata) {
+		// Transfer a subset (range) of the KVServer's data to another KVServer
+		// Send a notification to the ECS, if data transfer is completed.
+
+		// Update internal metadata with the metadata is just recieved in the new
+		// message
 		update(metadata);
 
-		// figure out new endHash HERE
 		Boolean die = getHashRange();
-
-		// Transfer a subset (range) of the KVServer's data to another KVServer
-		// (reallocation before removing this server or adding a new KVServer to the
-		// ring);
-		// send a notification to the ECS, if data transfer is completed.
 		lockWrite();
 
 		ECSNode receiverNode = metadata.getReceiverNode();
@@ -289,25 +290,18 @@ public class KVServer implements IKVServer, Runnable {
 		BigInteger hash = receiverNode.getHash();
 		BigInteger endHash = receiverNode.getEndHash();
 
-		logger.info("ABOUT TO MOVE DATA TO: " + nameOfReceiver + ":" + portOfReceiver + ":" + hostOfReceiver);
-
-		// logger.debug("> " + hostOfReceiver + nameOfReceiver + "?" + hash + "?" +
-		// endHash);
-
 		if (nameOfReceiver == this.serverName) {
 			unLockWrite();
 			return;
 		}
 
 		try {
-			// This is the data being remove from this server and being moved to the
-			// reciever server
-			logger.debug("BEFORE GET DATA IN RANGE die " + die);
+			// Get data from Persistant Storage to move to new server
+			// If die = true, it will move all the data in its storage
 			String dataInRange = persistantStorage.getDataInRange(hash, endHash, die);
 
 			Socket socket = new Socket(hostOfReceiver, portOfReceiver);
 			OutputStream output = socket.getOutputStream();
-			// InputStream input = socket.getInputStream();
 
 			JSONMessage json = new JSONMessage();
 			json.setMessage(StatusType.PUT_MANY.name(), "put_many", dataInRange, null);
@@ -317,10 +311,6 @@ public class KVServer implements IKVServer, Runnable {
 			output.flush();
 			output.close();
 			socket.close();
-			// ????
-			// listen for put success
-			// then close socket
-			logger.info("Send data to node " + nameOfReceiver);
 		} catch (Exception e) {
 			logger.error("Unable to send data to node " + nameOfReceiver + ", " + e);
 		}
@@ -339,7 +329,7 @@ public class KVServer implements IKVServer, Runnable {
 	public void update(Metadata metadata) {
 		// Update the metadata repository of this server
 		this.hashRing = metadata.order;
-		Boolean tmp = getHashRange();
+		getHashRange();
 	}
 
 	public HashMap<String, BigInteger> getOrder() {
@@ -348,36 +338,6 @@ public class KVServer implements IKVServer, Runnable {
 
 	public boolean isMe(String toHash) {
 		return utils.isKeyInRange(this.hash, this.endHash, toHash);
-		// logger.debug("IN ISME");
-		// if (this.endHash == null) {
-		// // only server in the ring
-		// return true;
-		// }
-
-		// BigInteger hashed = hashRingClass.getHash(toHash);
-
-		// int isEndHashLarger = this.endHash.compareTo(this.hash);
-		// // a.compareTo(b)
-		// // 0 = equal
-		// // 1 = a > b
-		// // -1 = a < b
-
-		// int left = this.hash.compareTo(hashed);
-		// int right = this.endHash.compareTo(hashed);
-
-		// logger.debug("LEFT " + left + " right " + right);
-		// logger.debug("this.hash " + this.hash + " this.endHash " + this.endHash + "
-		// hashed " + hashed);
-
-		// if (isEndHashLarger > 0) {
-		// // left = 12, right = 20, tohash 18
-		// logger.debug("isEndHashLarger > 0 " + (left <= 0 && right > 0));
-		// return (left <= 0 && right > 0);
-		// } else {
-		// // left = 99, right = 2, tohash 1
-		// logger.debug("isEndHashLarger <= 0 " + (left <= 0 || right > 0));
-		// return (left <= 0 || right > 0);
-		// }
 	}
 
 	@Override
@@ -392,8 +352,6 @@ public class KVServer implements IKVServer, Runnable {
 
 	public String getNamePortHost() {
 		String rval = this.serverName + ":" + getPort() + ":" + "127.0.0.1";
-		// getHostname();
-		logger.info("THIS IS NAME PORT HOST: " + rval);
 		return rval;
 	}
 
