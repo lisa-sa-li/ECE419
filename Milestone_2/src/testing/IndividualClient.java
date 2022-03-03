@@ -5,10 +5,10 @@ import java.util.Random;
 import client.KVStore;
 import java.util.ArrayList;
 import java.util.List;
+import java.nio.charset.StandardCharsets;
+
 
 public class IndividualClient implements Runnable {
-    double totalDurationPUT;
-    double totalDurationGET;
     int numPUTRequests;
     int numGETRequests;
     private KVStore kvStore;
@@ -17,64 +17,60 @@ public class IndividualClient implements Runnable {
     private boolean initialPopulating;
     private List<ArrayList<String>> originalData;
     private int numRequests;
+    private double totalBytes = 0;
 
     public IndividualClient(String hostname, int port, List<ArrayList<String>> associatedData,
-                            List<ArrayList<String>> originalData, int numRequests) {
+                            List<ArrayList<String>> originalData, int numRequests, boolean initialPopulating) {
         this.kvStore = new KVStore(hostname, port);
         this.associatedData = associatedData;
         this.initialPopulating = initialPopulating;
         this.originalData = originalData;
         this.numRequests = numRequests;
+        System.out.println("associatedData.length " + associatedData.size());
     }
 
-    /*
-    public double computeTimeDurationPUT(String key, String val) {
-        long startTime = System.currentTimeMillis();
-        try {
-            this.kvStore.put(key, val);
-        } catch (Exception e) {
-        }
-        long endTime = System.currentTimeMillis();
-        return (endTime - startTime);
+    public double getTotalBytes(){
+        return this.totalBytes;
     }
 
-    public double computeTimeDurationGET(String key) {
-        long startTime = System.currentTimeMillis();
-        try {
-            this.kvStore.get(key);
-        } catch (Exception e) {
-        }
-        long endTime = System.currentTimeMillis();
-        return (endTime - startTime);
-    }
-    */
     public void run() {
         try{
-            this.kvStore.connect();
+            System.out.println("start of individual client run() ");
+            try {
+                this.kvStore.connect();
+                System.out.println("KVStore connected ");
+                // Had to comment out initHeartBeat() in KVServer.java
+            } catch (Exception e) {
+                System.out.println("KVStore not connected: " + e);
+            }
+            int count = 0;
             for (ArrayList<String> keyValuePair : this.associatedData) {
                 String key = keyValuePair.get(0);
                 String value = keyValuePair.get(1);
                 if (this.initialPopulating) {
-                    this.kvStore.put(key, value);
+                    try {
+                        this.kvStore.put(key, value);
+                        count += 1;
+                    } catch (Exception e) {
+                    }
+                    if (count % 100 == 0){
+                        System.out.println("Key value pair count " + count);
+                    }
                 } else {
                     if (Math.random() <= 0.5) {
                         try {
                             this.kvStore.put(key, value);
+                            this.totalBytes += value.getBytes(StandardCharsets.UTF_8).length;
                         } catch (Exception e) {
                         }
-                        // double outputDurationPUT = this.computeTimeDurationPUT(key, value);
-                        // this.totalDurationPUT += outputDurationPUT;
-                        // this.numPUTRequests += 1;
                     } else {
                         int randomIndex = this.randomNumber.nextInt(this.originalData.size());
                         ArrayList<String> pair = this.originalData.get(randomIndex);
                         try {
-                            this.kvStore.get(pair.get(0));
+                            String returnVal = this.kvStore.get(pair.get(0)).getValue();
+                            this.totalBytes += returnVal.getBytes(StandardCharsets.UTF_8).length;
                         } catch (Exception e){
                         }
-                        // double outputDurationGET = this.computeTimeDurationGET(pair.get(0));
-                        // this.totalDurationGET += outputDurationGET;
-                        // this.numGETRequests += 1;
                     }
                 }
                 if (this.numPUTRequests + this.numGETRequests == this.numRequests) {
