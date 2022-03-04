@@ -23,10 +23,11 @@ import java.nio.file.Files;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.MalformedInputException;
+import java.util.concurrent.TimeUnit;
 
 public class PerformanceTest {
     String hostname = "127.0.0.1";
-    int port = 8001;
+    int port;
     private final int numServers;
     private final int numClients;
     private static final String mailDataPath = "/Users/akinowatanabe/Documents/maildir";
@@ -115,7 +116,15 @@ public class PerformanceTest {
             ecsClient = new ECSClient();
             // System.out.println("initialized client");
             ecsClient.addNodes(this.numServers, this.cacheStrategy, this.cacheSize);
-            // System.out.println("Add nodes to client");
+            ecsClient.start();
+            try {
+                TimeUnit.SECONDS.sleep(this.numServers);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+            ArrayList<Integer> currentOpenPorts = ecsClient.getCurrentPorts();
+            this.port = currentOpenPorts.get(0);
+            System.out.println("Add nodes to client to port: " + port);
             // Populate the storage service with put requests
             ArrayList<IndividualClient> populatingClients = new ArrayList<>();
             int spacing = (populatingData.size() / this.numClients);
@@ -180,7 +189,7 @@ public class PerformanceTest {
         */
         // Test performance of using different numbers of clients with constant number of servers
         // No caching
-        new PerformanceTest(5, 2, "None", 0, false).runTests();
+        new PerformanceTest(5, 1, "None", 0, false).runTests();
         /*
         new PerformanceTest(5, 10, "None", 0, false).runTests();
         new PerformanceTest(5, 20, "None", 0, false).runTests();

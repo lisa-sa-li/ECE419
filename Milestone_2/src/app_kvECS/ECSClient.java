@@ -139,6 +139,18 @@ public class ECSClient implements IECSClient, Runnable {
         }
     }
 
+    public ArrayList<Integer> getCurrentPorts(){
+        Iterator<Map.Entry<String, ECSNode>> it = currServerMap.entrySet().iterator();
+        ArrayList<Integer> portNumbersCurrent = new ArrayList<>();
+        while (it.hasNext()) {
+            Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
+            ECSNode node = pair.getValue();
+            int port = node.getNodePort();
+            portNumbersCurrent.add(port);
+        }
+        return portNumbersCurrent;
+    }
+
     @Override
     public boolean start() {
         boolean startSuccess = true;
