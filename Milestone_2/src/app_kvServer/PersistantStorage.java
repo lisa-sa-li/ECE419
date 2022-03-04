@@ -214,6 +214,11 @@ public class PersistantStorage implements IPersistantStorage {
         }
     }
 
+    public boolean isEmpty() {
+        File file = new File(this.pathToFile);
+        return file.length() == 0;
+    }
+
     @Override
     public void clearStorage() {
         try {
@@ -246,6 +251,8 @@ public class PersistantStorage implements IPersistantStorage {
                 keyFromFile = json.getKey();
 
                 if (die == true) {
+                    // This indicates it's been removed from the ECS
+                    // We need to remove everything from its storage to send to another server
                     outputBuffer.append(line);
                     outputBuffer.append('\n');
                 } else if (utils.isKeyInRange(hash, endHash, keyFromFile)) {
@@ -275,7 +282,6 @@ public class PersistantStorage implements IPersistantStorage {
 
     @Override
     public StatusType appendToStorage(String keyValues) throws Exception {
-        logger.debug("appendToStorage here " + keyValues != "" + "?");
         try {
             BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
             StringBuffer inputBuffer = new StringBuffer();

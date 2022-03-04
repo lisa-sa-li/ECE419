@@ -1,19 +1,23 @@
 package testing;
 
+import java.nio.file.*;
+import java.io.File;
 import java.beans.Transient;
-
+import java.math.BigInteger;
+import junit.framework.TestCase;
 import org.junit.Test;
+
 import client.KVStore;
 
 import app_kvServer.PersistantStorage;
-import junit.framework.TestCase;
+
 import shared.messages.KVMessage.StatusType;
-import java.nio.file.*;
-import java.io.File;
+import shared.Utils;
 
 public class AdditionalTest extends TestCase {
 
 	private PersistantStorage persistantStorage;
+	private Utils utils = new Utils();
 
 	public void setUp() {
 		try {
@@ -232,4 +236,115 @@ public class AdditionalTest extends TestCase {
 
 		assertTrue(ex == null && !inStorage);
 	}
+
+	@Test
+	public void testPutManySuccess() {
+		String key = "put_many";
+		String value = "{'status':'NO_STATUS','key':'lisa','value':'l'}\n{'status':'NO_STATUS','key':'akino','value':'w'}\n";
+		Exception ex = null;
+		boolean inStorage = true;
+
+		try {
+			inStorage = persistantStorage.appendToStorage(value);
+
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && status == StatusType.PUT_SUCCESS);
+
+		String getValue;
+		try {
+			getValue = persistantStorage.get("lisa");
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && getValue.equals("l"));
+	}
+
+	@Test
+	public void testPutManyError() {
+		String key = "foo";
+		String value = "{'status':'NO_STATUS','key':'lisa','value':'l'}\n{'status':'NO_STATUS','key':'akino','value':'w'}\n";
+		StatusType status = null;
+		Exception ex = null;
+
+		try {
+			// Remove the file so there's nothing to write to
+			persistantStorage.deleteStorage();
+			status = persistantStorage.appendToStorage(value);
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && status == StatusType.PUT_ERROR);
+	}
+
+	@Test
+	public void testGetDataInRange() {
+		String output;
+		Exception ex = null;
+		String getValue;
+
+		persistantStorage.put("key1", "value1");
+		persistantStorage.put("key2", "value1");
+		persistantStorage.put("key3", "value1");
+		persistantStorage.put("key4", "value1");
+
+		String getValue;
+		try {
+			getValue = persistantStorage.get("key1");
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && getValue.equals("value1"));
+
+		BigInteger hash = utils.getHash("key1");
+		BigInteger endHash = hash.add(new BigInteger("1"));
+
+		try {
+			output = persistantStorage.getDataInRange(hash, endHash, false);
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && output.equals("{'status':'NO_STATUS','key':'key1','value':'value1'}\n"));
+
+		try {
+			getValue = persistantStorage.get("key1");
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && getValue == null);
+	}
+
+	@Test
+	public void testGetDataInRangeOnDeath() {
+		String output;
+		Exception ex = null;
+		String getValue;
+
+		persistantStorage.put("key1", "value1");
+		persistantStorage.put("key2", "value1");
+		persistantStorage.put("key3", "value1");
+		persistantStorage.put("key4", "value1");
+
+		BigInteger hash = utils.getHash("key1");
+		BigInteger endHash = hash.add(new BigInteger("1"));
+
+		try {
+			output = persistantStorage.getDataInRange(hash, endHash, true);
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && output.equals(
+				"{'status':'NO_STATUS','key':'key1','value':'value1'}\n{'status':'NO_STATUS','key':'key2','value':'value2'}\n{'status':'NO_STATUS','key':'key3','value':'value3'}\n{'status':'NO_STATUS','key':'key4','value':'value4'}\n"));
+
+		assertTrue(persistantStorage.isEmpty() == true);
+	}
+
 }

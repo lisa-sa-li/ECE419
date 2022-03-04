@@ -42,7 +42,7 @@ public class ECSClient implements IECSClient, Runnable {
     private static Logger logger = Logger.getRootLogger();
     private String[] servers;
     private String SERVER_JAR = "m2-server.jar";
-    private String CONFIG_FILEPATH = "./servers.cfg";
+    private static String CONFIG_FILEPATH = "./servers.cfg";
     // private String ZooKeeperApplication.ZK_NODE_ROOT_PATH = "./BLAH";
 
     private HashMap<String, ECSNode> allServerMap = new HashMap<String, ECSNode>();
@@ -71,9 +71,9 @@ public class ECSClient implements IECSClient, Runnable {
 
     private Random rand = new Random();
 
-    public ECSClient() {
+    public ECSClient(String configFile) {
         // load servers from config file
-        getServerMap();
+        getServerMap(configFile);
 
         hashRing = new HashRing(this.serverInfo);
         zkApp = new ZooKeeperApplication(ZooKeeperApplication.ZK_NODE_ROOT_PATH, zkPort, zkHost);
@@ -113,9 +113,9 @@ public class ECSClient implements IECSClient, Runnable {
         }
     }
 
-    private void getServerMap() {
+    private void getServerMap(String configPath) {
         try {
-            BufferedReader file = new BufferedReader(new FileReader(CONFIG_FILEPATH));
+            BufferedReader file = new BufferedReader(new FileReader(configPath));
             StringBuffer inputBuffer = new StringBuffer();
             String line;
             String keyFromFile;
@@ -141,13 +141,6 @@ public class ECSClient implements IECSClient, Runnable {
 
     @Override
     public boolean start() {
-        /**
-         * Starts the storage service by calling start() on all KVServer instances that
-         * participate in the service.\
-         * 
-         * @throws Exception some meaningfull exception on failure
-         * @return true on success, false on failure
-         */
         boolean startSuccess = true;
 
         Iterator<Map.Entry<String, ECSNode>> it = currServerMap.entrySet().iterator();
@@ -172,20 +165,13 @@ public class ECSClient implements IECSClient, Runnable {
             allServerMap.put(name, node);
             currServerMap.put(name, node);
         }
-
+        // This sends a START message to the servers
         hashRing.startAll();
         return startSuccess;
     }
 
     @Override
     public boolean stop() {
-        /**
-         * Stops the service; all participating KVServers are stopped for processing
-         * client requests but the processes remain running.
-         * 
-         * @throws Exception some meaningfull exception on failure
-         * @return true on success, false on failure
-         */
         boolean stopSuccess = true;
 
         Iterator<Map.Entry<String, ECSNode>> it = currServerMap.entrySet().iterator();
@@ -211,7 +197,7 @@ public class ECSClient implements IECSClient, Runnable {
             allServerMap.put(name, node);
             currServerMap.put(name, node);
         }
-
+        // This sends a STOP message to the servers
         hashRing.stopAll();
         return stopSuccess;
     }
@@ -255,6 +241,7 @@ public class ECSClient implements IECSClient, Runnable {
                 node.setStatus(NodeStatus.OFFLINE);
                 allServerMap.put(name, node);
                 currServerMap.put(name, node);
+                // This sends a SHUTDOWN message to the server
                 hashRing.removeNode(name);
             } catch (Exception e) {
                 shutdownSuccess = shutdownSuccess & false;
@@ -318,7 +305,7 @@ public class ECSClient implements IECSClient, Runnable {
                     + String.valueOf(zkPort) + " " + cacheStrategy + " "
                     + String.valueOf(cacheSize);
 
-            // System.out.println("THIS IS THE CMD " + cmd);
+            logger.debug("This is the command: " + cmd);
             try {
                 Process p = Runtime.getRuntime().exec(cmd);
                 boolean completed = awaitNode(serverName);
@@ -352,12 +339,6 @@ public class ECSClient implements IECSClient, Runnable {
 
     @Override
     public ArrayList<ECSNode> setupNodes(int count, String cacheStrategy, int cacheSize) {
-        /*
-         * Sets up `count` servers with the ECS (in this case Zookeeper)
-         * 
-         * @return array of strings, containing unique names of servers
-         */
-
         if (count > allServerMap.size()) {
             logger.error("There are not enough servers");
             return null;
@@ -383,24 +364,16 @@ public class ECSClient implements IECSClient, Runnable {
             nodes.add(node);
         }
 
-        // Check for the heartbeat launching?
         return nodes;
     }
 
     @Override
     public boolean awaitNode(final String name) throws Exception {
-        /**
-         * Wait for all nodes to report status or until timeout expires
-         * 
-         * @param count   number of nodes to wait for
-         * @param timeout the timeout in milliseconds
-         * @return true if all nodes reported successfully, false otherwise
-         */
-
         final CountDownLatch countDownLatch = new CountDownLatch(1);
 
         String heartbeatPath = ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH + "/" + name;
         try {
+            // Set watcher on the heartbeat znode being created
             zk.exists(heartbeatPath, new Watcher() {
                 @Override
                 public void process(WatchedEvent event) {
@@ -516,7 +489,7 @@ public class ECSClient implements IECSClient, Runnable {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("Unkown Error: " + e.getMessage());
+            logger.error("Unknown Error: " + e.getMessage());
         }
     }
 
@@ -560,7 +533,7 @@ public class ECSClient implements IECSClient, Runnable {
     public static void main(String[] args) {
         try {
             new ECSLogSetup("logs/ecs.log", Level.ALL);
-            ECSClient ecsClient = new ECSClient();
+            ECSClient ecsClient = new ECSClient(CONFIG_FILEPATH);
             ecsClient.run();
         } catch (IOException e) {
             System.out.println("Error! Unable to initialize logger!");
