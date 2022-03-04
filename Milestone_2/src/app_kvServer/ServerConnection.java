@@ -128,7 +128,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 
 			// Read next char from stream
 			read = (byte) input.read();
-			// logger.debug("recieve10");
 		}
 
 		if (msgBytes == null) {
@@ -170,7 +169,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		switch (status) {
 			case PUT:
 				try {
-					if (!this.kvServer.isMe(key)) {
+					if (this.kvServer.hash != null && !this.kvServer.isMe(key)) {
 						handleMessageStatus = StatusType.SERVER_NOT_RESPONSIBLE;
 						// send back metadata
 						order = this.kvServer.getOrder();
@@ -206,7 +205,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 				}
 				break;
 			case GET:
-				if (!this.kvServer.isMe(key)) {
+				if (this.kvServer.hash != null && !this.kvServer.isMe(key)) {
 					handleMessageStatus = StatusType.SERVER_NOT_RESPONSIBLE;
 					order = this.kvServer.getOrder();
 					// send back metadata
@@ -315,23 +314,32 @@ public class ServerConnection implements IServerConnection, Runnable {
 			while (this.isOpen) {
 				try {
 					JSONMessage receivedMessage = receiveJSONMessage();
+
 					if (receivedMessage != null) {
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
 
-						if (metadata == null && this.kvServer.serverStatus == ServerStatus.CLOSED) {
-							// If the status is closed , all client requests are responded to with
-							// SERVER_STOPPED messages
+						if (metadata == null) {
 							sendMessage = new JSONMessage();
-							sendMessage.setMessage(StatusType.SERVER_STOPPED.name(), receivedMessage.getKey(),
-									receivedMessage.getValue());
-						} else if (metadata == null) {
-							sendMessage = handleMessage(receivedMessage);
+							ServerStatus serverStatus = this.kvServer.serverStatus;
+							if (serverStatus == ServerStatus.CLOSED) {
+								// If the status is closed, all client requests are responded to with
+								// SERVER_STOPPED messages
+								sendMessage.setMessage(StatusType.SERVER_STOPPED.name(), receivedMessage.getKey(),
+										receivedMessage.getValue());
+							} else if (serverStatus == ServerStatus.LOCKED
+									&& receivedMessage.getStatus() == StatusType.PUT) {
+								// If the status is write locked, only get is possible
+								sendMessage.setMessage(StatusType.SERVER_WRITE_LOCK.name(), receivedMessage.getKey(),
+										receivedMessage.getValue());
+							} else {
+								sendMessage = handleMessage(receivedMessage);
+							}
 						} else {
 							sendMessage = handleMetadataMessage(metadata);
 						}
 
-						// In the case of a PUT_MANY, we do not need to send
+						// In the case of a PUT_MANY, we do not need to send a message
 						if (sendMessage != null) {
 							sendJSONMessage(sendMessage);
 						}

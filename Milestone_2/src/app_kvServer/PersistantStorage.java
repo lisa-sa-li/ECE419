@@ -64,29 +64,7 @@ public class PersistantStorage implements IPersistantStorage {
     }
 
     public BigInteger getHash(String value) {
-        try {
-            // get message bytes
-            byte[] byteVal = value.getBytes("UTF-8");
-            // create md5 instance
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
-
-            // convert value to md5 hash (returns bytes)
-            byte[] mdDigest = md5.digest(byteVal);
-
-            // convert to string
-            StringBuilder stringHash = new StringBuilder();
-            for (byte b : mdDigest) {
-                // code below: modified code from
-                // https://stackoverflow.com/questions/11380062/what-does-value-0xff-do-in-java
-                stringHash.append(Integer.toHexString((b & 0xFF) | 0x100), 1, 3);
-            }
-            // return stringHash.toString();
-            // return hex biginteger
-            return new BigInteger(stringHash.toString(), 16);
-
-        } catch (Exception e) {
-            return new BigInteger("00000000000000000000000000000000");
-        }
+        return utils.getHash(value);
     }
 
     @Override
@@ -214,6 +192,11 @@ public class PersistantStorage implements IPersistantStorage {
         }
     }
 
+    public boolean isEmpty() {
+        File file = new File(this.pathToFile);
+        return file.length() == 0;
+    }
+
     @Override
     public void clearStorage() {
         try {
@@ -229,6 +212,8 @@ public class PersistantStorage implements IPersistantStorage {
 
     @Override
     public String getDataInRange(BigInteger hash, BigInteger endHash, Boolean die) {
+        // Removes kv-pairs from the storage where the key falls within hash:endHash
+        // Returns those removed kv-pairs as a string
         try {
             BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
             StringBuffer inputBuffer = new StringBuffer();
@@ -246,6 +231,8 @@ public class PersistantStorage implements IPersistantStorage {
                 keyFromFile = json.getKey();
 
                 if (die == true) {
+                    // This indicates the server has been removed from the hashring
+                    // We need to remove everything from its storage to send to another server
                     outputBuffer.append(line);
                     outputBuffer.append('\n');
                 } else if (utils.isKeyInRange(hash, endHash, keyFromFile)) {
@@ -275,7 +262,7 @@ public class PersistantStorage implements IPersistantStorage {
 
     @Override
     public StatusType appendToStorage(String keyValues) throws Exception {
-        logger.debug("appendToStorage here " + keyValues != "" + "?");
+        // Appends kv-pairs to the end of the storage file
         try {
             BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
             StringBuffer inputBuffer = new StringBuffer();

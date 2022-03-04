@@ -16,6 +16,7 @@ import shared.exceptions.UnexpectedValueException;
 import shared.messages.Metadata;
 import shared.messages.Metadata.MessageType;
 import shared.messages.JSONMessage;
+import shared.Utils;
 
 public class HashRing {
     private static final Logger logger = Logger.getLogger("hashring");
@@ -24,6 +25,7 @@ public class HashRing {
     private HashMap<String, String> serverInfo = new HashMap<String, String>();
     private HashMap<BigInteger, ECSNode> hashServers = new HashMap<BigInteger, ECSNode>();
     private int numServers = 0;
+    private Utils utils = new Utils();
 
     public HashRing(HashMap<String, String> serverInfo) {
         this.serverInfo = serverInfo;
@@ -62,6 +64,7 @@ public class HashRing {
 
             newNode.setHashRange(hashed, prevNode.getHash());
             // send metadata to servers when there's more than 1 server operating
+
             if (numServers > 1) {
                 Metadata update = new Metadata(MessageType.MOVE_DATA, hashRing, newNode);
                 prevNode.sendMessage(update);
@@ -89,7 +92,8 @@ public class HashRing {
         // get hash from array list
         BigInteger removeHash = hashRing.get(name + ":" + portHost);
         if (removeHash == null) {
-            throw new NullPointerException("Invalid node name");
+            throw new NullPointerException(
+                    "Invalid node name: this node name is either incorrect or no longer in the hashring");
         }
         // collect idx of removed node in hashring
         int idx = hashOrder.indexOf(removeHash);
@@ -184,27 +188,29 @@ public class HashRing {
     }
 
     public BigInteger getHash(String value) {
-        try {
-            // get message bytes
-            byte[] byteVal = value.getBytes("UTF-8");
-            // create md5 instance
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
+        return utils.getHash(value);
+        // try {
+        // // get message bytes
+        // byte[] byteVal = value.getBytes("UTF-8");
+        // // create md5 instance
+        // MessageDigest md5 = MessageDigest.getInstance("MD5");
 
-            // convert value to md5 hash (returns bytes)
-            byte[] mdDigest = md5.digest(byteVal);
+        // // convert value to md5 hash (returns bytes)
+        // byte[] mdDigest = md5.digest(byteVal);
 
-            // convert to string
-            StringBuilder stringHash = new StringBuilder();
-            for (byte b : mdDigest) {
-                // code below: modified code from
-                // https://stackoverflow.com/questions/11380062/what-does-value-0xff-do-in-java
-                stringHash.append(Integer.toHexString((b & 0xFF) | 0x100), 1, 3);
-            }
-            return new BigInteger(stringHash.toString(), 16);
+        // // convert to string
+        // StringBuilder stringHash = new StringBuilder();
+        // for (byte b : mdDigest) {
+        // // code below: modified code from
+        // //
+        // https://stackoverflow.com/questions/11380062/what-does-value-0xff-do-in-java
+        // stringHash.append(Integer.toHexString((b & 0xFF) | 0x100), 1, 3);
+        // }
+        // return new BigInteger(stringHash.toString(), 16);
 
-        } catch (Exception e) {
-            return new BigInteger("00000000000000000000000000000000");
-        }
+        // } catch (Exception e) {
+        // return new BigInteger("00000000000000000000000000000000");
+        // }
     }
 
 }

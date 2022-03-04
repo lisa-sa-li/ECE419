@@ -44,7 +44,7 @@ public class PerformanceTest {
         this.nodeTest = nodeTest;
     }
 
-    public ArrayList<ArrayList<String>> readInMailData(String originalDataPath){
+    public ArrayList<ArrayList<String>> readInMailData(String originalDataPath) {
         ArrayList<ArrayList<String>> keyValuePairList = new ArrayList<>();
         try {
             readKeyValuePair(originalDataPath, originalDataPath, keyValuePairList);
@@ -54,7 +54,8 @@ public class PerformanceTest {
         return keyValuePairList;
     }
 
-    public void readKeyValuePair(String originalDataPath, String newDirPath, ArrayList<ArrayList<String>> keyValuePairList) {
+    public void readKeyValuePair(String originalDataPath, String newDirPath,
+            ArrayList<ArrayList<String>> keyValuePairList) {
         File newDir = new File(newDirPath);
         File[] fileContent = newDir.listFiles();
         assert fileContent != null;
@@ -79,9 +80,6 @@ public class PerformanceTest {
                 oneKeyValPair.add(key);
                 oneKeyValPair.add(value);
                 keyValuePairList.add(oneKeyValPair);
-                /*if (keyValuePairList.size() % 10000 == 0){
-                    System.out.println("Key value pair count " + keyValuePairList.size());
-                }*/
             }
         }
     }
@@ -125,7 +123,7 @@ public class PerformanceTest {
             List<ArrayList<String>> clientAllocatingData = originalData.subList(numRequests, numRequests * 2);
             // System.out.println("allocated data");
             // Set up ECSClient and add server nodes
-            ecsClient = new ECSClient();
+            ecsClient = new ECSClient("./servers.cfg");
             // System.out.println("initialized client");
             ecsClient.addNodes(this.numServers, this.cacheStrategy, this.cacheSize);
             ecsClient.start();
@@ -181,14 +179,15 @@ public class PerformanceTest {
                     + " with " + this.numClients + " clients and " + this.numServers + " servers is: " + throughput);
             ecsClient.shutdown();
         } else {
-            ecsClient = new ECSClient();
+            ecsClient = new ECSClient("./servers.cfg");
             // Measure time duration for adding nodes
             long startTime = System.currentTimeMillis();
             ecsClient.addNodes(this.numServers, this.cacheStrategy, this.cacheSize);
             long endTime = System.currentTimeMillis();
             long duration = (endTime - startTime);
-            System.out.println("The time duration (ms) of adding " + this.numServers + " server nodes with no caching is: "
-                    + duration);
+            System.out.println(
+                    "The time duration (ms) of adding " + this.numServers + " server nodes with no caching is: "
+                            + duration);
             // Measure time duration for removing nodes
             HashMap<String, ECSNode> hashRingMap = ecsClient.getNodes();
             startTime = System.currentTimeMillis();

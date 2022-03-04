@@ -8,7 +8,6 @@ import java.util.List;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
-
 public class IndividualClient implements Runnable {
     int numPUTRequests = 0;
     int numGETRequests = 0;
@@ -22,7 +21,7 @@ public class IndividualClient implements Runnable {
     private int waitCount = 10;
 
     public IndividualClient(String hostname, int port, List<ArrayList<String>> associatedData,
-                            List<ArrayList<String>> originalData, int numRequests, boolean initialPopulating) {
+            List<ArrayList<String>> originalData, int numRequests, boolean initialPopulating) {
         this.kvStore = new KVStore(hostname, port);
         this.associatedData = associatedData;
         this.initialPopulating = initialPopulating;
@@ -31,12 +30,12 @@ public class IndividualClient implements Runnable {
         System.out.println("associatedData.length " + associatedData.size());
     }
 
-    public double getTotalBytes(){
+    public double getTotalBytes() {
         return this.totalBytes;
     }
 
     public void run() {
-        try{
+        try {
             // System.out.println("start of individual client run() ");
             try {
                 this.kvStore.connect();
@@ -51,9 +50,6 @@ public class IndividualClient implements Runnable {
                 String key = keyValuePair.get(0);
                 String value = keyValuePair.get(1);
                 if (this.initialPopulating) {
-                    /*if (count % 5 == 0 && count != 0){
-                        System.out.println("populating now " + count);
-                    }*/
                     try {
                         //System.out.println("before PUT");
                         //System.out.println("key: " + key);
@@ -103,9 +99,7 @@ public class IndividualClient implements Runnable {
                             String returnVal = this.kvStore.get(pair.get(0)).getValue();
                             this.totalBytes += returnVal.getBytes(StandardCharsets.UTF_8).length;
                             this.numGETRequests += 1;
-                            //count += 1;
-                            //System.out.println("GET is called: " + count);
-                        } catch (Exception e){
+                        } catch (Exception e) {
                         }
                     }
                     /*if (count % 5 == 0 && count != 0){

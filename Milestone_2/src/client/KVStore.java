@@ -36,7 +36,7 @@ public class KVStore implements KVCommInterface, Runnable {
 	private static Logger logger = Logger.getRootLogger();
 	private static final int BUFFER_SIZE = 1024;
 	private static final int DROP_SIZE = 1024 * BUFFER_SIZE;
-	private ClientConnection clientConnection;
+	public ClientConnection clientConnection;
 	private Metadata metadata;
 	private HashMap<String, BigInteger> metadataOrder;
 	private HashRing hashRing;

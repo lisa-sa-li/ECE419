@@ -3,7 +3,6 @@ package testing;
 import org.junit.Test;
 
 import client.KVStore;
-import app_kvServer.KVServer;
 import junit.framework.TestCase;
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
@@ -17,7 +16,7 @@ public class InteractionTest extends TestCase {
 		try {
 			kvStore.connect();
 		} catch (Exception e) {
-			System.out.println("FAILED TO CONNECT CLIENT");
+			// logger.info("FAILED TO CONNECT CLIENT");
 			System.out.println(e);
 
 		}
