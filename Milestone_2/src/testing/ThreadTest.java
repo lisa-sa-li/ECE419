@@ -15,7 +15,7 @@ public class ThreadTest {
     int port = 8085;
 
     public void testThreads() {
-        kvServer = new KVServer(port, 0, "", true);
+        kvServer = new KVServer(port, 0, "FIFO", true);
         kvServer.clearStorage();
 
         for (int i = 0; i < NUM_THREADS; i++) {
