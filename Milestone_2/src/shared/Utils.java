@@ -1,6 +1,7 @@
 package shared;
 
 import java.math.BigInteger;
+import java.security.MessageDigest;
 
 import ecs.HashRing;
 

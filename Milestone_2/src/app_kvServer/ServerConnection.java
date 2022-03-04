@@ -128,7 +128,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 
 			// Read next char from stream
 			read = (byte) input.read();
-			// logger.debug("recieve10");
 		}
 
 		if (msgBytes == null) {
@@ -170,7 +169,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		switch (status) {
 			case PUT:
 				try {
-					if (!this.kvServer.isMe(key)) {
+					if (this.kvServer.hash != null && !this.kvServer.isMe(key)) {
 						handleMessageStatus = StatusType.SERVER_NOT_RESPONSIBLE;
 						// send back metadata
 						order = this.kvServer.getOrder();
@@ -205,7 +204,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 				}
 				break;
 			case GET:
-				if (!this.kvServer.isMe(key)) {
+				if (this.kvServer.hash != null && !this.kvServer.isMe(key)) {
 					handleMessageStatus = StatusType.SERVER_NOT_RESPONSIBLE;
 					order = this.kvServer.getOrder();
 					// send back metadata
@@ -317,6 +316,17 @@ public class ServerConnection implements IServerConnection, Runnable {
 					if (receivedMessage != null) {
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
+
+						// logger.debug("this.kvServer.serverStatus " +
+						// this.kvServer.serverStatus.name() + " metadata "
+						// + metadata == null);
+						// logger.info("this.kvServer.serverStatus " + this.kvServer.serverStatus.name()
+						// + " metadata "
+						// + metadata == null);
+						// System.out.println(
+						// "this.kvServer.serverStatus " + this.kvServer.serverStatus.name() + "
+						// metadata "
+						// + metadata == null);
 
 						if (metadata == null && this.kvServer.serverStatus == ServerStatus.CLOSED) {
 							// If the status is closed , all client requests are responded to with

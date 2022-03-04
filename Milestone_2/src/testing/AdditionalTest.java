@@ -242,18 +242,17 @@ public class AdditionalTest extends TestCase {
 		String key = "put_many";
 		String value = "{'status':'NO_STATUS','key':'lisa','value':'l'}\n{'status':'NO_STATUS','key':'akino','value':'w'}\n";
 		Exception ex = null;
-		boolean inStorage = true;
+		StatusType status = null;
+		String getValue = "";
 
 		try {
-			inStorage = persistantStorage.appendToStorage(value);
-
+			status = persistantStorage.appendToStorage(value);
 		} catch (Exception e) {
 			ex = e;
 		}
 
 		assertTrue(ex == null && status == StatusType.PUT_SUCCESS);
 
-		String getValue;
 		try {
 			getValue = persistantStorage.get("lisa");
 		} catch (Exception e) {
@@ -283,17 +282,14 @@ public class AdditionalTest extends TestCase {
 
 	@Test
 	public void testGetDataInRange() {
-		String output;
+		String output = "", getValue = "";
 		Exception ex = null;
-		String getValue;
 
-		persistantStorage.put("key1", "value1");
-		persistantStorage.put("key2", "value1");
-		persistantStorage.put("key3", "value1");
-		persistantStorage.put("key4", "value1");
-
-		String getValue;
 		try {
+			persistantStorage.put("key1", "value1");
+			persistantStorage.put("key2", "value1");
+			persistantStorage.put("key3", "value1");
+			persistantStorage.put("key4", "value1");
 			getValue = persistantStorage.get("key1");
 		} catch (Exception e) {
 			ex = e;
@@ -310,7 +306,8 @@ public class AdditionalTest extends TestCase {
 			ex = e;
 		}
 
-		assertTrue(ex == null && output.equals("{'status':'NO_STATUS','key':'key1','value':'value1'}\n"));
+		assertTrue(ex == null &&
+				output.equals("{\"status\":\"NO_STATUS\",\"key\":\"key1\",\"value\":\"value1\"}\n"));
 
 		try {
 			getValue = persistantStorage.get("key1");
@@ -323,26 +320,24 @@ public class AdditionalTest extends TestCase {
 
 	@Test
 	public void testGetDataInRangeOnDeath() {
-		String output;
+		String output = "";
 		Exception ex = null;
-		String getValue;
-
-		persistantStorage.put("key1", "value1");
-		persistantStorage.put("key2", "value1");
-		persistantStorage.put("key3", "value1");
-		persistantStorage.put("key4", "value1");
 
 		BigInteger hash = utils.getHash("key1");
 		BigInteger endHash = hash.add(new BigInteger("1"));
 
 		try {
+			persistantStorage.put("key1", "value1");
+			persistantStorage.put("key2", "value2");
+			persistantStorage.put("key3", "value3");
+			persistantStorage.put("key4", "value4");
 			output = persistantStorage.getDataInRange(hash, endHash, true);
 		} catch (Exception e) {
 			ex = e;
 		}
 
 		assertTrue(ex == null && output.equals(
-				"{'status':'NO_STATUS','key':'key1','value':'value1'}\n{'status':'NO_STATUS','key':'key2','value':'value2'}\n{'status':'NO_STATUS','key':'key3','value':'value3'}\n{'status':'NO_STATUS','key':'key4','value':'value4'}\n"));
+				"{\"status\":\"NO_STATUS\",\"key\":\"key1\",\"value\":\"value1\"}\n{\"status\":\"NO_STATUS\",\"key\":\"key2\",\"value\":\"value2\"}\n{\"status\":\"NO_STATUS\",\"key\":\"key3\",\"value\":\"value3\"}\n{\"status\":\"NO_STATUS\",\"key\":\"key4\",\"value\":\"value4\"}\n"));
 
 		assertTrue(persistantStorage.isEmpty() == true);
 	}

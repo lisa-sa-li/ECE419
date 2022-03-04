@@ -139,7 +139,7 @@ public class ECSClient implements IECSClient, Runnable {
         }
     }
 
-    public ArrayList<Integer> getCurrentPorts(){
+    public ArrayList<Integer> getCurrentPorts() {
         Iterator<Map.Entry<String, ECSNode>> it = currServerMap.entrySet().iterator();
         ArrayList<Integer> portNumbersCurrent = new ArrayList<>();
         while (it.hasNext()) {
@@ -149,6 +149,18 @@ public class ECSClient implements IECSClient, Runnable {
             portNumbersCurrent.add(port);
         }
         return portNumbersCurrent;
+    }
+
+    public ArrayList<String> getCurrentServers() {
+        Iterator<Map.Entry<String, ECSNode>> it = currServerMap.entrySet().iterator();
+        ArrayList<String> namesCurrent = new ArrayList<>();
+        while (it.hasNext()) {
+            Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
+            ECSNode node = pair.getValue();
+            String name = node.getNodeName();
+            namesCurrent.add(name);
+        }
+        return namesCurrent;
     }
 
     @Override
@@ -425,6 +437,7 @@ public class ECSClient implements IECSClient, Runnable {
             logger.error("You are removing too many nodes. There must be at least one active server.");
             return false;
         }
+
         for (String name : nodeNames) {
             ECSNode serverNode = allServerMap.get(name);
             serverNode.setStatus(NodeStatus.OFFLINE);

@@ -59,8 +59,8 @@ public class KVServer implements IKVServer, Runnable {
 	private ZooKeeperApplication zkApp;
 
 	// hashring variables
-	private BigInteger hash;
-	private BigInteger endHash;
+	public BigInteger hash;
+	public BigInteger endHash;
 	private HashMap<String, BigInteger> hashRing;
 	// private HashRing hashRingClass = new HashRing();
 
@@ -394,7 +394,6 @@ public class KVServer implements IKVServer, Runnable {
 		if (this.cache != null) {
 			this.cache.put(key, value);
 		}
-		System.out.println("CALLING PUT IN KVSERVER");
 		return this.persistantStorage.put(key, value);
 	}
 
@@ -519,8 +518,6 @@ public class KVServer implements IKVServer, Runnable {
 				new KVServer(port, serverName, zkHost, zkPort, cacheStrategy, cacheSize).run();
 			} else {
 				int port = Integer.parseInt(args[0]);
-				// System.out.println("args", args);
-				// TODO: set params for cache size and strategy
 				new KVServer(port, 10, "FIFO").run();
 			}
 		} catch (IOException e) {

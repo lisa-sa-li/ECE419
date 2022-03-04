@@ -9,13 +9,15 @@ import junit.framework.Test;
 import junit.framework.TestSuite;
 import logging.LogSetup;
 import java.io.File;
+import org.apache.log4j.Logger;
 
 public class AllTests {
+	private static Logger logger = Logger.getRootLogger();
 
 	static {
 		try {
-			new LogSetup("logs/testing/test.log", Level.ERROR);
-			KVServer kvServer = new KVServer(50000, 10, "FIFO", true);
+			new LogSetup("logs/testing/test.log", Level.DEBUG);
+			KVServer kvServer = new KVServer(50000, 3, "FIFO", true);
 			kvServer.clearStorage();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -25,8 +27,8 @@ public class AllTests {
 	public static Test suite() {
 		TestSuite clientSuite = new TestSuite("Basic Storage ServerTest-Suite");
 		clientSuite.addTestSuite(ConnectionTest.class);
-		clientSuite.addTestSuite(InteractionTest.class);
-		clientSuite.addTestSuite(ECSInteractionTest.class);
+		// clientSuite.addTestSuite(InteractionTest.class);
+		// clientSuite.addTestSuite(ECSInteractionTest.class);
 		clientSuite.addTestSuite(AdditionalTest.class);
 		clientSuite.addTestSuite(FIFOCacheTest.class);
 		clientSuite.addTestSuite(LRUCacheTest.class);

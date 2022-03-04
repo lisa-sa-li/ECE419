@@ -16,6 +16,7 @@ import shared.exceptions.UnexpectedValueException;
 import shared.messages.Metadata;
 import shared.messages.Metadata.MessageType;
 import shared.messages.JSONMessage;
+// import shared.Utils;
 
 public class HashRing {
     private static final Logger logger = Logger.getLogger("hashring");
@@ -24,6 +25,7 @@ public class HashRing {
     private HashMap<String, String> serverInfo = new HashMap<String, String>();
     private HashMap<BigInteger, ECSNode> hashServers = new HashMap<BigInteger, ECSNode>();
     private int numServers = 0;
+    // private Utils utils = new Utils();
 
     public HashRing(HashMap<String, String> serverInfo) {
         this.serverInfo = serverInfo;
@@ -62,6 +64,7 @@ public class HashRing {
 
             newNode.setHashRange(hashed, prevNode.getHash());
             // send metadata to servers when there's more than 1 server operating
+
             if (numServers > 1) {
                 Metadata update = new Metadata(MessageType.MOVE_DATA, hashRing, newNode);
                 prevNode.sendMessage(update);
@@ -184,6 +187,7 @@ public class HashRing {
     }
 
     public BigInteger getHash(String value) {
+        // return utils.getHash(value);
         try {
             // get message bytes
             byte[] byteVal = value.getBytes("UTF-8");
