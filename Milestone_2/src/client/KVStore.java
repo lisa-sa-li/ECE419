@@ -109,25 +109,34 @@ public class KVStore implements KVCommInterface, Runnable {
 	public JSONMessage runPutGet(JSONMessage jsonMessage, String key) throws Exception {
 		JSONMessage finalMsg = null;
 		wasSuccessful = false;
+		// System.out.println("Inside runPutGet in kvstore");
 		if (this.currentNode != null && this.ECSNodeOrdered != null
 				&& !isECSNodeResponsibleForKey(key, this.currentNode)) {
+			//System.out.println("Metadata stale: original address: " + this.address + " original port: " + this.port);
 			// metadata already exists (might be stale)
 			this.updateToCorrectNodeFromList(key);
+			//System.out.println("Updated to correct node info: " + this.address + " new port: " + this.port);
 		}
 
 		this.clientConnection.sendJSONMessage(jsonMessage);
 		JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
+		// System.out.println("sent message before while loop: " + returnMsg.getStatus().toString());
 		int retries = 0;
 		while (!wasSuccessful && retries < 3) {
 			try {
 				if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
+					//System.out.println("Server not responsible so switching soon");
 					this.updateToCorrectNodeInfo(returnMsg, key);
 					this.switchServer();
+					// System.out.println("switched to: " + this.address + " address and port: " + this.port);
 					this.clientConnection.sendJSONMessage(jsonMessage);
+					// System.out.println("Sent message");
 					returnMsg = this.clientConnection.receiveJSONMessage();
+					// System.out.println("returned message: " + returnMsg.getStatus().toString());
 				} else {
 					wasSuccessful = true;
 					finalMsg = returnMsg;
+					// System.out.println("server was responsible: returned message: " + returnMsg.getStatus().toString());
 				}
 			} catch (Exception e) {
 				logger.error(e);

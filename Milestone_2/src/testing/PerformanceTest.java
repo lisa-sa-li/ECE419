@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.MalformedInputException;
 import java.util.concurrent.TimeUnit;
+import java.nio.file.Paths;
 
 public class PerformanceTest {
     String hostname = "127.0.0.1";
@@ -68,7 +69,8 @@ public class PerformanceTest {
                 String value; // contents of the file if exists correctly
                 try {
                     // https://howtodoinjava.com/java11/files-readstring-read-file-to-string/
-                    value = Files.readString(f.toPath(), Charset.defaultCharset());
+                    // value = Files.readString(f.toPath(), Charset.defaultCharset());
+                    value = new String (Files.readAllBytes(Paths.get(String.valueOf(f.toPath()))));
                 } catch (Exception e) {
                     // System.out.println("readKeyValuePair catch: " + e);
                     continue;
@@ -77,9 +79,9 @@ public class PerformanceTest {
                 oneKeyValPair.add(key);
                 oneKeyValPair.add(value);
                 keyValuePairList.add(oneKeyValPair);
-                if (keyValuePairList.size() % 10000 == 0){
+                /*if (keyValuePairList.size() % 10000 == 0){
                     System.out.println("Key value pair count " + keyValuePairList.size());
-                }
+                }*/
             }
         }
     }
@@ -88,14 +90,24 @@ public class PerformanceTest {
         Thread[] threads = new Thread[this.numClients];
         for (int i = 0; i < this.numClients; i++) {
             threads[i] = new Thread(clientList.get(i));
-            System.out.println("created thread " + i);
+            // System.out.println("created thread " + i);
             threads[i].start();
-            System.out.println("started thread " + i);
+            // System.out.println("started thread " + i);
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
         }
         for (Thread thread : threads) {
             try {
                 thread.join();
                 System.out.println("joined successfully");
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
             } catch (Exception e) {
                 System.out.println("Error: " + e);
             }
@@ -103,12 +115,12 @@ public class PerformanceTest {
     }
 
     public void runTests() {
-        int numRequests = 1000;
+        int numRequests = 8;
         ECSClient ecsClient;
         if (!nodeTest) {
             // Mail data handling
             List<ArrayList<String>> originalData = this.readInMailData(mailDataPath);
-            System.out.println("originalData.size() " + originalData.size()); // 517310
+            // System.out.println("originalData.size() " + originalData.size()); // 517310
             List<ArrayList<String>> populatingData = originalData.subList(0, numRequests);
             List<ArrayList<String>> clientAllocatingData = originalData.subList(numRequests, numRequests * 2);
             // System.out.println("allocated data");
@@ -118,7 +130,7 @@ public class PerformanceTest {
             ecsClient.addNodes(this.numServers, this.cacheStrategy, this.cacheSize);
             ecsClient.start();
             try {
-                TimeUnit.SECONDS.sleep(this.numServers);
+                TimeUnit.SECONDS.sleep(this.numServers*5);
             } catch (Exception e) {
                 System.out.println(e);
             }
@@ -126,26 +138,37 @@ public class PerformanceTest {
             this.port = currentOpenPorts.get(0);
             System.out.println("Add nodes to client to port: " + port);
             // Populate the storage service with put requests
-            ArrayList<IndividualClient> populatingClients = new ArrayList<>();
+            ArrayList<IndividualClient> clients = new ArrayList<>();
             int spacing = (populatingData.size() / this.numClients);
             for (int i = 0; i < this.numClients; i++){
-                populatingClients.add(new IndividualClient(hostname, port, populatingData.subList(i*spacing, (i+1)*spacing),
+                clients.add(new IndividualClient(hostname, port, populatingData.subList(i*spacing, (i+1)*spacing),
                         originalData, numRequests, true));
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
             }
-            System.out.println("added client threads");
-            runClientThreads(populatingClients);
-            System.out.println("runClientThreads(populatingClients);");
+            // System.out.println("added client threads");
+            runClientThreads(clients);
+            // System.out.println("runClientThreads(populatingClients);");
             // Prepare the clients for latency and throughput computation
-            ArrayList<IndividualClient> clients = new ArrayList<>();
+            clients = new ArrayList<>();
             spacing = (clientAllocatingData.size() / numClients);
-            for (int i = 0; i < numClients; i++)
-                clients.add(new IndividualClient(hostname, port, clientAllocatingData.subList(i*spacing, (i+1)*spacing),
-                        originalData, numRequests, false));
+            for (int i = 0; i < this.numClients; i++) {
+                clients.add(new IndividualClient(hostname, port, clientAllocatingData.subList(i * spacing, (i + 1) * spacing),
+                        populatingData, numRequests, false));
+                try {
+                    TimeUnit.SECONDS.sleep(5);
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            }
             System.out.println("added client threads for not populating");
             long startTime = System.currentTimeMillis();
             runClientThreads(clients);
             long endTime = System.currentTimeMillis();
-            System.out.println("runClientThreads(clients);");
+            //System.out.println("runClientThreads(clients);");
             long duration = endTime - startTime;
             long latency = 1000 * duration / numRequests;
             System.out.println("The latency (ms) of " + this.cacheStrategy + " cache with the size of " + this.cacheSize
@@ -153,8 +176,9 @@ public class PerformanceTest {
             double totalBytes = 0;
             for (int i = 0; i < numClients; i++)
                 totalBytes += clients.get(i).getTotalBytes();
+            double throughput = totalBytes / (duration);
             System.out.println("The throughput of " + this.cacheStrategy + " cache with the size of " + this.cacheSize
-                    + " with " + this.numClients + " clients and " + this.numServers + " servers is: " + totalBytes);
+                    + " with " + this.numClients + " clients and " + this.numServers + " servers is: " + throughput);
             ecsClient.shutdown();
         } else {
             ecsClient = new ECSClient();
@@ -186,28 +210,28 @@ public class PerformanceTest {
         new PerformanceTest(5, 0, "None", 0, true).runTests();
         new PerformanceTest(7, 0, "None", 0, true).runTests();
         new PerformanceTest(10, 0, "None", 0, true).runTests();
-        */
-        // Test performance of using different numbers of clients with constant number of servers
-        // No caching
-        new PerformanceTest(5, 1, "None", 0, false).runTests();
-        /*
-        new PerformanceTest(5, 10, "None", 0, false).runTests();
-        new PerformanceTest(5, 20, "None", 0, false).runTests();
+
         // Test performance of using different numbers of servers with constant number of clients
         // No caching
-        new PerformanceTest(2, 10, "None", 0, false).runTests();
-        new PerformanceTest(6, 10, "None", 0, false).runTests();
-        new PerformanceTest(10, 10, "None", 0, false).runTests();
+        new PerformanceTest(1, 2, "None", 0, false).runTests();
+        new PerformanceTest(3, 2, "None", 0, false).runTests();
+        new PerformanceTest(4, 2, "None", 0, false).runTests();
+         */
+        // Test performance of using different numbers of clients with constant number of servers
+        // No caching
+        new PerformanceTest(2, 4, "None", 0, false).runTests();
+        /*new PerformanceTest(3, 3, "None", 0, false).runTests();
+        new PerformanceTest(3, 5, "None", 0, false).runTests();
         // Test performance of using different types of cache strategy
         // Same number of servers and clients and cache size
-        new PerformanceTest(5, 10, "FIFO", 50, false).runTests();
-        new PerformanceTest(5, 10, "LFU", 50, false).runTests();
-        new PerformanceTest(5, 10, "LRU", 50, false).runTests();
+        new PerformanceTest(3, 3, "FIFO", 50, false).runTests();
+        new PerformanceTest(3, 3, "LFU", 50, false).runTests();
+        new PerformanceTest(3, 3, "LRU", 50, false).runTests();
         // Test performance of using different cache size
         // Same number of servers and clients and cache strategy (FIFO)
-        new PerformanceTest(5, 10, "FIFO", 20, false).runTests();
-        new PerformanceTest(5, 10, "FIFO", 100, false).runTests();
-        new PerformanceTest(5, 10, "FIFO", 200, false).runTests();
+        new PerformanceTest(3, 3, "FIFO", 20, false).runTests();
+        new PerformanceTest(3, 3, "FIFO", 100, false).runTests();
+        new PerformanceTest(3, 3, "FIFO", 200, false).runTests();
         */
     }
 
