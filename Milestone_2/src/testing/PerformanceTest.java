@@ -99,7 +99,7 @@ public class PerformanceTest {
         }
         for (Thread thread : threads) {
             try {
-                thread.join();
+                thread.join(60000);
                 System.out.println("joined successfully");
                 try {
                     TimeUnit.SECONDS.sleep(5);
@@ -197,41 +197,43 @@ public class PerformanceTest {
             System.out.println("The duration (ms) of removing " + this.numServers + " server nodes with no caching is: "
                     + duration);
             ecsClient.shutdown();
+            try {
+                TimeUnit.SECONDS.sleep(10);
+            } catch (Exception e) {
+                System.out.println(e);
+            }
         }
 
     }
 
     public static void main(String[] args) {
-        /*
         // Test performance of adding and removing the server nodes
         new PerformanceTest(1, 0, "None", 0, true).runTests();
         new PerformanceTest(3, 0, "None", 0, true).runTests();
         new PerformanceTest(5, 0, "None", 0, true).runTests();
         new PerformanceTest(7, 0, "None", 0, true).runTests();
         new PerformanceTest(10, 0, "None", 0, true).runTests();
-
         // Test performance of using different numbers of servers with constant number of clients
         // No caching
         new PerformanceTest(1, 2, "None", 0, false).runTests();
         new PerformanceTest(3, 2, "None", 0, false).runTests();
         new PerformanceTest(4, 2, "None", 0, false).runTests();
-         */
+
         // Test performance of using different numbers of clients with constant number of servers
         // No caching
         new PerformanceTest(2, 4, "None", 0, false).runTests();
-        /*new PerformanceTest(3, 3, "None", 0, false).runTests();
-        new PerformanceTest(3, 5, "None", 0, false).runTests();
+        new PerformanceTest(2, 2, "None", 0, false).runTests();
+        new PerformanceTest(2, 1, "None", 0, false).runTests();
         // Test performance of using different types of cache strategy
         // Same number of servers and clients and cache size
-        new PerformanceTest(3, 3, "FIFO", 50, false).runTests();
-        new PerformanceTest(3, 3, "LFU", 50, false).runTests();
-        new PerformanceTest(3, 3, "LRU", 50, false).runTests();
+        new PerformanceTest(2, 1, "FIFO", 8, false).runTests();
+        new PerformanceTest(2, 1, "LFU", 8, false).runTests();
+        new PerformanceTest(2, 1, "LRU", 8, false).runTests();
         // Test performance of using different cache size
         // Same number of servers and clients and cache strategy (FIFO)
-        new PerformanceTest(3, 3, "FIFO", 20, false).runTests();
-        new PerformanceTest(3, 3, "FIFO", 100, false).runTests();
-        new PerformanceTest(3, 3, "FIFO", 200, false).runTests();
-        */
+        new PerformanceTest(2, 1, "FIFO", 20, false).runTests();
+        new PerformanceTest(2, 1, "FIFO", 10, false).runTests();
+        new PerformanceTest(2, 1, "FIFO", 3, false).runTests();
     }
 
 }
