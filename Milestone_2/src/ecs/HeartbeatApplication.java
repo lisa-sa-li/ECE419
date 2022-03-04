@@ -38,7 +38,7 @@ public class HeartbeatApplication implements Watcher {
         if (KeeperState.SyncConnected == keeperState) {
             // Delete node
             if (EventType.NodeDeleted == eventType) {
-                logger.info("node " + path + " Deleted");
+                logger.info("node " + path + " deleted");
                 kvServer.close();
             }
         } else if (KeeperState.Disconnected == keeperState || KeeperState.AuthFailed == keeperState

@@ -31,7 +31,7 @@
   <property name="performancetestmain.class" value="testing.PerformanceTest"/>
 
   <!-- Configuration for multithread test -->
-  <property name="threadtest.file"      value="m1-thread-test.jar"/>
+  <property name="threadtest.file"      value="m2-thread-test.jar"/>
   <property name="threadtestmanifest.file" value="THREAD_TEST_MANIFEST.MF"/>
   <property name="threadtestmain.class" value="testing.ThreadTest"/>
 

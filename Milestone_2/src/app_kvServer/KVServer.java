@@ -233,7 +233,7 @@ public class KVServer implements IKVServer, Runnable {
 		// removed
 
 		if (inHashRing() == false) {
-			// This detects that it's not in the hashring anymore, thus it needs to die
+			// This detects if it's not in the hashring anymore, thus it needs to die
 			this.hash = null;
 			this.endHash = null;
 			return true;
@@ -264,7 +264,6 @@ public class KVServer implements IKVServer, Runnable {
 		update(metadata);
 
 		Boolean die = getHashRange();
-		logger.debug("die? " + die);
 		lockWrite();
 
 		ECSNode receiverNode = metadata.getReceiverNode();

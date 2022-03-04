@@ -152,42 +152,4 @@ public class ECSConnection {
 				+ ">: '" + json.getJSON().trim() + "'");
 		return json;
 	}
-
-	// public void run() {
-	// // while connection is open, listen for messages
-	// try {
-	// System.out.println("Runnin in ECSConnection");
-	// while (this.isOpen) {
-	// System.out.println("Runnin Biteches");
-	// try {
-	// System.out.println("Listening for messages");
-	// JSONMessage recievedMesage = receiveMetadataMessage();
-	// System.out.println("got eeem");
-
-	// // if (recievedMesage != null) {
-	// // JSONMessage sendMessage = handleMessage(recievedMesage);
-	// // sendJSONMessage(sendMessage);
-	// // }
-	// } catch (IOException e) {
-	// logger.error("Server connection lost: ", e);
-	// this.isOpen = false;
-	// } catch (Exception e) {
-	// logger.error(e);
-	// }
-	// }
-	// } finally {
-	// try {
-	// // close connection
-	// if (ecsSocket != null) {
-	// // Send message????
-	// input.close();
-	// output.close();
-	// ecsSocket.close();
-	// }
-	// } catch (IOException ioe) {
-	// logger.error("Error! Unable to tear down connection!", ioe);
-	// }
-	// }
-	// }
-
 }
