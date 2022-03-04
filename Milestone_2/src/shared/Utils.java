@@ -3,13 +3,9 @@ package shared;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 
-import ecs.HashRing;
-
 public class Utils {
-    HashRing hashRing;
 
     public Utils() {
-        hashRing = new HashRing();
     }
 
     public boolean isKeyInRange(BigInteger hash, BigInteger endHash, String key) {
@@ -17,10 +13,9 @@ public class Utils {
             return true;
         }
 
-        BigInteger keyHash = hashRing.getHash(key);
+        BigInteger keyHash = getHash(key);
         int left = hash.compareTo(keyHash);
         int right = endHash.compareTo(keyHash);
-        // return (left >= 0 && right < 0);
 
         int isEndHashLarger = endHash.compareTo(hash);
         // a.compareTo(b)
