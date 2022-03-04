@@ -43,7 +43,7 @@ public class PerformanceTest {
         this.nodeTest = nodeTest;
     }
 
-    public ArrayList<ArrayList<String>> readInMailData(String originalDataPath){
+    public ArrayList<ArrayList<String>> readInMailData(String originalDataPath) {
         ArrayList<ArrayList<String>> keyValuePairList = new ArrayList<>();
         try {
             readKeyValuePair(originalDataPath, originalDataPath, keyValuePairList);
@@ -53,7 +53,8 @@ public class PerformanceTest {
         return keyValuePairList;
     }
 
-    public void readKeyValuePair(String originalDataPath, String newDirPath, ArrayList<ArrayList<String>> keyValuePairList) {
+    public void readKeyValuePair(String originalDataPath, String newDirPath,
+            ArrayList<ArrayList<String>> keyValuePairList) {
         File newDir = new File(newDirPath);
         File[] fileContent = newDir.listFiles();
         assert fileContent != null;
@@ -77,7 +78,7 @@ public class PerformanceTest {
                 oneKeyValPair.add(key);
                 oneKeyValPair.add(value);
                 keyValuePairList.add(oneKeyValPair);
-                if (keyValuePairList.size() % 10000 == 0){
+                if (keyValuePairList.size() % 10000 == 0) {
                     System.out.println("Key value pair count " + keyValuePairList.size());
                 }
             }
@@ -113,7 +114,7 @@ public class PerformanceTest {
             List<ArrayList<String>> clientAllocatingData = originalData.subList(numRequests, numRequests * 2);
             // System.out.println("allocated data");
             // Set up ECSClient and add server nodes
-            ecsClient = new ECSClient();
+            ecsClient = new ECSClient("./servers.cfg");
             // System.out.println("initialized client");
             ecsClient.addNodes(this.numServers, this.cacheStrategy, this.cacheSize);
             ecsClient.start();
@@ -128,9 +129,10 @@ public class PerformanceTest {
             // Populate the storage service with put requests
             ArrayList<IndividualClient> populatingClients = new ArrayList<>();
             int spacing = (populatingData.size() / this.numClients);
-            for (int i = 0; i < this.numClients; i++){
-                populatingClients.add(new IndividualClient(hostname, port, populatingData.subList(i*spacing, (i+1)*spacing),
-                        originalData, numRequests, true));
+            for (int i = 0; i < this.numClients; i++) {
+                populatingClients.add(
+                        new IndividualClient(hostname, port, populatingData.subList(i * spacing, (i + 1) * spacing),
+                                originalData, numRequests, true));
             }
             System.out.println("added client threads");
             runClientThreads(populatingClients);
@@ -139,7 +141,8 @@ public class PerformanceTest {
             ArrayList<IndividualClient> clients = new ArrayList<>();
             spacing = (clientAllocatingData.size() / numClients);
             for (int i = 0; i < numClients; i++)
-                clients.add(new IndividualClient(hostname, port, clientAllocatingData.subList(i*spacing, (i+1)*spacing),
+                clients.add(new IndividualClient(hostname, port,
+                        clientAllocatingData.subList(i * spacing, (i + 1) * spacing),
                         originalData, numRequests, false));
             System.out.println("added client threads for not populating");
             long startTime = System.currentTimeMillis();
@@ -157,14 +160,15 @@ public class PerformanceTest {
                     + " with " + this.numClients + " clients and " + this.numServers + " servers is: " + totalBytes);
             ecsClient.shutdown();
         } else {
-            ecsClient = new ECSClient();
+            ecsClient = new ECSClient("./servers.cfg");
             // Measure time duration for adding nodes
             long startTime = System.currentTimeMillis();
             ecsClient.addNodes(this.numServers, this.cacheStrategy, this.cacheSize);
             long endTime = System.currentTimeMillis();
             long duration = (endTime - startTime);
-            System.out.println("The time duration (ms) of adding " + this.numServers + " server nodes with no caching is: "
-                    + duration);
+            System.out.println(
+                    "The time duration (ms) of adding " + this.numServers + " server nodes with no caching is: "
+                            + duration);
             // Measure time duration for removing nodes
             HashMap<String, ECSNode> hashRingMap = ecsClient.getNodes();
             startTime = System.currentTimeMillis();
@@ -180,35 +184,37 @@ public class PerformanceTest {
 
     public static void main(String[] args) {
         /*
-        // Test performance of adding and removing the server nodes
-        new PerformanceTest(1, 0, "None", 0, true).runTests();
-        new PerformanceTest(3, 0, "None", 0, true).runTests();
-        new PerformanceTest(5, 0, "None", 0, true).runTests();
-        new PerformanceTest(7, 0, "None", 0, true).runTests();
-        new PerformanceTest(10, 0, "None", 0, true).runTests();
-        */
-        // Test performance of using different numbers of clients with constant number of servers
+         * // Test performance of adding and removing the server nodes
+         * new PerformanceTest(1, 0, "None", 0, true).runTests();
+         * new PerformanceTest(3, 0, "None", 0, true).runTests();
+         * new PerformanceTest(5, 0, "None", 0, true).runTests();
+         * new PerformanceTest(7, 0, "None", 0, true).runTests();
+         * new PerformanceTest(10, 0, "None", 0, true).runTests();
+         */
+        // Test performance of using different numbers of clients with constant number
+        // of servers
         // No caching
         new PerformanceTest(5, 1, "None", 0, false).runTests();
         /*
-        new PerformanceTest(5, 10, "None", 0, false).runTests();
-        new PerformanceTest(5, 20, "None", 0, false).runTests();
-        // Test performance of using different numbers of servers with constant number of clients
-        // No caching
-        new PerformanceTest(2, 10, "None", 0, false).runTests();
-        new PerformanceTest(6, 10, "None", 0, false).runTests();
-        new PerformanceTest(10, 10, "None", 0, false).runTests();
-        // Test performance of using different types of cache strategy
-        // Same number of servers and clients and cache size
-        new PerformanceTest(5, 10, "FIFO", 50, false).runTests();
-        new PerformanceTest(5, 10, "LFU", 50, false).runTests();
-        new PerformanceTest(5, 10, "LRU", 50, false).runTests();
-        // Test performance of using different cache size
-        // Same number of servers and clients and cache strategy (FIFO)
-        new PerformanceTest(5, 10, "FIFO", 20, false).runTests();
-        new PerformanceTest(5, 10, "FIFO", 100, false).runTests();
-        new PerformanceTest(5, 10, "FIFO", 200, false).runTests();
-        */
+         * new PerformanceTest(5, 10, "None", 0, false).runTests();
+         * new PerformanceTest(5, 20, "None", 0, false).runTests();
+         * // Test performance of using different numbers of servers with constant
+         * number of clients
+         * // No caching
+         * new PerformanceTest(2, 10, "None", 0, false).runTests();
+         * new PerformanceTest(6, 10, "None", 0, false).runTests();
+         * new PerformanceTest(10, 10, "None", 0, false).runTests();
+         * // Test performance of using different types of cache strategy
+         * // Same number of servers and clients and cache size
+         * new PerformanceTest(5, 10, "FIFO", 50, false).runTests();
+         * new PerformanceTest(5, 10, "LFU", 50, false).runTests();
+         * new PerformanceTest(5, 10, "LRU", 50, false).runTests();
+         * // Test performance of using different cache size
+         * // Same number of servers and clients and cache strategy (FIFO)
+         * new PerformanceTest(5, 10, "FIFO", 20, false).runTests();
+         * new PerformanceTest(5, 10, "FIFO", 100, false).runTests();
+         * new PerformanceTest(5, 10, "FIFO", 200, false).runTests();
+         */
     }
 
 }
