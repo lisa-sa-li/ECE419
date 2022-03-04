@@ -395,6 +395,7 @@ public class KVServer implements IKVServer, Runnable {
 		if (this.cache != null) {
 			this.cache.put(key, value);
 		}
+		System.out.println("CALLING PUT IN KVSERVER");
 		return this.persistantStorage.put(key, value);
 	}
 
@@ -521,7 +522,7 @@ public class KVServer implements IKVServer, Runnable {
 				int port = Integer.parseInt(args[0]);
 				// System.out.println("args", args);
 				// TODO: set params for cache size and strategy
-				new KVServer(port, 1, "").run();
+				new KVServer(port, 10, "FIFO").run();
 			}
 		} catch (IOException e) {
 			System.out.println("Error! Unable to initialize logger!");

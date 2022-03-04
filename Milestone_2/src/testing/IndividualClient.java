@@ -9,8 +9,8 @@ import java.nio.charset.StandardCharsets;
 
 
 public class IndividualClient implements Runnable {
-    int numPUTRequests;
-    int numGETRequests;
+    int numPUTRequests = 0;
+    int numGETRequests = 0;
     private KVStore kvStore;
     private List<ArrayList<String>> associatedData;
     Random randomNumber = new Random();
@@ -35,7 +35,7 @@ public class IndividualClient implements Runnable {
 
     public void run() {
         try{
-            System.out.println("start of individual client run() ");
+            // System.out.println("start of individual client run() ");
             try {
                 this.kvStore.connect();
                 System.out.println("KVStore connected ");
@@ -48,19 +48,32 @@ public class IndividualClient implements Runnable {
                 String key = keyValuePair.get(0);
                 String value = keyValuePair.get(1);
                 if (this.initialPopulating) {
+                    if (count % 100 == 0){
+                        System.out.println("populating now " + count);
+                    }
                     try {
-                        this.kvStore.put(key, value);
+                        System.out.println("before PUT");
+                        System.out.println("key: " + key);
+                        System.out.println("value length: " + value.length());
+                        String msg = this.kvStore.put(key, value).toString();
+                        System.out.println("END OF PUT: " + msg);
+                        String status = this.kvStore.put(key, value).getStatus().toString();
+                        System.out.println("PUT Status: " + status);
+                        this.numPUTRequests += 1;
                         count += 1;
                     } catch (Exception e) {
                     }
                     if (count % 100 == 0){
                         System.out.println("Key value pair count " + count);
                     }
+                    System.out.println("---------------------------------------------------------------------------------------------");
+                    break;
                 } else {
                     if (Math.random() <= 0.5) {
                         try {
                             this.kvStore.put(key, value);
                             this.totalBytes += value.getBytes(StandardCharsets.UTF_8).length;
+                            this.numPUTRequests += 1;
                         } catch (Exception e) {
                         }
                     } else {
@@ -69,6 +82,7 @@ public class IndividualClient implements Runnable {
                         try {
                             String returnVal = this.kvStore.get(pair.get(0)).getValue();
                             this.totalBytes += returnVal.getBytes(StandardCharsets.UTF_8).length;
+                            this.numGETRequests += 1;
                         } catch (Exception e){
                         }
                     }
