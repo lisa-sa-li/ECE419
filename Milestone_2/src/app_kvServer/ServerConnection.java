@@ -313,20 +313,10 @@ public class ServerConnection implements IServerConnection, Runnable {
 			while (this.isOpen) {
 				try {
 					JSONMessage receivedMessage = receiveJSONMessage();
+
 					if (receivedMessage != null) {
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
-
-						// logger.debug("this.kvServer.serverStatus " +
-						// this.kvServer.serverStatus.name() + " metadata "
-						// + metadata == null);
-						// logger.info("this.kvServer.serverStatus " + this.kvServer.serverStatus.name()
-						// + " metadata "
-						// + metadata == null);
-						// System.out.println(
-						// "this.kvServer.serverStatus " + this.kvServer.serverStatus.name() + "
-						// metadata "
-						// + metadata == null);
 
 						if (metadata == null && this.kvServer.serverStatus == ServerStatus.CLOSED) {
 							// If the status is closed , all client requests are responded to with

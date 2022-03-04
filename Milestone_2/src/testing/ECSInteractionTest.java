@@ -1,14 +1,11 @@
 package testing;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
 import client.KVStore;
-import app_kvServer.KVServer;
 import junit.framework.TestCase;
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
@@ -54,6 +51,10 @@ public class ECSInteractionTest extends TestCase {
 	public void testSingleServerRing() {
 		// test adding a single server
 		ecs.addNode("FIFO", 3);
+		try {
+			TimeUnit.SECONDS.sleep(1);
+		} catch (Exception e) {
+		}
 		ecs.start();
 
 		// collect available servers
@@ -196,64 +197,73 @@ public class ECSInteractionTest extends TestCase {
 		kvStore.disconnect();
 	}
 
-	// @Test
-	// public void testECSStop() {
-	// ecs.addNode("FIFO", 3);
+	@Test
+	public void testECSStop() {
+		ecs.addNode("FIFO", 3);
+		try {
+			TimeUnit.SECONDS.sleep(3);
+		} catch (Exception e) {
+		}
+		ecs.stop();
 
-	// int port = ecs.getCurrentPorts().get(0);
-	// KVStore kvStore = new KVStore("127.0.0.1", port);
-	// Exception ex = null;
-	// try {
-	// kvStore.connect();
-	// } catch (Exception e) {
-	// ex = e;
-	// }
-	// assertTrue(ex == null);
+		int port = ecs.getCurrentPorts().get(0);
+		KVStore kvStore = new KVStore("localhost", port);
+		Exception ex = null;
+		try {
+			kvStore.connect();
+		} catch (Exception e) {
+			ex = e;
+		}
+		// System.out.println("ex :" + ex + port);
+		assertTrue(ex == null);
 
-	// ecs.stop();
+		String key = "foo2", value = "bar2";
+		JSONMessage response = null;
 
-	// String key = "foo2", value = "bar2";
-	// JSONMessage response = null;
+		try {
+			response = sendAndRecieve(kvStore, key, value);
+		} catch (Exception e) {
+			ex = e;
+		}
 
-	// try {
-	// response = sendAndRecieve(kvStore, key, value);
-	// } catch (Exception e) {
-	// ex = e;
-	// }
+		System.out.println("ex2:" + ex + port);
+		System.out.println("TESTECSSTOP: " + response.getStatus().name());
+		assertTrue(ex == null && response.getStatus() == StatusType.SERVER_STOPPED);
+		kvStore.disconnect();
+	}
 
-	// System.out.println("TESTECSSTOP: " + response.getStatus().name());
-	// assertTrue(ex == null && response.getStatus() == StatusType.SERVER_STOPPED);
-	// kvStore.disconnect();
-	// }
+	@Test
+	public void testServerNotResponsible() {
+		ecs.addNodes(2, "FIFO", 3);
+		try {
+			TimeUnit.SECONDS.sleep(5);
+		} catch (Exception e) {
+		}
+		ecs.start();
 
-	// @Test
-	// public void testServerNotResponsible() {
-	// ecs.addNodes(2, "FIFO", 3);
+		int port = ecs.getCurrentPorts().get(0);
+		KVStore kvStore = new KVStore("127.0.0.1", port);
+		Exception ex = null;
+		try {
+			kvStore.connect();
+		} catch (Exception e) {
+			ex = e;
+		}
+		assertTrue(ex == null);
 
-	// int port = ecs.getCurrentPorts().get(0);
-	// KVStore kvStore = new KVStore("127.0.0.1", port);
-	// Exception ex = null;
-	// try {
-	// kvStore.connect();
-	// } catch (Exception e) {
-	// ex = e;
-	// }
-	// assertTrue(ex == null);
+		String key = "127.0.0.1:" + ecs.getCurrentPorts().get(1), value = "bar2";
+		JSONMessage response = null;
 
-	// String key = "127.0.0.1:" + ecs.getCurrentPorts().get(1), value = "bar2";
-	// JSONMessage response = null;
+		try {
+			response = sendAndRecieve(kvStore, key, value);
+		} catch (Exception e) {
+			ex = e;
+		}
 
-	// try {
-	// response = sendAndRecieve(kvStore, key, value);
-	// } catch (Exception e) {
-	// ex = e;
-	// }
+		System.out.println("TESTECSSTOP2: " + response.getStatus().name());
 
-	// System.out.println("TESTECSSTOP2: " + response.getStatus().name());
-
-	// assertTrue(ex == null && response.getStatus() ==
-	// StatusType.SERVER_NOT_RESPONSIBLE);
-	// kvStore.disconnect();
-	// }
+		assertTrue(ex == null && response.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE);
+		kvStore.disconnect();
+	}
 
 }

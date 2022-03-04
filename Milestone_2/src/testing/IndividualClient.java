@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.nio.charset.StandardCharsets;
 
-
 public class IndividualClient implements Runnable {
     int numPUTRequests = 0;
     int numGETRequests = 0;
@@ -20,7 +19,7 @@ public class IndividualClient implements Runnable {
     private double totalBytes = 0;
 
     public IndividualClient(String hostname, int port, List<ArrayList<String>> associatedData,
-                            List<ArrayList<String>> originalData, int numRequests, boolean initialPopulating) {
+            List<ArrayList<String>> originalData, int numRequests, boolean initialPopulating) {
         this.kvStore = new KVStore(hostname, port);
         this.associatedData = associatedData;
         this.initialPopulating = initialPopulating;
@@ -29,12 +28,12 @@ public class IndividualClient implements Runnable {
         System.out.println("associatedData.length " + associatedData.size());
     }
 
-    public double getTotalBytes(){
+    public double getTotalBytes() {
         return this.totalBytes;
     }
 
     public void run() {
-        try{
+        try {
             // System.out.println("start of individual client run() ");
             try {
                 this.kvStore.connect();
@@ -48,7 +47,7 @@ public class IndividualClient implements Runnable {
                 String key = keyValuePair.get(0);
                 String value = keyValuePair.get(1);
                 if (this.initialPopulating) {
-                    if (count % 100 == 0){
+                    if (count % 100 == 0) {
                         System.out.println("populating now " + count);
                     }
                     try {
@@ -63,10 +62,11 @@ public class IndividualClient implements Runnable {
                         count += 1;
                     } catch (Exception e) {
                     }
-                    if (count % 100 == 0){
+                    if (count % 100 == 0) {
                         System.out.println("Key value pair count " + count);
                     }
-                    System.out.println("---------------------------------------------------------------------------------------------");
+                    System.out.println(
+                            "---------------------------------------------------------------------------------------------");
                     break;
                 } else {
                     if (Math.random() <= 0.5) {
@@ -83,7 +83,7 @@ public class IndividualClient implements Runnable {
                             String returnVal = this.kvStore.get(pair.get(0)).getValue();
                             this.totalBytes += returnVal.getBytes(StandardCharsets.UTF_8).length;
                             this.numGETRequests += 1;
-                        } catch (Exception e){
+                        } catch (Exception e) {
                         }
                     }
                 }

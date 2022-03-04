@@ -3,7 +3,6 @@ package testing;
 import org.junit.Test;
 
 import client.KVStore;
-import app_kvServer.KVServer;
 import junit.framework.TestCase;
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;

@@ -2,12 +2,9 @@ package testing;
 
 import java.nio.file.*;
 import java.io.File;
-import java.beans.Transient;
 import java.math.BigInteger;
 import junit.framework.TestCase;
 import org.junit.Test;
-
-import client.KVStore;
 
 import app_kvServer.PersistantStorage;
 
