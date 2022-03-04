@@ -57,15 +57,13 @@ public class KVClient implements IKVClient, Runnable {
 
         if (status == StatusType.SERVER_STOPPED) {
             System.out.println("The server is closed and can't be written to or read from.");
+        } else if (status == StatusType.SERVER_WRITE_LOCK) {
+            System.out.println("The server is locked for write. Only get is possible right now.");
         } else if (value == null || value.isEmpty()) {
-            System.out
-                    .println(status + "\t key: " + key);
+            System.out.println(status + "\t key: " + key);
         } else {
-            System.out
-                    .println(status + "\t key: " + key + " & value: "
-                            + value);
+            System.out.println(status + "\t key: " + key + " & value: " + value);
         }
-
     }
 
     private void handleCommand(String cmdLine) {

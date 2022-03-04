@@ -214,7 +214,7 @@ public class ECSInteractionTest extends TestCase {
 		} catch (Exception e) {
 			ex = e;
 		}
-		// System.out.println("ex :" + ex + port);
+
 		assertTrue(ex == null);
 
 		String key = "foo2", value = "bar2";
@@ -226,8 +226,6 @@ public class ECSInteractionTest extends TestCase {
 			ex = e;
 		}
 
-		System.out.println("ex2:" + ex + port);
-		System.out.println("TESTECSSTOP: " + response.getStatus().name());
 		assertTrue(ex == null && response.getStatus() == StatusType.SERVER_STOPPED);
 		kvStore.disconnect();
 	}
@@ -259,8 +257,6 @@ public class ECSInteractionTest extends TestCase {
 		} catch (Exception e) {
 			ex = e;
 		}
-
-		System.out.println("TESTECSSTOP2: " + response.getStatus().name());
 
 		assertTrue(ex == null && response.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE);
 		kvStore.disconnect();

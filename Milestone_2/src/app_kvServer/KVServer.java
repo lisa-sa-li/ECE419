@@ -62,7 +62,6 @@ public class KVServer implements IKVServer, Runnable {
 	public BigInteger hash;
 	public BigInteger endHash;
 	private HashMap<String, BigInteger> hashRing;
-	// private HashRing hashRingClass = new HashRing();
 
 	private Utils utils = new Utils();
 
@@ -71,17 +70,6 @@ public class KVServer implements IKVServer, Runnable {
 	private CacheStrategy cacheAlgo;
 	private Cache cache;
 
-	/**
-	 * Start KV Server at given port
-	 * 
-	 * @param port      given port for storage server to operate
-	 * @param cacheSize specifies how many key-value pairs the server is allowed
-	 *                  to keep in-memory
-	 * @param algo      specifies the cache replacement strategy in case the cache
-	 *                  is full and there is a GET- or PUT-request on a key that is
-	 *                  currently not contained in the cache. Options are "FIFO",
-	 *                  "LRU", and "LFU".
-	 */
 	public KVServer(int port, int cacheSize, String algo) {
 		this.port = port;
 		this.cacheSize = cacheSize;
@@ -127,7 +115,8 @@ public class KVServer implements IKVServer, Runnable {
 	private void initCache() {
 		if (this.cacheAlgo == CacheStrategy.None) {
 			this.cache = null;
-		} else { // allocate cache
+		} else {
+			// allocate cache
 			try {
 				Constructor<?> constructorCache = Class.forName("cache." + this.cacheAlgo + "Cache")
 						.getConstructor(Integer.class);
@@ -142,6 +131,8 @@ public class KVServer implements IKVServer, Runnable {
 
 	private void initHeartbeat() {
 		zkApp = new ZooKeeperApplication(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, zkPort, zkHost);
+
+		// Connect to ZK
 		try {
 			zk = zkApp.connect(zkHost + ":" + String.valueOf(zkPort), zkTimeout);
 		} catch (InterruptedException | IOException e) {
@@ -149,19 +140,8 @@ public class KVServer implements IKVServer, Runnable {
 			System.exit(1);
 		}
 
-		try {
-			if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH, false) == null) {
-				logger.error("ZK does not exist, has not been initialized yet");
-				System.exit(1);
-			}
-		} catch (KeeperException | InterruptedException e) {
-			logger.error(e);
-			System.exit(1);
-		} catch (Exception e) {
-			logger.error(e);
-			System.exit(1);
-		}
-
+		// Confirm if the zNode '/root/<server name>' exists. Exit if it doesn't,
+		// because it means the ECS didn't successfully initialize it
 		try {
 			if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + serverName,
 					false) == null) {
@@ -176,7 +156,10 @@ public class KVServer implements IKVServer, Runnable {
 			System.exit(1);
 		}
 
+		// Confirm if the zNode '/heartbeat/<server name>' exists. Exit if it doesn't,
+		// because it means the ECS didn't successfully initialize it
 		try {
+			// Create en ephemeral heartbeat znode
 			String heartbeatPath = ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH + "/" +
 					serverName;
 			zkApp.create(heartbeatPath, serverName + " heartbeat", CreateMode.EPHEMERAL);
@@ -193,9 +176,7 @@ public class KVServer implements IKVServer, Runnable {
 
 	public void initKVServer(Metadata metadata) {
 		// Initialize the KVServer with the metadata and block it for client requests,
-		// i.e., all client requests are rejected with an SERVER_STOPPED error message;
-		// ECS requests have to be processed.
-		this.serverStatus = ServerStatus.CLOSED;
+		stop();
 		update(metadata);
 	}
 
@@ -233,7 +214,8 @@ public class KVServer implements IKVServer, Runnable {
 		// removed
 
 		if (inHashRing() == false) {
-			// This detects if it's not in the hashring anymore, thus it needs to die
+			// When inHashRing() is false, it means this server is not in the hashring
+			// anymore, thus it has been removed
 			this.hash = null;
 			this.endHash = null;
 			return true;
@@ -244,10 +226,15 @@ public class KVServer implements IKVServer, Runnable {
 		Collections.sort(orderedKeys);
 
 		this.hash = hashRing.get(getNamePortHost());
+
+		// If it's the only server in the hashring, set the end hash to null to indicate
+		// that
 		if (orderedKeys.size() == 1) {
 			this.endHash = null;
 			return false;
 		}
+		// Else find its endHash in the sorted hashring, which is the next server's
+		// start hash
 		Integer nextIdx = orderedKeys.indexOf(this.hash);
 		nextIdx = (nextIdx + 1) % orderedKeys.size();
 
@@ -257,7 +244,6 @@ public class KVServer implements IKVServer, Runnable {
 
 	public void moveData(Metadata metadata) {
 		// Transfer a subset (range) of the KVServer's data to another KVServer
-		// Send a notification to the ECS, if data transfer is completed.
 
 		// Update internal metadata with the metadata is just recieved in the new
 		// message

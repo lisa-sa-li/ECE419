@@ -318,19 +318,27 @@ public class ServerConnection implements IServerConnection, Runnable {
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
 
-						if (metadata == null && this.kvServer.serverStatus == ServerStatus.CLOSED) {
-							// If the status is closed , all client requests are responded to with
-							// SERVER_STOPPED messages
+						if (metadata == null) {
 							sendMessage = new JSONMessage();
-							sendMessage.setMessage(StatusType.SERVER_STOPPED.name(), receivedMessage.getKey(),
-									receivedMessage.getValue());
-						} else if (metadata == null) {
-							sendMessage = handleMessage(receivedMessage);
+							ServerStatus serverStatus = this.kvServer.serverStatus;
+							if (serverStatus == ServerStatus.CLOSED) {
+								// If the status is closed, all client requests are responded to with
+								// SERVER_STOPPED messages
+								sendMessage.setMessage(StatusType.SERVER_STOPPED.name(), receivedMessage.getKey(),
+										receivedMessage.getValue());
+							} else if (serverStatus == ServerStatus.LOCKED
+									&& receivedMessage.getStatus() == StatusType.PUT) {
+								// If the status is write locked, only get is possible
+								sendMessage.setMessage(StatusType.SERVER_WRITE_LOCK.name(), receivedMessage.getKey(),
+										receivedMessage.getValue());
+							} else {
+								sendMessage = handleMessage(receivedMessage);
+							}
 						} else {
 							sendMessage = handleMetadataMessage(metadata);
 						}
 
-						// In the case of a PUT_MANY, we do not need to send
+						// In the case of a PUT_MANY, we do not need to send a message
 						if (sendMessage != null) {
 							sendJSONMessage(sendMessage);
 						}

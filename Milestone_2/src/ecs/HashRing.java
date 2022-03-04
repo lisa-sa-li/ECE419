@@ -92,7 +92,8 @@ public class HashRing {
         // get hash from array list
         BigInteger removeHash = hashRing.get(name + ":" + portHost);
         if (removeHash == null) {
-            throw new NullPointerException("Invalid node name");
+            throw new NullPointerException(
+                    "Invalid node name: this node name is either incorrect or no longer in the hashring");
         }
         // collect idx of removed node in hashring
         int idx = hashOrder.indexOf(removeHash);
