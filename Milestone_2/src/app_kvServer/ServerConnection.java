@@ -176,16 +176,15 @@ public class ServerConnection implements IServerConnection, Runnable {
 						break;
 					}
 					// check key, value length
-					/*
 					if (key.length() > 20) {
 						throw new KeyValueTooLongException("Key too long: " + key);
-					}*/
+					}
 					if (key.trim().isEmpty() || key == null) {
 						throw new InvalidKeyException("Invalid key: " + key);
 					}
-					/*if (value.length() > 120000) {
+					if (value.length() > 120000) {
 						throw new KeyValueTooLongException("Value too long : " + value);
-					}*/
+					}
 					handleMessageStatus = this.kvServer.putKV(key, value);
 					logger.info(handleMessageStatus.name() + ": key " + key + " & value " + value);
 				} catch (Exception e) {
@@ -212,9 +211,11 @@ public class ServerConnection implements IServerConnection, Runnable {
 					break;
 				}
 				try {
-					/* if (key.length() > 20) {
-						throw new KeyValueTooLongException("Key too long: " + key);
-					}*/
+					/*
+					 * if (key.length() > 20) {
+					 * throw new KeyValueTooLongException("Key too long: " + key);
+					 * }
+					 */
 					if (!value.trim().isEmpty() && value != null) {
 						throw new UnexpectedValueException("Unexpected value for GET: " + value);
 					}

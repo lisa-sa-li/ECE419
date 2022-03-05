@@ -71,7 +71,7 @@ public class PerformanceTest {
                 try {
                     // https://howtodoinjava.com/java11/files-readstring-read-file-to-string/
                     // value = Files.readString(f.toPath(), Charset.defaultCharset());
-                    value = new String (Files.readAllBytes(Paths.get(String.valueOf(f.toPath()))));
+                    value = new String(Files.readAllBytes(Paths.get(String.valueOf(f.toPath()))));
                 } catch (Exception e) {
                     // System.out.println("readKeyValuePair catch: " + e);
                     continue;
@@ -128,7 +128,7 @@ public class PerformanceTest {
             ecsClient.addNodes(this.numServers, this.cacheStrategy, this.cacheSize);
             ecsClient.start();
             try {
-                TimeUnit.SECONDS.sleep(this.numServers*5);
+                TimeUnit.SECONDS.sleep(this.numServers * 5);
             } catch (Exception e) {
                 System.out.println(e);
             }
@@ -138,8 +138,8 @@ public class PerformanceTest {
             // Populate the storage service with put requests
             ArrayList<IndividualClient> clients = new ArrayList<>();
             int spacing = (populatingData.size() / this.numClients);
-            for (int i = 0; i < this.numClients; i++){
-                clients.add(new IndividualClient(hostname, port, populatingData.subList(i*spacing, (i+1)*spacing),
+            for (int i = 0; i < this.numClients; i++) {
+                clients.add(new IndividualClient(hostname, port, populatingData.subList(i * spacing, (i + 1) * spacing),
                         originalData, numRequests, true));
                 try {
                     TimeUnit.SECONDS.sleep(5);
@@ -154,7 +154,8 @@ public class PerformanceTest {
             clients = new ArrayList<>();
             spacing = (clientAllocatingData.size() / numClients);
             for (int i = 0; i < this.numClients; i++) {
-                clients.add(new IndividualClient(hostname, port, clientAllocatingData.subList(i * spacing, (i + 1) * spacing),
+                clients.add(new IndividualClient(hostname, port,
+                        clientAllocatingData.subList(i * spacing, (i + 1) * spacing),
                         populatingData, numRequests, false));
                 try {
                     TimeUnit.SECONDS.sleep(5);
@@ -166,7 +167,7 @@ public class PerformanceTest {
             long startTime = System.currentTimeMillis();
             runClientThreads(clients);
             long endTime = System.currentTimeMillis();
-            //System.out.println("runClientThreads(clients);");
+            // System.out.println("runClientThreads(clients);");
             long duration = endTime - startTime;
             long latency = 1000 * duration / numRequests;
             System.out.println("The latency (ms) of " + this.cacheStrategy + " cache with the size of " + this.cacheSize
@@ -213,13 +214,15 @@ public class PerformanceTest {
         new PerformanceTest(5, 0, "None", 0, true).runTests();
         new PerformanceTest(7, 0, "None", 0, true).runTests();
         new PerformanceTest(10, 0, "None", 0, true).runTests();
-        // Test performance of using different numbers of servers with constant number of clients
+        // Test performance of using different numbers of servers with constant number
+        // of clients
         // No caching
         new PerformanceTest(1, 2, "None", 0, false).runTests();
         new PerformanceTest(3, 2, "None", 0, false).runTests();
         new PerformanceTest(4, 2, "None", 0, false).runTests();
 
-        // Test performance of using different numbers of clients with constant number of servers
+        // Test performance of using different numbers of clients with constant number
+        // of servers
         // No caching
         new PerformanceTest(2, 4, "None", 0, false).runTests();
         new PerformanceTest(2, 2, "None", 0, false).runTests();
