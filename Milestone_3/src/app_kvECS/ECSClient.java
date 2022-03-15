@@ -40,7 +40,7 @@ public class ECSClient implements IECSClient, Runnable {
 
     private static Logger logger = Logger.getRootLogger();
     private String[] servers;
-    private String SERVER_JAR = "m2-server.jar";
+    private String SERVER_JAR = "m3-server.jar";
     private static String CONFIG_FILEPATH = "./servers.cfg";
 
     private HashMap<String, ECSNode> allServerMap = new HashMap<String, ECSNode>();
