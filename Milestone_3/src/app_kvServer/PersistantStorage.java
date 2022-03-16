@@ -21,6 +21,7 @@ public class PersistantStorage implements IPersistantStorage {
     private String fileName;
     private String pathToFile;
     private String dir = "./storage";
+    private String GLOBAL_STORAGE_PATH = dir + "/global_storage.txt";
     private HashRing hashRing;
     private Utils utils;
 
@@ -59,6 +60,18 @@ public class PersistantStorage implements IPersistantStorage {
             }
         } catch (Exception e) {
             logger.error("Error when creating file " + f.getName() + ": " + e);
+        }
+
+        // Create global storage file if it does not exist
+        File f_global = new File(GLOBAL_STORAGE_PATH);
+        try {
+            if (f_global.createNewFile()) {
+                logger.info("File created: " + f_global.getName());
+            } else {
+                logger.info("File already exists.");
+            }
+        } catch (Exception e) {
+            logger.error("Error when creating file " + f_global.getName() + ": " + e);
         }
 
     }
@@ -286,6 +299,58 @@ public class PersistantStorage implements IPersistantStorage {
             logger.error("Problem reading file to put_many.");
         }
         return StatusType.PUT_ERROR;
+    }
+
+    public void moveToGlobalStorage() {
+        // Appends kv-pairs to global_storage.txt if it's being shut down and is the
+        // last server
+        try {
+            BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
+            StringBuffer inputBuffer = new StringBuffer();
+            String line;
+
+            while ((line = file.readLine()) != null) {
+                inputBuffer.append(line);
+                inputBuffer.append('\n');
+            }
+            file.close();
+            this.clearStorage();
+            // Write all its contents to a global storage
+            FileOutputStream fileOut = new FileOutputStream(GLOBAL_STORAGE_PATH);
+            fileOut.write(inputBuffer.toString().getBytes());
+            fileOut.close();
+
+            logger.info("Successfully moved kv-pairs to global_storage.txt");
+        } catch (Exception e) {
+            logger.error("Problem moving kv-pairs to global_storage.txt");
+        }
+    }
+
+    public void getFromGlobalStorage() {
+        // Retrieve kv-pairs from global_storage.txt if it's the first server being
+        // started up
+        try {
+            BufferedReader file = new BufferedReader(new FileReader(GLOBAL_STORAGE_PATH));
+            StringBuffer inputBuffer = new StringBuffer();
+            String line;
+
+            while ((line = file.readLine()) != null) {
+                inputBuffer.append(line);
+                inputBuffer.append('\n');
+            }
+            file.close();
+
+            // Clear the file
+            PrintWriter writer = new PrintWriter(GLOBAL_STORAGE_PATH);
+            writer.print("");
+            writer.close();
+
+            // Append the kv-pairs to its own storage
+            this.appendToStorage(inputBuffer.toString());
+            logger.info("Successfully retrieved kv-pairs from global_storage.txt");
+        } catch (Exception e) {
+            logger.error("Problem retrieving kv-pairs from global_storage.txt");
+        }
     }
 
 }

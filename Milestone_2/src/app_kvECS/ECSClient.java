@@ -172,17 +172,17 @@ public class ECSClient implements IECSClient, Runnable {
             String name = pair.getKey().toString();
             ECSNode node = pair.getValue();
 
-            String zNodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + name;
-            try {
-                zkApp.createOrSetData(zNodePath, name);
-            } catch (KeeperException | InterruptedException e) {
-                startSuccess = false;
-                continue;
-            } catch (Exception e) {
-                startSuccess = false;
-                logger.error(e);
-                continue;
-            }
+            // String zNodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + name;
+            // try {
+            // zkApp.createOrSetData(zNodePath, name);
+            // } catch (KeeperException | InterruptedException e) {
+            // startSuccess = false;
+            // continue;
+            // } catch (Exception e) {
+            // startSuccess = false;
+            // logger.error(e);
+            // continue;
+            // }
 
             node.setStatus(NodeStatus.STARTING);
             allServerMap.put(name, node);

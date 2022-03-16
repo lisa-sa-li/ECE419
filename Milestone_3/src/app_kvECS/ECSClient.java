@@ -166,28 +166,29 @@ public class ECSClient implements IECSClient, Runnable {
     public boolean start() {
         boolean startSuccess = true;
 
-        Iterator<Map.Entry<String, ECSNode>> it = currServerMap.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
-            String name = pair.getKey().toString();
-            ECSNode node = pair.getValue();
+        // Iterator<Map.Entry<String, ECSNode>> it =
+        // currServerMap.entrySet().iterator();
+        // while (it.hasNext()) {
+        // Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
+        // String name = pair.getKey().toString();
+        // ECSNode node = pair.getValue();
 
-            String zNodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + name;
-            try {
-                zkApp.createOrSetData(zNodePath, name);
-            } catch (KeeperException | InterruptedException e) {
-                startSuccess = false;
-                continue;
-            } catch (Exception e) {
-                startSuccess = false;
-                logger.error(e);
-                continue;
-            }
+        // // String zNodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + name;
+        // // try {
+        // // zkApp.createOrSetData(zNodePath, name);
+        // // } catch (KeeperException | InterruptedException e) {
+        // // startSuccess = false;
+        // // continue;
+        // // } catch (Exception e) {
+        // // startSuccess = false;
+        // // logger.error(e);
+        // // continue;
+        // // }
 
-            node.setStatus(NodeStatus.STARTING);
-            allServerMap.put(name, node);
-            currServerMap.put(name, node);
-        }
+        // node.setStatus(NodeStatus.STARTING);
+        // allServerMap.put(name, node);
+        // currServerMap.put(name, node);
+        // }
         // This sends a START message to the servers
         hashRing.startAll();
         return startSuccess;
@@ -203,18 +204,18 @@ public class ECSClient implements IECSClient, Runnable {
             String name = pair.getKey().toString();
             ECSNode node = pair.getValue();
 
-            String zNodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + name;
-            try {
-                zkApp.createOrSetData(zNodePath, name);
-            } catch (KeeperException | InterruptedException e) {
-                stopSuccess = false;
-                logger.error("Cannot stop ZK " + e);
-                continue;
-            } catch (Exception e) {
-                stopSuccess = false;
-                logger.error(e);
-                continue;
-            }
+            // String zNodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + name;
+            // try {
+            // zkApp.createOrSetData(zNodePath, name);
+            // } catch (KeeperException | InterruptedException e) {
+            // stopSuccess = false;
+            // logger.error("Cannot stop ZK " + e);
+            // continue;
+            // } catch (Exception e) {
+            // stopSuccess = false;
+            // logger.error(e);
+            // continue;
+            // }
 
             node.setStatus(NodeStatus.STOPPED);
             allServerMap.put(name, node);
@@ -412,11 +413,14 @@ public class ECSClient implements IECSClient, Runnable {
 
     @Override
     public boolean removeNodes(Collection<String> nodeNames) {
-        if (currServerMap.size() == 1) {
-            logger.error("You may not remove the last running node: there must be at least one active server.");
-            return false;
-        } else if (nodeNames.size() >= currServerMap.size()) {
-            logger.error("You are removing too many nodes. There must be at least one active server.");
+        // if (currServerMap.size() == 1) {
+        // logger.error("You may not remove the last running node: there must be at
+        // least one active server.");
+        // return false;
+        // } else
+        if (nodeNames.size() > currServerMap.size()) {
+            logger.error("You are removing too many nodes. There are " + currServerMap.size()
+                    + " servers that have started.");
             return false;
         }
 
