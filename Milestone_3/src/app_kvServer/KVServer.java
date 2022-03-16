@@ -178,9 +178,9 @@ public class KVServer implements IKVServer, Runnable {
 		// Initialize the KVServer with the metadata and block it for client requests,
 		stop();
 		update(metadata);
-		logger.debug("initKVServer1");
+		logger.debug("initKVServer1 " + this.hashRing.size());
 
-		if (inHashRing() && hashRing.size() == 1) {
+		if (inHashRing() && this.hashRing.size() == 1) {
 			logger.debug("initKVServer2");
 			persistantStorage.getFromGlobalStorage();
 		}
@@ -270,11 +270,11 @@ public class KVServer implements IKVServer, Runnable {
 		logger.debug(nameOfReceiver == this.serverName);
 
 		// if (this.hashRing.size() == 0) {
-		// 	logger.debug("here22");
-		// 	persistantStorage.moveToGlobalStorage();
-		// 	logger.debug("here44");
-		// 	unLockWrite();
-		// 	return;
+		// logger.debug("here22");
+		// persistantStorage.moveToGlobalStorage();
+		// logger.debug("here44");
+		// unLockWrite();
+		// return;
 		// }
 
 		if (nameOfReceiver.equals(this.serverName)) {
@@ -289,6 +289,12 @@ public class KVServer implements IKVServer, Runnable {
 			}
 			logger.debug("here3");
 			unLockWrite();
+			try {
+				TimeUnit.SECONDS.sleep(5);
+				kill();
+			} catch (Exception e) {
+				logger.error("Unable to kill server");
+			}
 			return;
 		}
 

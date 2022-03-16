@@ -418,11 +418,12 @@ public class ECSClient implements IECSClient, Runnable {
         // least one active server.");
         // return false;
         // } else
-        if (nodeNames.size() > currServerMap.size()) {
-            logger.error("You are removing too many nodes. There are " + currServerMap.size()
-                    + " servers that have started.");
-            return false;
-        }
+        // if (nodeNames.size() > currServerMap.size()) {
+        // logger.error("You are removing too many nodes. There are only " +
+        // currServerMap.size()
+        // + " servers that have started.");
+        // return false;
+        // }
 
         for (String name : nodeNames) {
             ECSNode serverNode = allServerMap.get(name);
