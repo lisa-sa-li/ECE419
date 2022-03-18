@@ -1,6 +1,8 @@
 package ecs;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Collections;
 import com.google.gson.Gson;
@@ -22,6 +24,7 @@ public class HashRing {
     private static final Logger logger = Logger.getLogger("hashring");
     private ArrayList<BigInteger> hashOrder = new ArrayList<>();
     private HashMap<String, BigInteger> hashRing = new HashMap<String, BigInteger>();
+    private HashMap<String, Integer> ports = new HashMap<String, Integer>();
     private HashMap<String, String> serverInfo = new HashMap<String, String>();
     private HashMap<BigInteger, ECSNode> hashServers = new HashMap<BigInteger, ECSNode>();
     private int numServers = 0;

@@ -127,14 +127,34 @@ public class ECSClient implements IECSClient, Runnable {
                     throw new UnexpectedFormatException("Error while reading config file: " + line);
                 }
                 int port = Integer.parseInt(serverInfo[2]);
-                // create ECSNode w/ status OFFLINE
-                ECSNode serverNode = new ECSNode(serverInfo[0], port, serverInfo[1], ECSNode.NodeStatus.OFFLINE);
+                int replicateReceiverPort = findFreePort();
+                // create ECSNode w/ status OFFLINE + pre-defined receiver port
+                ECSNode serverNode = new ECSNode(serverInfo[0], port, serverInfo[1], ECSNode.NodeStatus.OFFLINE,
+                        replicateReceiverPort);
                 // add to all server map <3
                 allServerMap.put(serverInfo[0], serverNode);
                 this.serverInfo.put(serverInfo[0], serverInfo[2] + ":" + serverInfo[1]);
             }
         } catch (Exception e) {
             logger.error("Could not read from file");
+        }
+    }
+
+    private static int findFreePort() {
+        ServerSocket socket = null;
+        try {
+            socket = new ServerSocket(0);
+            socket.setReuseAddress(true);
+            return socket.getLocalPort();
+        } catch (IOException e) {
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    logger.info("Could not close temporary port");
+                }
+            }
         }
     }
 

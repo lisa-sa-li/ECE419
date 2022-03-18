@@ -14,8 +14,8 @@ public class ECSNode implements IECSNode {
 
     private String name;
     private String host;
-    private int id;
     private int port;
+    private int replicateReceiverPort;
     private String[] nodeHashRange;
     private ECSConnection ecsConnection;
 
@@ -49,13 +49,13 @@ public class ECSNode implements IECSNode {
         this.status = inStatus;
     }
 
-    public ECSNode(String name, int port, String host, NodeStatus inStatus, int orderAdded) {
+    public ECSNode(String name, int port, String host, NodeStatus inStatus, int replicateReceiverPort) {
         // initializing a node
         this.name = name;
         this.host = host;
         this.port = port;
         this.status = inStatus;
-        this.id = orderAdded;
+        this.replicateReceiverPort = replicateReceiverPort;
     }
 
     public ECSNode(String host, int port, BigInteger inHash) {
