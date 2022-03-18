@@ -34,6 +34,13 @@ public class ECSNode implements IECSNode {
         this.port = port;
     }
 
+    public ECSNode(String name, String port, String host) {
+        // initializing a node
+        this.name = name;
+        this.host = host;
+        this.port = Integer.parseInt(port);
+    }
+
     public ECSNode(String name, int port, String host, NodeStatus inStatus) {
         // initializing a node
         this.name = name;
