@@ -49,6 +49,8 @@ public class KVServer implements IKVServer, Runnable {
 	public ServerStatus serverStatus;
 	private ServerSocket serverSocket;
 
+	private int replicateReceiverPort;
+
 	private ECSConnection ecsConnection;
 	public String serverName;
 	private String zkHost;
@@ -80,7 +82,7 @@ public class KVServer implements IKVServer, Runnable {
 		initCache();
 	}
 
-	public KVServer(int port, String serverName, String zkHost, int zkPort, String cacheStrategy, int cacheSize)
+	public KVServer(int port, String serverName, String zkHost, int zkPort, String cacheStrategy, int cacheSize, int replicateReceiverPort)
 			throws InterruptedException, KeeperException {
 		this.port = port;
 		this.serverName = serverName;
@@ -92,6 +94,8 @@ public class KVServer implements IKVServer, Runnable {
 
 		this.cacheSize = cacheSize;
 		this.cacheAlgo = CacheStrategy.valueOf(cacheStrategy);
+
+		this.replicateReceiverPort = replicateReceiverPort;
 
 		initCache();
 		initHeartbeat();
@@ -457,9 +461,23 @@ public class KVServer implements IKVServer, Runnable {
 		}
 	}
 
+	private void initializeReplicateListener(){
+		try {
+			ServerSocket replicateReceiveSocket = new ServerSocket(replicateReceiverPort);
+			new Thread(new ReplicateServer(replicateReceiveSocket, this));
+		} catch (IOException e) {
+			logger.error("Could not open replicate listening socket");
+			e.printStackTrace();
+		} catch (Exception e_1) {
+			logger.error("Error creating thread: " + e_1);
+		}
+	}
+
 	@Override
 	public void run() {
 		running = initializeServer();
+
+		initializeReplicateListener();
 
 		if (serverSocket != null) {
 			while (isRunning()) {
@@ -483,7 +501,7 @@ public class KVServer implements IKVServer, Runnable {
 		logger.info("Server stopped.");
 	}
 
-	private boolean isRunning() {
+	public boolean isRunning() {
 		return this.running;
 	}
 
@@ -524,17 +542,18 @@ public class KVServer implements IKVServer, Runnable {
 	public static void main(String[] args) {
 		try {
 			new LogSetup("logs/server.log", Level.ALL);
-			if (args.length != 1 && args.length != 6) {
+			if (args.length != 1 && args.length != 7) {
 				System.out.println("Error! Invalid number of arguments!");
 				System.out.println("Usage: Server <port>!");
-			} else if (args.length == 6) {
+			} else if (args.length == 7) {
 				int port = Integer.parseInt(args[0]);
 				String serverName = args[1];
 				String zkHost = args[2];
 				int zkPort = Integer.parseInt(args[3]);
 				String cacheStrategy = args[4];
 				int cacheSize = Integer.parseInt(args[5]);
-				new KVServer(port, serverName, zkHost, zkPort, cacheStrategy, cacheSize).run();
+				int replicatePort = Integer.parseInt(args[6]);
+				new KVServer(port, serverName, zkHost, zkPort, cacheStrategy, cacheSize, replicatePort).run();
 			} else {
 				int port = Integer.parseInt(args[0]);
 				new KVServer(port, 10, "FIFO").run();

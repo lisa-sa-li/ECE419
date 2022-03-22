@@ -15,6 +15,7 @@ public class Metadata {
     // public BigInteger hash;
     // public BigInteger endHash; // non-inclusive
     public HashMap<String, BigInteger> order;
+    public HashMap<String, Integer> replicateReceiverPorts;
     // public String data;
     // public ECSNode receiverNode;
     public int receiverNodePort;
@@ -36,13 +37,29 @@ public class Metadata {
         UNLOCK, // unlock
         CLEAR_STORAGE, // clears persistant storage
         DELETE_STORAGE, // deletes persistant storage
-
         SERVER_NOT_RESPONSIBLE,
+
+        INIT_REPLICATE_DATA,
+        UPDATE_REPLICATE_DATA,
+        DELETE_REPLICATE_DATA,
     }
 
     public Metadata(MessageType status, HashMap<String, BigInteger> order, ECSNode receiverNode) {
         this.status = status;
         this.order = order;
+        if (receiverNode != null) {
+            this.receiverNodeName = receiverNode.getNodeName();
+            this.receiverNodePort = receiverNode.getNodePort();
+            this.receiverNodeHost = receiverNode.getNodeHost();
+            this.receiveNodeHash = receiverNode.getHash();
+            this.receiveNodeEndHash = receiverNode.getEndHash();
+        }
+    }
+
+    public Metadata(MessageType status, HashMap<String, BigInteger> order, HashMap<String, Integer> replicateReceiverPorts, ECSNode receiverNode) {
+        this.status = status;
+        this.order = order;
+        this.replicateReceiverPorts = replicateReceiverPorts;
         if (receiverNode != null) {
             this.receiverNodeName = receiverNode.getNodeName();
             this.receiverNodePort = receiverNode.getNodePort();

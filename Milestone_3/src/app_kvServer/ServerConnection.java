@@ -211,11 +211,9 @@ public class ServerConnection implements IServerConnection, Runnable {
 					break;
 				}
 				try {
-					/*
-					 * if (key.length() > 20) {
-					 * throw new KeyValueTooLongException("Key too long: " + key);
-					 * }
-					 */
+					if (key.length() > 20) {
+						throw new KeyValueTooLongException("Key too long: " + key);
+					}
 					if (!value.trim().isEmpty() && value != null) {
 						throw new UnexpectedValueException("Unexpected value for GET: " + value);
 					}

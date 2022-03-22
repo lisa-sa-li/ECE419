@@ -27,6 +27,8 @@ public class HashRing {
     private HashMap<String, Integer> ports = new HashMap<String, Integer>();
     private HashMap<String, String> serverInfo = new HashMap<String, String>();
     private HashMap<BigInteger, ECSNode> hashServers = new HashMap<BigInteger, ECSNode>();
+    private HashMap<String, Integer> replicatePorts = new HashMap<String, Integer>();
+
     private int numServers = 0;
     private Utils utils = new Utils();
 
@@ -48,6 +50,7 @@ public class HashRing {
         hashOrder.add(hashed);
         Collections.sort(hashOrder);
         hashRing.put(name + ":" + newNode.getNodePort() + ":" + newNode.getNodeHost(), hashed);
+        replicatePorts.put(name + ":" + newNode.getNodePort() + ":" + newNode.getNodeHost(), newNode.getReplicateReceiverPort());
         hashServers.put(hashed, newNode);
 
         numServers += 1;
@@ -69,7 +72,7 @@ public class HashRing {
             // send metadata to servers when there's more than 1 server operating
 
             if (numServers > 1) {
-                Metadata update = new Metadata(MessageType.MOVE_DATA, hashRing, newNode);
+                Metadata update = new Metadata(MessageType.MOVE_DATA, hashRing, replicatePorts, newNode);
                 prevNode.sendMessage(update);
                 JSONMessage msg = prevNode.receiveMessage();
                 // set hash
@@ -110,14 +113,15 @@ public class HashRing {
         // remove values from lists
         hashOrder.remove(removeHash);
         hashRing.remove(name + ":" + portHost);
+        replicatePorts.remove(name + ":" + portHost);
         hashServers.remove(removeHash);
 
         // send metadata to servers
         if (numServers > 1) {
-            Metadata update = new Metadata(MessageType.SET_METADATA, hashRing, null);
+            Metadata update = new Metadata(MessageType.SET_METADATA, hashRing, replicatePorts, null);
             prevNode.sendMessage(update);
         }
-        Metadata death = new Metadata(MessageType.MOVE_DATA, hashRing, prevNode);
+        Metadata death = new Metadata(MessageType.MOVE_DATA, hashRing, replicatePorts, prevNode);
         deadNode.sendMessage(death);
 
         numServers -= 1;
@@ -133,7 +137,7 @@ public class HashRing {
                 continue;
             }
             ECSNode currNode = hashServers.get(key);
-            Metadata metadata = new Metadata(MessageType.SET_METADATA, hashRing, null);
+            Metadata metadata = new Metadata(MessageType.SET_METADATA, hashRing, replicatePorts, null);
             // send server info
             currNode.sendMessage(metadata);
             JSONMessage msg = currNode.receiveMessage();
@@ -145,7 +149,7 @@ public class HashRing {
         // iterate through sorted key array
         for (BigInteger key : hashOrder) {
             ECSNode currNode = hashServers.get(key);
-            Metadata metadata = new Metadata(MessageType.SET_METADATA, hashRing, null);
+            Metadata metadata = new Metadata(MessageType.SET_METADATA, hashRing, replicatePorts, null);
             // send server info
             currNode.sendMessage(metadata);
         }
@@ -155,7 +159,7 @@ public class HashRing {
         // iterate through sorted key array
         for (BigInteger key : hashOrder) {
             ECSNode currNode = hashServers.get(key);
-            Metadata metadata = new Metadata(MessageType.START, hashRing, null);
+            Metadata metadata = new Metadata(MessageType.START, hashRing, replicatePorts, null);
             // send server info
             currNode.sendMessage(metadata);
         }
@@ -165,7 +169,7 @@ public class HashRing {
         // iterate through sorted key array
         for (BigInteger key : hashOrder) {
             ECSNode currNode = hashServers.get(key);
-            Metadata metadata = new Metadata(MessageType.STOP, hashRing, null);
+            Metadata metadata = new Metadata(MessageType.STOP, hashRing, replicatePorts, null);
             // send server info
             currNode.sendMessage(metadata);
         }

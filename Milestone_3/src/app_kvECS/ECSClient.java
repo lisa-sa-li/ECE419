@@ -147,6 +147,8 @@ public class ECSClient implements IECSClient, Runnable {
             socket.setReuseAddress(true);
             return socket.getLocalPort();
         } catch (IOException e) {
+            logger.info("Could not locate open port: " + e);
+            return -1;
         } finally {
             if (socket != null) {
                 try {
@@ -330,7 +332,8 @@ public class ECSClient implements IECSClient, Runnable {
             String cmd = "java -jar " + SERVER_JAR + " "
                     + String.valueOf(node.getNodePort()) + " " + serverName + " " + zkHost + " "
                     + String.valueOf(zkPort) + " " + cacheStrategy + " "
-                    + String.valueOf(cacheSize);
+                    + String.valueOf(cacheSize) + " "
+                    + String.valueOf(node.getReplicateReceiverPort());
 
             if (!node.getNodeHost().equals("127.0.0.1") && !node.getNodeHost().equals("localhost")) {
                 cmd = "ssh -n " + node.getNodeHost() + " nohup " + cmd + " &";

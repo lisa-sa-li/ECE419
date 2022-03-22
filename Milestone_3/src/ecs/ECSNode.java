@@ -146,6 +146,10 @@ public class ECSNode implements IECSNode {
         return endHash;
     }
 
+    public int getReplicateReceiverPort() {
+        return this.replicateReceiverPort;
+    }
+
     public void setHashRange(BigInteger hashVal, BigInteger endVal) {
         this.hash = hashVal;
         this.endHash = endVal;

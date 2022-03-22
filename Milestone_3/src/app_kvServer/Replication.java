@@ -6,12 +6,17 @@ import java.util.Map.Entry;
 import java.net.Socket;
 import java.io.OutputStream;
 
+import org.apache.log4j.*;
+import org.apache.log4j.Logger;
+import logging.ServerLogSetup;
+
 import ecs.ECSNode;
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
 import app_kvServer.PersistantStorage;
 
 public class Replication {
+	private static Logger logger = Logger.getRootLogger();
 
     private final int NUM_REPLICANTS = 2;
 
@@ -167,5 +172,6 @@ public class Replication {
     // public void getUpdatedReplicateData() {
     //     // get replicated data from head server
     // }
+    }
 
 }
