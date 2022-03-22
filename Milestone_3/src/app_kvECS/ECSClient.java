@@ -145,7 +145,12 @@ public class ECSClient implements IECSClient, Runnable {
         try {
             socket = new ServerSocket(0);
             socket.setReuseAddress(true);
-            return socket.getLocalPort();
+            int socketNum = socket.getLocalPort();
+            if (socketNum >= 8000 && socketNum <= 8009){
+                // in case it picks a provisioned socket
+                socketNum += 1456;
+            }
+            return socketNum;
         } catch (IOException e) {
             logger.info("Could not locate open port: " + e);
             return -1;
