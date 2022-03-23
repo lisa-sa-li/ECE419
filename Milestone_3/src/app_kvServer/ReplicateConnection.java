@@ -158,7 +158,7 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 					break;
 			}
 		} catch (Exception e) {
-			logger.error("Unknown error when handling metadata message: " + e.getMessage());
+			logger.error("Unknown error when handling replicate metadata message: " + e.getMessage());
 		}
 		handleMessage.setMessage(handleMessageStatus.name(), key, value);
 		return handleMessage;
