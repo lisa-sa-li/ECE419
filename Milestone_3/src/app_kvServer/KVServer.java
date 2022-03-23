@@ -82,7 +82,8 @@ public class KVServer implements IKVServer, Runnable {
 		initCache();
 	}
 
-	public KVServer(int port, String serverName, String zkHost, int zkPort, String cacheStrategy, int cacheSize, int replicateReceiverPort)
+	public KVServer(int port, String serverName, String zkHost, int zkPort, String cacheStrategy, int cacheSize,
+			int replicateReceiverPort)
 			throws InterruptedException, KeeperException {
 		this.port = port;
 		this.serverName = serverName;
@@ -461,7 +462,7 @@ public class KVServer implements IKVServer, Runnable {
 		}
 	}
 
-	private void initializeReplicateListener(){
+	private void initializeReplicateListener() {
 		try {
 			ServerSocket replicateReceiveSocket = new ServerSocket(replicateReceiverPort);
 			new Thread(new ReplicateServer(replicateReceiveSocket, this));

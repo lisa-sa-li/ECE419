@@ -16,7 +16,7 @@ import shared.messages.KVMessage.StatusType;
 import app_kvServer.PersistantStorage;
 
 public class Replication {
-	private static Logger logger = Logger.getRootLogger();
+    private static Logger logger = Logger.getRootLogger();
 
     private final int NUM_REPLICANTS = 2;
 
@@ -71,9 +71,6 @@ public class Replication {
         String namePortHost = "" + replicant1Info[0] + ":" + replicant1Info[1] + ":" + replicant1Info[2];
         replicants.put(namePortHost, firstReplicant);
 
-        // Create its persistant storage
-        persistantStorages.put(namePortHost, new PersistantStorage("repl_" + namePortHost + "_" + getNamePortHost()));
-
         // check if second replicant possible
         if (orderedKeys.size() == 2) {
             logger.info("Only 1 replicant possible: 2 nodes total in the ring");
@@ -87,6 +84,14 @@ public class Replication {
         ECSNode secondReplicant = new ECSNode(replicant2Info[0], replicant2Info[1], replicant2Info[2]);
         namePortHost = "" + replicant2Info[0] + ":" + replicant2Info[1] + ":" + replicant2Info[2];
         replicants.put(namePortHost, secondReplicant);
+    }
+
+    public void initReplicateData(String namePortHost) {
+        // Create its persistant storage
+        if (persistantStorages.size() == 2) {
+            logger.error("This server already has 2 replicates");
+            return;
+        }
         persistantStorages.put(namePortHost, new PersistantStorage("repl_" + namePortHost + "_" + getNamePortHost()));
     }
 
@@ -147,31 +152,32 @@ public class Replication {
         // do we need this?
         // lockWrite();
 
-    //     for (ECSNode replicate : replicants.values()) {
-    //         String hostOfReceiver = replicate.getNodeHost();
-    //         String nameOfReceiver = replicate.getNodeName();
+        // for (ECSNode replicate : replicants.values()) {
+        // String hostOfReceiver = replicate.getNodeHost();
+        // String nameOfReceiver = replicate.getNodeName();
 
-    //         try {
-    //             Socket socket = new Socket(hostOfReceiver, portOfReceiver);
-    //             OutputStream output = socket.getOutputStream();
+        // try {
+        // Socket socket = new Socket(hostOfReceiver, portOfReceiver);
+        // OutputStream output = socket.getOutputStream();
 
-    //             JSONMessage json = new JSONMessage();
-    //             json.setMessage(StatusType.PUT_MANY.name(), "put_many", dataInRange, null);
-    //             byte[] jsonBytes = json.getJSONByte();
+        // JSONMessage json = new JSONMessage();
+        // json.setMessage(StatusType.PUT_MANY.name(), "put_many", dataInRange, null);
+        // byte[] jsonBytes = json.getJSONByte();
 
-    //             output.write(jsonBytes, 0, jsonBytes.length);
-    //             output.flush();
-    //             output.close();
-    //             socket.close();
-    //         } catch (Exception e) {
-    //             logger.error("Unable to send data to replicant " + nameOfReceiver + ", " + e);
-    //         }
-    //     }
-    // }
+        // output.write(jsonBytes, 0, jsonBytes.length);
+        // output.flush();
+        // output.close();
+        // socket.close();
+        // } catch (Exception e) {
+        // logger.error("Unable to send data to replicant " + nameOfReceiver + ", " +
+        // e);
+        // }
+        // }
+        // }
 
-    // public void getUpdatedReplicateData() {
-    //     // get replicated data from head server
-    // }
+        // public void getUpdatedReplicateData() {
+        // // get replicated data from head server
+        // }
     }
 
 }
