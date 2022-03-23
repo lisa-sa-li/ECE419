@@ -14,7 +14,7 @@ import shared.messages.KVMessage.StatusType;
 
 public class ReplicateConnection implements IServerConnection, Runnable {
 
-    private static Logger logger = Logger.getRootLogger();
+	private static Logger logger = Logger.getRootLogger();
 
 	private boolean isOpen;
 	private static final int BUFFER_SIZE = 1024;
@@ -164,7 +164,7 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 		return handleMessage;
 	}
 
-    public void run() {
+	public void run() {
 		// while connection is open, listen for messages
 		try {
 			while (this.isOpen) {
@@ -175,9 +175,9 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
 
-                        sendMessage = handleMetadataMessage(metadata);
-                        // do we reply?
-                        // sendJSONMessage(sendMessage);
+						sendMessage = handleMetadataMessage(metadata);
+						// do we reply?
+						// sendJSONMessage(sendMessage);
 					}
 				} catch (IOException e) {
 					logger.error("Server connection lost: " + e);
@@ -197,8 +197,8 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 			} catch (IOException ioe) {
 				logger.error("Error! Unable to tear down connection!" + ioe);
 			}
-        }
+		}
 
-    }
+	}
 
 }

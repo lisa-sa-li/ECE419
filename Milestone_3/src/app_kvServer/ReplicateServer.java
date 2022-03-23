@@ -55,22 +55,22 @@ public class ReplicateServer implements Runnable {
 	}
 
 	public void run() {
-        while (kvServer.isRunning()){
-            try {
-                Socket client = listeningSocket.accept();
-                ReplicateConnection replicateConnection = new ReplicateConnection(client, this);
-                Thread newThread = new Thread(replicateConnection);
-                newThread.start();
+		while (kvServer.isRunning()) {
+			try {
+				Socket client = listeningSocket.accept();
+				ReplicateConnection replicateConnection = new ReplicateConnection(client, this);
+				Thread newThread = new Thread(replicateConnection);
+				newThread.start();
 
-                logger.info(
-                        "Connected to " + client.getInetAddress().getHostName() + " on port "
-                                + client.getPort());
-            } catch (IOException e) {
-                logger.error("Error! Unable to establish connection to master. \n", e);
-            } catch (Exception e) {
-                logger.error("Listener Error! \n", e);
-            }
+				logger.info(
+						"Connected to " + client.getInetAddress().getHostName() + " on port "
+								+ client.getPort());
+			} catch (IOException e) {
+				logger.error("Error! Unable to establish connection to master. \n", e);
+			} catch (Exception e) {
+				logger.error("Listener Error! \n", e);
+			}
 
-        }
+		}
 	}
 }
