@@ -150,6 +150,10 @@ public class ECSNode implements IECSNode {
         return this.replicateReceiverPort;
     }
 
+    public void setReplicateReceiverPort(int replicatePort) {
+        this.replicateReceiverPort = replicatePort;
+    }
+
     public void setHashRange(BigInteger hashVal, BigInteger endVal) {
         this.hash = hashVal;
         this.endHash = endVal;

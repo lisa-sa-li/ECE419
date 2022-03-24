@@ -44,9 +44,14 @@ public class Replication {
         return true;
     }
 
-    public void getReplicationServers(HashMap<String, BigInteger> hashRing) {
+    public int getNumReplicants() {
+        return replicants.size();
+    }
+
+    public void getReplicationServers(HashMap<String, BigInteger> hashRing,
+            HashMap<String, Integer> replicateReceiverPorts) {
         // clear current replication servers
-        this.replicants.clear();
+        // this.replicants.clear();
         // check that current server exists in the hashring!
         // edge cases: only 1 node in ring, only 2 nodes in ring
 
@@ -64,11 +69,12 @@ public class Replication {
         // find first replicant
         Integer firstIdx = orderedKeys.indexOf(currHash);
         firstIdx = (firstIdx + 1) % orderedKeys.size();
-        String[] replicant1Info = getServerByHash(hashRing, orderedKeys.get(firstIdx)).split(":");
+        String namePortHost = getServerByHash(hashRing, orderedKeys.get(firstIdx));
+        String[] replicant1Info = namePortHost.split(":");
 
         // put info into ECSNode
         ECSNode firstReplicant = new ECSNode(replicant1Info[0], replicant1Info[1], replicant1Info[2]);
-        String namePortHost = "" + replicant1Info[0] + ":" + replicant1Info[1] + ":" + replicant1Info[2];
+        firstReplicant.setReplicateReceiverPort(replicateReceiverPorts.get(namePortHost));
         replicants.put(namePortHost, firstReplicant);
 
         // check if second replicant possible
@@ -78,21 +84,52 @@ public class Replication {
         }
 
         Integer secondIdx = (firstIdx + 1) % orderedKeys.size();
-        String[] replicant2Info = getServerByHash(hashRing, orderedKeys.get(secondIdx)).split(":");
+        namePortHost = getServerByHash(hashRing, orderedKeys.get(secondIdx));
+        String[] replicant2Info = namePortHost.split(":");
 
         // put info into ECSNode
         ECSNode secondReplicant = new ECSNode(replicant2Info[0], replicant2Info[1], replicant2Info[2]);
-        namePortHost = "" + replicant2Info[0] + ":" + replicant2Info[1] + ":" + replicant2Info[2];
+        secondReplicant.setReplicateReceiverPort(replicateReceiverPorts.get(namePortHost));
         replicants.put(namePortHost, secondReplicant);
     }
 
-    public void initReplicateData(String namePortHost) {
+    public void initReplicateData(Replication repl, String data) {
         // Create its persistant storage
         if (persistantStorages.size() == 2) {
             logger.error("This server already has 2 replicates");
             return;
         }
-        persistantStorages.put(namePortHost, new PersistantStorage("repl_" + namePortHost + "_" + getNamePortHost()));
+        String namePortHost = repl.getNamePortHost();
+        PersistantStorage ps = new PersistantStorage("repl_" + namePortHost + "_" + getNamePortHost());
+        ps.appendToStorage(data);
+        persistantStorages.put(namePortHost, ps);
+    }
+
+    public void updateReplicateData(Replication repl, String data) {
+        String namePortHost = repl.getNamePortHost();
+        PersistantStorage ps = persistantStorages.get(namePortHost);
+
+        for (String line : data.split("\n")) {
+            JSONMessage msg = new JSONMessage();
+            msg.deserialize(line);
+
+            String key = msg.getKey();
+            String value = msg.getValue();
+            StatusType status = msg.getStatus();
+
+            switch (status) {
+                case PUT:
+                    try {
+                        ps.put(key, value);
+                    } catch (Exception e) {
+                        logger.info("PUT_ERROR: key " + key + " & value " + value);
+                    }
+                    break;
+                default:
+                    logger.error("Unknown command.");
+                    break;
+            }
+        }
     }
 
     // from
@@ -143,41 +180,40 @@ public class Replication {
         return rval;
     }
 
-    public void sendUpdatedReplicateData() {
-        // send replicated data to replicate servers (replicate servers are the same)
+    public void sendReplicateData(String repl_data) {
 
-        // TODO: check that replicate servers haven't changed
+        // private HashMap<String, ECSNode> replicants;
+        // both init and update
+
+        // TODO: check that replicate servers haven't changed?
         // if !serversChanged)
 
         // do we need this?
         // lockWrite();
 
-        // for (ECSNode replicate : replicants.values()) {
-        // String hostOfReceiver = replicate.getNodeHost();
-        // String nameOfReceiver = replicate.getNodeName();
+        for (ECSNode replicate : replicants.values()) {
+            String hostOfReceiver = replicate.getNodeHost();
+            String nameOfReceiver = replicate.getNodeName();
 
-        // try {
-        // Socket socket = new Socket(hostOfReceiver, portOfReceiver);
-        // OutputStream output = socket.getOutputStream();
+            try {
+                Socket socket = new Socket(hostOfReceiver, replicate.getReplicateReceiverPort());
+                OutputStream output = socket.getOutputStream();
 
-        // JSONMessage json = new JSONMessage();
-        // json.setMessage(StatusType.PUT_MANY.name(), "put_many", dataInRange, null);
-        // byte[] jsonBytes = json.getJSONByte();
+                JSONMessage json = new JSONMessage();
+                json.setMessage(StatusType.INIT_REPLICATE_DATA.name(), "put_many", repl_data);
+                byte[] jsonBytes = json.getJSONByte();
 
-        // output.write(jsonBytes, 0, jsonBytes.length);
-        // output.flush();
-        // output.close();
-        // socket.close();
-        // } catch (Exception e) {
-        // logger.error("Unable to send data to replicant " + nameOfReceiver + ", " +
-        // e);
-        // }
-        // }
-        // }
-
-        // public void getUpdatedReplicateData() {
-        // // get replicated data from head server
-        // }
+                output.write(jsonBytes, 0, jsonBytes.length);
+                output.flush();
+                output.close();
+                socket.close();
+            } catch (Exception e) {
+                logger.error("Unable to send data to replicant " + nameOfReceiver + ", " + e);
+            }
+        }
     }
 
+    public void getUpdatedReplicateData() {
+        // get replicated data from head server
+    }
 }

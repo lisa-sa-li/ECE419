@@ -274,7 +274,7 @@ public class PersistantStorage implements IPersistantStorage {
     }
 
     @Override
-    public StatusType appendToStorage(String keyValues) throws Exception {
+    public StatusType appendToStorage(String keyValues) {
         // Appends kv-pairs to the end of the storage file
         try {
             BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
@@ -301,23 +301,44 @@ public class PersistantStorage implements IPersistantStorage {
         return StatusType.PUT_ERROR;
     }
 
+    public String getAllFromStorage() {
+        // Appends kv-pairs to the end of the storage file
+        try {
+            BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
+            StringBuffer buffer = new StringBuffer();
+            String line;
+
+            while ((line = file.readLine()) != null) {
+                buffer.append(line);
+                buffer.append('\n');
+            }
+
+            file.close();
+            logger.info("Retrieved all key-value pairs from storage");
+            return buffer.toString();
+        } catch (Exception e) {
+            logger.error("Problem retrieving all key-value pairs from storage.");
+        }
+        return "";
+    }
+
     public void moveToGlobalStorage() {
         // Appends kv-pairs to global_storage.txt if it's being shut down and is the
         // last server
         try {
             BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
-            StringBuffer inputBuffer = new StringBuffer();
+            StringBuffer buffer = new StringBuffer();
             String line;
 
             while ((line = file.readLine()) != null) {
-                inputBuffer.append(line);
-                inputBuffer.append('\n');
+                buffer.append(line);
+                buffer.append('\n');
             }
             file.close();
             this.clearStorage();
             // Write all its contents to a global storage
             FileOutputStream fileOut = new FileOutputStream(GLOBAL_STORAGE_PATH);
-            fileOut.write(inputBuffer.toString().getBytes());
+            fileOut.write(buffer.toString().getBytes());
             fileOut.close();
 
             logger.info("Successfully moved kv-pairs to global_storage.txt");
@@ -331,12 +352,12 @@ public class PersistantStorage implements IPersistantStorage {
         // started up
         try {
             BufferedReader file = new BufferedReader(new FileReader(GLOBAL_STORAGE_PATH));
-            StringBuffer inputBuffer = new StringBuffer();
+            StringBuffer buffer = new StringBuffer();
             String line;
 
             while ((line = file.readLine()) != null) {
-                inputBuffer.append(line);
-                inputBuffer.append('\n');
+                buffer.append(line);
+                buffer.append('\n');
             }
             file.close();
 
@@ -346,7 +367,7 @@ public class PersistantStorage implements IPersistantStorage {
             writer.close();
 
             // Append the kv-pairs to its own storage
-            this.appendToStorage(inputBuffer.toString());
+            this.appendToStorage(buffer.toString());
             logger.info("Successfully retrieved kv-pairs from global_storage.txt");
         } catch (Exception e) {
             logger.error("Problem retrieving kv-pairs from global_storage.txt");

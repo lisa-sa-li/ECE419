@@ -27,6 +27,10 @@ public interface KVMessage {
 		SERVER_STOPPED, // Server has not been started by the ECS, cannot process client commands
 		SERVER_NOT_RESPONSIBLE, /* the server is not responsible for the key */
 		SERVER_WRITE_LOCK,
+
+		INIT_REPLICATE_DATA,
+		UPDATE_REPLICATE_DATA,
+		DELETE_REPLICATE_DATA,
 	}
 
 	/**

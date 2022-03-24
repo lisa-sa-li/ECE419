@@ -146,7 +146,7 @@ public class ECSClient implements IECSClient, Runnable {
             socket = new ServerSocket(0);
             socket.setReuseAddress(true);
             int socketNum = socket.getLocalPort();
-            if (socketNum >= 8000 && socketNum <= 8009){
+            if (socketNum >= 8000 && socketNum <= 8009) {
                 // in case it picks a provisioned socket
                 socketNum += 1456;
             }

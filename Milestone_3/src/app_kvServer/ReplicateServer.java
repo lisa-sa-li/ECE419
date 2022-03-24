@@ -54,6 +54,18 @@ public class ReplicateServer implements Runnable {
 		this.kvServer = kvServer;
 	}
 
+	public String getName() {
+		return kvServer.serverName;
+	}
+
+	public String getServerHost() {
+		return kvServer.getHostname();
+	}
+
+	public Integer getPort() {
+		return listeningSocket.getLocalPort();
+	}
+
 	public void run() {
 		while (kvServer.isRunning()) {
 			try {

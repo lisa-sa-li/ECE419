@@ -139,18 +139,26 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 		return json;
 	}
 
-	private JSONMessage handleMetadataMessage(Metadata message) {
-		// value back
-		StatusType handleMessageStatus = StatusType.NO_STATUS;
-		JSONMessage handleMessage = new JSONMessage();
-		String key = "";
-		String value = "";
+	private void handleMessage(JSONMessage msg) {
+		String key = msg.getKey();
+		String value = msg.getValue();
+		StatusType status = msg.getStatus();
 
+		// value back
+		// StatusType handleMessageStatus = StatusType.NO_STATUS;
+		// JSONMessage handleMessage = new JSONMessage();
+		// String key = "";
+		// String value = "";
+
+		Replication replicate = new Replication(replicateServer.getName(), replicateServer.getPort(),
+				replicateServer.getServerHost());
 		try {
-			switch (message.getStatus()) {
+			switch (status) {
 				case INIT_REPLICATE_DATA:
+					replicate.initReplicateData(replicate, value);
 					break;
 				case UPDATE_REPLICATE_DATA:
+					replicate.updateReplicateData(replicate, value);
 					break;
 				case DELETE_REPLICATE_DATA:
 					break;
@@ -160,8 +168,8 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 		} catch (Exception e) {
 			logger.error("Unknown error when handling replicate metadata message: " + e.getMessage());
 		}
-		handleMessage.setMessage(handleMessageStatus.name(), key, value);
-		return handleMessage;
+		// handleMessage.setMessage(handleMessageStatus.name(), key, value);
+		// return handleMessage;
 	}
 
 	public void run() {
@@ -175,7 +183,8 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
 
-						sendMessage = handleMetadataMessage(metadata);
+						// sendMessage =
+						handleMessage(receivedMessage);
 						// do we reply?
 						// sendJSONMessage(sendMessage);
 					}

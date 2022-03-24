@@ -48,6 +48,7 @@ public class KVServer implements IKVServer, Runnable {
 	private ArrayList<Thread> threads;
 	public ServerStatus serverStatus;
 	private ServerSocket serverSocket;
+	private Replication master;
 
 	private int replicateReceiverPort;
 
@@ -183,10 +184,21 @@ public class KVServer implements IKVServer, Runnable {
 		// Initialize the KVServer with the metadata and block it for client requests,
 		stop();
 		update(metadata);
-		logger.debug("initKVServer1 " + this.hashRing.size());
+
+		// Find + send data to replicates
+		master = new Replication(this.serverName, this.port, this.getHostname());
+		logger.debug("this.getHostname() " + this.getHostname());
+		// establish replicate servers within master Replication class
+		master.getReplicationServers(metadata.order, metadata.replicateReceiverPorts);
+		if (master.getNumReplicants() > 0) {
+			// init those bad boys
+			master.sendReplicateData(persistantStorage.getAllFromStorage());
+		}
+		// check num replicate servers???
+		// send data if numReplicateServers > 0 (<3)
 
 		if (inHashRing() && this.hashRing.size() == 1) {
-			logger.debug("initKVServer2");
+			// Get old data from global storage if it's the first server being booted up
 			persistantStorage.getFromGlobalStorage();
 		}
 	}
@@ -270,29 +282,13 @@ public class KVServer implements IKVServer, Runnable {
 		BigInteger hash = receiverNode.getHash();
 		BigInteger endHash = receiverNode.getEndHash();
 
-		logger.debug("here0 " + nameOfReceiver);
-		logger.debug("this.serverName " + this.serverName);
-		logger.debug(nameOfReceiver == this.serverName);
-
-		// if (this.hashRing.size() == 0) {
-		// logger.debug("here22");
-		// persistantStorage.moveToGlobalStorage();
-		// logger.debug("here44");
-		// unLockWrite();
-		// return;
-		// }
-
 		if (nameOfReceiver.equals(this.serverName)) {
-			logger.debug("here1");
 			// It's being told to move the data to itself
 			if (die == true) {
 				// This is the last server and it's being told to die
 				// Move its storage to global_storage.txt
-				logger.debug("here2");
 				persistantStorage.moveToGlobalStorage();
-				logger.debug("here4");
 			}
-			logger.debug("here3");
 			unLockWrite();
 			try {
 				TimeUnit.SECONDS.sleep(5);
@@ -466,6 +462,7 @@ public class KVServer implements IKVServer, Runnable {
 		try {
 			ServerSocket replicateReceiveSocket = new ServerSocket(replicateReceiverPort);
 			new Thread(new ReplicateServer(replicateReceiveSocket, this));
+			logger.info("Replicate server listening on port: " + replicateReceiveSocket.getLocalPort());
 		} catch (IOException e) {
 			logger.error("Could not open replicate listening socket");
 			e.printStackTrace();
