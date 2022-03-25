@@ -151,7 +151,10 @@ public class KVStore implements KVCommInterface, Runnable {
 					break;
 				}
 			}
-		} else {
+		}
+
+		if (finalMsg == null) {
+			this.updateToCorrectNodeFromList(key);
 			this.clientConnection.sendJSONMessage(jsonMessage);
 			JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
 			// System.out.println("sent message before while loop: " + returnMsg.getStatus().toString());
