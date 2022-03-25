@@ -24,6 +24,7 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 	private InputStream input;
 	private OutputStream output;
 	private ReplicateServer replicateServer;
+	private Replicate replicate;
 
 	/**
 	 * Constructs a new ServerConnection object for a given TCP socket.
@@ -36,6 +37,14 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 		this.master = master;
 		this.isOpen = true;
 		this.replicateServer = replicateServer;
+
+		// establish itself as a replicate
+		this.replicate = new Replicate(replicateServer.getName(), replicateServer.getPort(),
+				replicateServer.getServerHost());
+		// set master info
+		replicate.setMaster(master.getPort() + ":" + master.getInetAddress().getHostAddress());
+
+		// connect
 		connect();
 	}
 
@@ -144,23 +153,16 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 		String value = msg.getValue();
 		StatusType status = msg.getStatus();
 
-		// value back
-		// StatusType handleMessageStatus = StatusType.NO_STATUS;
-		// JSONMessage handleMessage = new JSONMessage();
-		// String key = "";
-		// String value = "";
-
-		Replication replicate = new Replication(replicateServer.getName(), replicateServer.getPort(),
-				replicateServer.getServerHost());
 		try {
 			switch (status) {
 				case INIT_REPLICATE_DATA:
-					replicate.initReplicateData(replicate, value);
+					replicate.initReplicateData(value);
 					break;
 				case UPDATE_REPLICATE_DATA:
-					replicate.updateReplicateData(replicate, value);
+					replicate.updateReplicateData(value);
 					break;
 				case DELETE_REPLICATE_DATA:
+					replicate.deleteReplicateData();
 					break;
 				default:
 					break;
@@ -168,8 +170,6 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 		} catch (Exception e) {
 			logger.error("Unknown error when handling replicate metadata message: " + e.getMessage());
 		}
-		// handleMessage.setMessage(handleMessageStatus.name(), key, value);
-		// return handleMessage;
 	}
 
 	public void run() {
@@ -183,7 +183,6 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
 
-						// sendMessage =
 						handleMessage(receivedMessage);
 						// do we reply?
 						// sendJSONMessage(sendMessage);

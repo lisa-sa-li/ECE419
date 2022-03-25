@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.BindException;
 import java.util.*;
 import java.math.BigInteger;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Level;
@@ -48,7 +49,7 @@ public class KVServer implements IKVServer, Runnable {
 	private ArrayList<Thread> threads;
 	public ServerStatus serverStatus;
 	private ServerSocket serverSocket;
-	private Replication master;
+	private Controller controller;
 
 	private int replicateReceiverPort;
 
@@ -72,6 +73,8 @@ public class KVServer implements IKVServer, Runnable {
 	private int cacheSize;
 	private CacheStrategy cacheAlgo;
 	private Cache cache;
+
+	private HashMap<String, String> logs = new HashMap<String, String>();
 
 	public KVServer(int port, int cacheSize, String algo) {
 		this.port = port;
@@ -186,16 +189,21 @@ public class KVServer implements IKVServer, Runnable {
 		update(metadata);
 
 		// Find + send data to replicates
-		master = new Replication(this.serverName, this.port, this.getHostname());
-		logger.debug("this.getHostname() " + this.getHostname());
+		this.controller = new Controller(this.serverName, this.port, this.getHostname());
+
 		// establish replicate servers within master Replication class
-		master.getReplicationServers(metadata.order, metadata.replicateReceiverPorts);
-		if (master.getNumReplicants() > 0) {
-			// init those bad boys
-			master.sendReplicateData(persistantStorage.getAllFromStorage());
+		this.controller.setReplicationServers(metadata.order, metadata.replicateReceiverPorts);
+		// check that replicates exist (>1 server in ring)
+		if (controller.getNumReplicants() > 0) {
+			// get list of replicates
+			HashMap<String, ECSNode> replicates = controller.getReplicateServers();
+			for (ECSNode replicate : replicates.values()) {
+				CyclicBarrier barrier = new CyclicBarrier(1);
+				ControllerSender controllerSender = new ControllerSender(replicate, this, barrier,
+						persistantStorage.getAllFromStorage(), false);
+				new Thread(controllerSender).start();
+			}
 		}
-		// check num replicate servers???
-		// send data if numReplicateServers > 0 (<3)
 
 		if (inHashRing() && this.hashRing.size() == 1) {
 			// Get old data from global storage if it's the first server being booted up
@@ -355,8 +363,7 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	public String getNamePortHost() {
-		String rval = this.serverName + ":" + getPort() + ":" + "127.0.0.1";
-		return rval;
+		return this.serverName + ":" + getPort() + ":" + "127.0.0.1";
 	}
 
 	@Override
@@ -414,7 +421,34 @@ public class KVServer implements IKVServer, Runnable {
 		if (this.cache != null) {
 			this.cache.put(key, value);
 		}
+
+		// Add this command to the logs, to be sent to the replicates
+		addToLogs(key, value);
+
 		return this.persistantStorage.put(key, value);
+	}
+
+	private void addToLogs(String key, String value) {
+		this.logs.put(key, value);
+	}
+
+	private String getStringLogs(boolean clearLogs) {
+		StringBuffer buffer = new StringBuffer();
+
+		for (Map.Entry<String, String> entry : this.logs.entrySet()) {
+			String key = entry.getKey();
+			String value = entry.getValue();
+
+			JSONMessage log = new JSONMessage();
+			log.setMessage("PUT", key, value);
+			buffer.append(log.serialize(false) + "\n");
+		}
+
+		if (clearLogs) {
+			this.logs.clear();
+		}
+
+		return buffer.toString();
 	}
 
 	public StatusType appendToStorage(String keyValues) throws Exception {
