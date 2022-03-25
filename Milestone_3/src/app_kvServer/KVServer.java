@@ -42,7 +42,7 @@ public class KVServer implements IKVServer, Runnable {
 	private static Logger logger = Logger.getRootLogger();
 
 	private int port;
-	private PersistantStorage persistantStorage;
+	public PersistantStorage persistantStorage;
 	private Socket client;
 	private boolean running;
 	private String hostName;
@@ -183,27 +183,45 @@ public class KVServer implements IKVServer, Runnable {
 		}
 	}
 
+	// public void clearReplicates() {
+	// // check if REPLICATES CHANGED!!!???!!!??!?!?!?!?!?
+	// if (controller.getNumReplicants() > 0) {
+	// // get list of replicates
+	// HashMap<String, ECSNode> replicates = controller.getReplicateServers();
+	// for (ECSNode replicate : replicates.values()) {
+	// CyclicBarrier barrier = new CyclicBarrier(1);
+	// ControllerSender controllerSender = new ControllerSender(replicate, this,
+	// barrier,
+	// "", "delete");
+	// new Thread(controllerSender).start();
+	// }
+	// }
+	// }
+
+	// public void updateReplicates() {
+	// if (controller.getNumReplicants() > 0) {
+	// // get list of replicates
+	// HashMap<String, ECSNode> replicates = controller.getReplicateServers();
+	// for (ECSNode replicate : replicates.values()) {
+	// CyclicBarrier barrier = new CyclicBarrier(1);
+	// ControllerSender controllerSender = new ControllerSender(replicate, this,
+	// barrier,
+	// getStringLogs(true), "update");
+	// new Thread(controllerSender).start();
+	// }
+	// }
+	// }
+
 	public void initKVServer(Metadata metadata) {
 		// Initialize the KVServer with the metadata and block it for client requests,
 		stop();
 		update(metadata);
 
 		// Find + send data to replicates
-		this.controller = new Controller(this.serverName, this.port, this.getHostname());
+		this.controller = new Controller(this);
 
 		// establish replicate servers within master Replication class
 		this.controller.setReplicationServers(metadata.order, metadata.replicateReceiverPorts);
-		// check that replicates exist (>1 server in ring)
-		if (controller.getNumReplicants() > 0) {
-			// get list of replicates
-			HashMap<String, ECSNode> replicates = controller.getReplicateServers();
-			for (ECSNode replicate : replicates.values()) {
-				CyclicBarrier barrier = new CyclicBarrier(1);
-				ControllerSender controllerSender = new ControllerSender(replicate, this, barrier,
-						persistantStorage.getAllFromStorage(), false);
-				new Thread(controllerSender).start();
-			}
-		}
 
 		if (inHashRing() && this.hashRing.size() == 1) {
 			// Get old data from global storage if it's the first server being booted up
@@ -329,6 +347,7 @@ public class KVServer implements IKVServer, Runnable {
 
 		unLockWrite();
 		if (die == true) {
+
 			try {
 				TimeUnit.SECONDS.sleep(5);
 				kill();
@@ -422,17 +441,22 @@ public class KVServer implements IKVServer, Runnable {
 			this.cache.put(key, value);
 		}
 
+		StatusType putStatus = this.persistantStorage.put(key, value);
 		// Add this command to the logs, to be sent to the replicates
-		addToLogs(key, value);
 
-		return this.persistantStorage.put(key, value);
+		if (putStatus == StatusType.PUT_SUCCESS || putStatus == StatusType.DELETE_SUCCESS
+				|| putStatus == StatusType.PUT_UPDATE) {
+			addToLogs(key, value);
+			controller.updateReplicates();
+		}
+		return putStatus;
 	}
 
 	private void addToLogs(String key, String value) {
 		this.logs.put(key, value);
 	}
 
-	private String getStringLogs(boolean clearLogs) {
+	public String getStringLogs(boolean clearLogs) {
 		StringBuffer buffer = new StringBuffer();
 
 		for (Map.Entry<String, String> entry : this.logs.entrySet()) {
@@ -451,16 +475,20 @@ public class KVServer implements IKVServer, Runnable {
 		return buffer.toString();
 	}
 
-	public StatusType appendToStorage(String keyValues) throws Exception {
-		return this.persistantStorage.appendToStorage(keyValues);
-	}
-
 	@Override
 	public void clearCache() {
 		if (this.cache != null) {
 			this.cache.clear();
 		}
 		logger.info("Cache cleared");
+	}
+
+	public String getAllFromStorage() {
+		return this.persistantStorage.getAllFromStorage();
+	}
+
+	public StatusType appendToStorage(String keyValues) throws Exception {
+		return this.persistantStorage.appendToStorage(keyValues);
 	}
 
 	@Override

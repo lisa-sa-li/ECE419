@@ -3,6 +3,7 @@ package app_kvServer;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.CyclicBarrier;
 import java.net.Socket;
 import java.io.OutputStream;
 
@@ -25,17 +26,14 @@ public class Controller {
     private String controllerName;
     private String controllerHost;
     private int controllerPort;
+    private KVServer kvServer;
 
-    public Controller(String controllerName, int controllerPort, String controllerHost) {
-        this.controllerName = controllerName;
-        this.controllerPort = controllerPort;
-        this.controllerHost = controllerHost;
-    }
+    public Controller(KVServer kvServer) {
+        this.kvServer = kvServer;
 
-    public Controller(String controllerName, int controllerPort) {
-        this.controllerName = controllerName;
-        this.controllerPort = controllerPort;
-        this.controllerHost = "127.0.0.1";
+        this.controllerName = kvServer.serverName;
+        this.controllerPort = kvServer.getPort();
+        this.controllerHost = kvServer.getHostname();
     }
 
     public boolean sameReplicateServers() {
@@ -54,10 +52,11 @@ public class Controller {
 
     public void setReplicationServers(HashMap<String, BigInteger> hashRing,
             HashMap<String, Integer> replicateReceiverPorts) {
-        // clear current replication servers
-        // this.replicants.clear();
-        // check that current server exists in the hashring!
-        // edge cases: only 1 node in ring, only 2 nodes in ring
+
+        // Store previous replicates
+        HashMap<String, ECSNode> prevReplicateServers = new HashMap<String, ECSNode>(replicants);
+        // clear this.replicants
+        this.replicants.clear();
 
         Collection<BigInteger> keys = hashRing.values();
         ArrayList<BigInteger> orderedKeys = new ArrayList<>(keys);
@@ -67,34 +66,84 @@ public class Controller {
         // If it's the only server in the hashring, no replicates
         if (orderedKeys.size() == 1) {
             logger.info("No replicates possible: only 1 node in hashring");
-            return;
+        } else {
+            // find first replicant
+            Integer firstIdx = orderedKeys.indexOf(currHash);
+            firstIdx = (firstIdx + 1) % orderedKeys.size();
+            String namePortHost = getServerByHash(hashRing, orderedKeys.get(firstIdx));
+            String[] replicant1Info = namePortHost.split(":");
+
+            // put info into ECSNode
+            ECSNode firstReplicant = new ECSNode(replicant1Info[0], replicant1Info[1], replicant1Info[2]);
+            firstReplicant.setReplicateReceiverPort(replicateReceiverPorts.get(namePortHost));
+            replicants.put(namePortHost, firstReplicant);
+
+            // check if second replicant possible
+            if (orderedKeys.size() == 2) {
+                logger.info("Only 1 replicate possible: 2 nodes total in the ring");
+            } else {
+                Integer secondIdx = (firstIdx + 1) % orderedKeys.size();
+                namePortHost = getServerByHash(hashRing, orderedKeys.get(secondIdx));
+                String[] replicant2Info = namePortHost.split(":");
+
+                // put info into ECSNode
+                ECSNode secondReplicant = new ECSNode(replicant2Info[0], replicant2Info[1], replicant2Info[2]);
+                secondReplicant.setReplicateReceiverPort(replicateReceiverPorts.get(namePortHost));
+                replicants.put(namePortHost, secondReplicant);
+            }
         }
 
-        // find first replicant
-        Integer firstIdx = orderedKeys.indexOf(currHash);
-        firstIdx = (firstIdx + 1) % orderedKeys.size();
-        String namePortHost = getServerByHash(hashRing, orderedKeys.get(firstIdx));
-        String[] replicant1Info = namePortHost.split(":");
+        // Array to store which replicates are new and need to be initialized
+        ArrayList<ECSNode> needToInit = new ArrayList<>();
 
-        // put info into ECSNode
-        ECSNode firstReplicant = new ECSNode(replicant1Info[0], replicant1Info[1], replicant1Info[2]);
-        firstReplicant.setReplicateReceiverPort(replicateReceiverPorts.get(namePortHost));
-        replicants.put(namePortHost, firstReplicant);
+        // Determine which
+        for (Map.Entry<String, ECSNode> entry : replicants.entrySet()) {
+            String rNamePortHost = entry.getKey();
+            ECSNode r = entry.getValue();
 
-        // check if second replicant possible
-        if (orderedKeys.size() == 2) {
-            logger.info("Only 1 replicate possible: 2 nodes total in the ring");
-            return;
+            // If the old replicate is still a replicate,
+            // remove it from prevReplicateServers
+            if (prevReplicateServers.get(rNamePortHost) != null) {
+                prevReplicateServers.remove(rNamePortHost);
+            } else {
+                needToInit.add(r);
+            }
         }
 
-        Integer secondIdx = (firstIdx + 1) % orderedKeys.size();
-        namePortHost = getServerByHash(hashRing, orderedKeys.get(secondIdx));
-        String[] replicant2Info = namePortHost.split(":");
+        // SEND A DELETE MSG TO THESE replicates
+        this.deleteReplicates(new ArrayList<ECSNode>(prevReplicateServers.values()));
 
-        // put info into ECSNode
-        ECSNode secondReplicant = new ECSNode(replicant2Info[0], replicant2Info[1], replicant2Info[2]);
-        secondReplicant.setReplicateReceiverPort(replicateReceiverPorts.get(namePortHost));
-        replicants.put(namePortHost, secondReplicant);
+        // These replicates were just added, send them an init message
+        this.initReplicates(needToInit);
+
+    }
+
+    public void initReplicates(ArrayList<ECSNode> replicates) {
+        for (ECSNode replicate : replicates) {
+            CyclicBarrier barrier = new CyclicBarrier(1);
+            ControllerSender controllerSender = new ControllerSender(replicate, kvServer, barrier,
+                    kvServer.getAllFromStorage(), "init");
+            new Thread(controllerSender).start();
+        }
+    }
+
+    public void updateReplicates() {
+        for (ECSNode replicate : this.replicants.values()) {
+            CyclicBarrier barrier = new CyclicBarrier(1);
+            ControllerSender controllerSender = new ControllerSender(replicate, kvServer, barrier,
+                    kvServer.getStringLogs(true), "update");
+            new Thread(controllerSender).start();
+        }
+    }
+
+    public void deleteReplicates(ArrayList<ECSNode> replicates) {
+        // get list of replicates
+        for (ECSNode replicate : replicates) {
+            CyclicBarrier barrier = new CyclicBarrier(1);
+            ControllerSender controllerSender = new ControllerSender(replicate, kvServer, barrier,
+                    "", "delete");
+            new Thread(controllerSender).start();
+        }
     }
 
     // from

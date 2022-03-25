@@ -61,7 +61,7 @@ public class Replicate {
                     try {
                         ps.put(key, value);
                     } catch (Exception e) {
-                        logger.info("PUT_ERROR: key " + key + " & value " + value);
+                        logger.info("PUT_ERROR in replicate: key " + key + " & value " + value);
                     }
                     break;
                 default:

@@ -23,15 +23,15 @@ public class ControllerSender implements Runnable {
     private KVServer kvServer;
     private CyclicBarrier barrier;
     private String msg;
-    private boolean update;
+    private String action;
 
-    public ControllerSender(ECSNode replicate, KVServer kvServer, CyclicBarrier barrier, String msg, boolean update) {
+    public ControllerSender(ECSNode replicate, KVServer kvServer, CyclicBarrier barrier, String msg, String action) {
         // needs to know replicate info
         this.replicate = replicate;
         this.kvServer = kvServer;
         this.barrier = barrier;
         this.msg = msg;
-        this.update = update;
+        this.action = action;
     }
 
     @Override
@@ -44,10 +44,16 @@ public class ControllerSender implements Runnable {
                 OutputStream output = socket.getOutputStream();
 
                 JSONMessage json = new JSONMessage();
-                if (update){
-                    json.setMessage(StatusType.UPDATE_REPLICATE_DATA.name(), "update", msg);
-                } else {
-                     json.setMessage(StatusType.INIT_REPLICATE_DATA.name(), "put_many", msg);
+                switch(action){
+                    case "init":
+                        json.setMessage(StatusType.INIT_REPLICATE_DATA.name(), "put_many", msg);
+                        break;
+                    case "update":
+                        json.setMessage(StatusType.UPDATE_REPLICATE_DATA.name(), "update", msg);
+                        break;
+                    case "delete":
+                        json.setMessage(StatusType.DELETE_REPLICATE_DATA.name(), "delete", msg);
+                        break;
                 }
                 byte[] jsonBytes = json.getJSONByte();
 

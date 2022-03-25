@@ -32,7 +32,7 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 	 * @param serverSocket the Socket object for the server connection.
 	 */
 	public ReplicateConnection(Socket master, ReplicateServer replicateServer) throws Exception {
-		new ServerLogSetup("logs/serverConnection.log", Level.ALL);
+		new ServerLogSetup("logs/replicateConnection.log", Level.ALL);
 
 		this.master = master;
 		this.isOpen = true;
