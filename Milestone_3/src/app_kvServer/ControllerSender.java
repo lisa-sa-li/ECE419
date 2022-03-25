@@ -36,37 +36,36 @@ public class ControllerSender implements Runnable {
 
     @Override
     public void run() {
-         String hostOfReceiver = replicate.getNodeHost();
-            String nameOfReceiver = replicate.getNodeName();
+        String hostOfReceiver = replicate.getNodeHost();
+        String nameOfReceiver = replicate.getNodeName();
 
-            try {
-                Socket socket = new Socket(hostOfReceiver, replicate.getReplicateReceiverPort());
-                OutputStream output = socket.getOutputStream();
+        try {
+            Socket socket = new Socket(hostOfReceiver, replicate.getReplicateReceiverPort());
+            OutputStream output = socket.getOutputStream();
 
-                JSONMessage json = new JSONMessage();
-                switch(action){
-                    case "init":
-                        json.setMessage(StatusType.INIT_REPLICATE_DATA.name(), "put_many", msg);
-                        break;
-                    case "update":
-                        json.setMessage(StatusType.UPDATE_REPLICATE_DATA.name(), "update", msg);
-                        break;
-                    case "delete":
-                        json.setMessage(StatusType.DELETE_REPLICATE_DATA.name(), "delete", msg);
-                        break;
-                }
-                byte[] jsonBytes = json.getJSONByte();
-
-                output.write(jsonBytes, 0, jsonBytes.length);
-                output.flush();
-                output.close();
-                socket.close();
-                logger.error("Sent data to replicant " + nameOfReceiver);
-            } catch (Exception e) {
-                logger.error("Unable to send data to replicant " + nameOfReceiver + ", " + e);
+            JSONMessage json = new JSONMessage();
+            switch (action) {
+                case "init":
+                    json.setMessage(StatusType.INIT_REPLICATE_DATA.name(), "put_many", msg);
+                    break;
+                case "update":
+                    json.setMessage(StatusType.UPDATE_REPLICATE_DATA.name(), "update", msg);
+                    break;
+                case "delete":
+                    json.setMessage(StatusType.DELETE_REPLICATE_DATA.name(), "delete", msg);
+                    break;
             }
-        }
+            byte[] jsonBytes = json.getJSONByte();
 
+            output.write(jsonBytes, 0, jsonBytes.length);
+            output.flush();
+            output.close();
+            socket.close();
+            logger.error("Sent data to replicant " + nameOfReceiver);
+        } catch (Exception e) {
+            logger.error("Unable to send data to replicant " + nameOfReceiver + ", " + e);
+        }
     }
 
 }
+

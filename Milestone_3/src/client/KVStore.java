@@ -13,6 +13,7 @@ import ecs.ECSNode;
 import ecs.IECSNode.NodeStatus;
 
 import app_kvClient.ClientConnection;
+import app_kvServer.Controller;
 
 import shared.messages.Metadata;
 import shared.messages.KVMessage.StatusType;
@@ -45,6 +46,11 @@ public class KVStore implements KVCommInterface, Runnable {
 	private List<ECSNode> ECSNodeOrdered;
 	private ECSNode currentNode;
 	private boolean wasSuccessful;
+	private List<ECSNode> currReplicants;
+	private String namePortHost;
+	private String nodeName;
+	private HashMap<String, List<ECSNode>> nodePortHostVSListECSNode;
+	private HashMap<String, List<String>> nodePortHostVSListECSNodeKeyIsAReplicaOf;
 
 	private Utils utils = new Utils();
 
@@ -91,57 +97,86 @@ public class KVStore implements KVCommInterface, Runnable {
 		}
 	}
 
-	// Change for M2 --> Needs edit
 	@Override
 	public JSONMessage put(String key, String value) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
 		jsonMessage.setMessage(StatusType.PUT.name(), key, value, null);
-		return this.runPutGet(jsonMessage, key);
+		return this.runPutGet(jsonMessage, key, false);
 	}
 
 	@Override
 	public JSONMessage get(String key) throws Exception {
 		JSONMessage jsonMessage = new JSONMessage();
 		jsonMessage.setMessage(StatusType.GET.name(), key, "", null);
-		return this.runPutGet(jsonMessage, key);
+		return this.runPutGet(jsonMessage, key, true);
 	}
 
-	public JSONMessage runPutGet(JSONMessage jsonMessage, String key) throws Exception {
+	public JSONMessage runPutGet(JSONMessage jsonMessage, String key, boolean getBoolean) throws Exception {
 		JSONMessage finalMsg = null;
 		wasSuccessful = false;
 		// System.out.println("Inside runPutGet in kvstore");
 		if (this.currentNode != null && this.ECSNodeOrdered != null
-				&& !isECSNodeResponsibleForKey(key, this.currentNode)) {
-			//System.out.println("Metadata stale: original address: " + this.address + " original port: " + this.port);
-			// metadata already exists (might be stale)
-			this.updateToCorrectNodeFromList(key);
-			//System.out.println("Updated to correct node info: " + this.address + " new port: " + this.port);
+				&& !isECSNodeResponsibleForKey(key, this.currentNode) ) {
+			if ((getBoolean && this.nodePortHostVSListECSNodeKeyIsAReplicaOf == null) || (!getBoolean)){
+				//System.out.println("Metadata stale: original address: " + this.address + " original port: " + this.port);
+				// metadata already exists (might be stale)
+				this.updateToCorrectNodeFromList(key);
+				//System.out.println("Updated to correct node info: " + this.address + " new port: " + this.port);
+			}
 		}
 
-		this.clientConnection.sendJSONMessage(jsonMessage);
-		JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
-		// System.out.println("sent message before while loop: " + returnMsg.getStatus().toString());
-		int retries = 0;
-		while (!wasSuccessful && retries < 3) {
-			try {
-				if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
-					//System.out.println("Server not responsible so switching soon");
-					this.updateToCorrectNodeInfo(returnMsg, key);
-					this.switchServer();
-					// System.out.println("switched to: " + this.address + " address and port: " + this.port);
-					this.clientConnection.sendJSONMessage(jsonMessage);
-					// System.out.println("Sent message");
-					returnMsg = this.clientConnection.receiveJSONMessage();
-					// System.out.println("returned message: " + returnMsg.getStatus().toString());
-				} else {
-					wasSuccessful = true;
+		if (getBoolean && this.nodePortHostVSListECSNodeKeyIsAReplicaOf != null) {
+			// Check the replicas if one of them are responsible for key
+			String tempNamePortHost = this.currentNode.getNodeName() + ":"
+					+ this.currentNode.getNodePort() + ":" + this.currentNode.getNodeHost();
+			List<String> tempNodeIsAReplicaOf = this.nodePortHostVSListECSNodeKeyIsAReplicaOf.get(tempNamePortHost);
+			for (int i = 0; i < tempNodeIsAReplicaOf.size(); i++) {
+				// ECSNode tempNodeAnother = tempNodeIsAReplicaOf.get(i);
+				// String tempNamePortHostAnother = tempNodeAnother.getNodeName() + ":"
+				// 		+ tempNodeAnother.getNodePort() + ":" + tempNodeAnother.getNodeHost();
+				// this.currentNode = tempNodeAnother;
+				String tempNamePortHostAnother = tempNodeIsAReplicaOf.get(i);
+				String[] tempNamePortHostAnotherSeparate = tempNamePortHostAnother.split(":");
+				this.address = tempNamePortHostAnotherSeparate[2];
+				this.port = Integer.valueOf(tempNamePortHostAnotherSeparate[1]);
+				this.nodeName = tempNamePortHostAnotherSeparate[0];
+				this.namePortHost = tempNamePortHostAnother;
+				this.currentNode = new ECSNode(this.nodeName, this.port, this.address);
+				this.switchServer();
+				this.clientConnection.sendJSONMessage(jsonMessage);
+				JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
+				if (returnMsg.getStatus() == StatusType.GET_SUCCESS || returnMsg.getStatus() == StatusType.GET_ERROR
+						|| returnMsg.getStatus() == StatusType.GET) {
 					finalMsg = returnMsg;
-					// System.out.println("server was responsible: returned message: " + returnMsg.getStatus().toString());
+					break;
 				}
-			} catch (Exception e) {
-				logger.error(e);
 			}
-			retries++;
+		} else {
+			this.clientConnection.sendJSONMessage(jsonMessage);
+			JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
+			// System.out.println("sent message before while loop: " + returnMsg.getStatus().toString());
+			int retries = 0;
+			while (!wasSuccessful && retries < 3) {
+				try {
+					if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
+						//System.out.println("Server not responsible so switching soon");
+						this.updateToCorrectNodeInfo(returnMsg, key);
+						this.switchServer();
+						// System.out.println("switched to: " + this.address + " address and port: " + this.port);
+						this.clientConnection.sendJSONMessage(jsonMessage);
+						// System.out.println("Sent message");
+						returnMsg = this.clientConnection.receiveJSONMessage();
+						// System.out.println("returned message: " + returnMsg.getStatus().toString());
+					} else {
+						wasSuccessful = true;
+						finalMsg = returnMsg;
+						// System.out.println("server was responsible: returned message: " + returnMsg.getStatus().toString());
+					}
+				} catch (Exception e) {
+					logger.error(e);
+				}
+				retries++;
+			}
 		}
 		return finalMsg;
 	}
@@ -159,7 +194,6 @@ public class KVStore implements KVCommInterface, Runnable {
 	public boolean isECSNodeResponsibleForKey(String key, ECSNode currNode) {
 		BigInteger hash = currNode.getHash();
 		BigInteger endHash = currNode.getEndHash();
-
 		return utils.isKeyInRange(hash, endHash, key);
 	}
 
@@ -184,9 +218,19 @@ public class KVStore implements KVCommInterface, Runnable {
 				this.currentNode = this.ECSNodeOrdered.get(i);
 				this.address = this.currentNode.getNodeHost();
 				this.port = this.currentNode.getNodePort();
+				this.nodeName = this.currentNode.getNodeName();
+				this.namePortHost = this.nodeName + ":" + this.port + ":" + this.address;
+				this.currReplicants = this.setReplicationServers(this.metadataOrder, this.namePortHost);
+				this.nodePortHostVSListECSNode.put(this.namePortHost, this.currReplicants);
 				break;
+			} else {
+				ECSNode tempNode = this.ECSNodeOrdered.get(i);
+				String tempNamePortHost = tempNode.getNodeName() + ":" + tempNode.getNodePort() + ":" + tempNode.getNodeHost();
+				List<ECSNode> currECSNodeTempListReplica = this.setReplicationServers(this.metadataOrder, tempNamePortHost);
+				this.nodePortHostVSListECSNode.put(tempNamePortHost, currECSNodeTempListReplica);
 			}
 		}
+		this.findNodeIsAReplicaOf(this.nodePortHostVSListECSNode);
 	}
 
 	public void orderMetadataIntoECSNodeList(final boolean ascending) {
@@ -225,6 +269,65 @@ public class KVStore implements KVCommInterface, Runnable {
 				endHash = metadataList.get(i + 1).getValue();
 			}
 			this.ECSNodeOrdered.add(new ECSNode(serverName, serverHost, serverPort, entry.getValue(), endHash));
+		}
+	}
+
+	// From Controller.java
+	public String getServerByHash(HashMap<String, BigInteger> map, BigInteger value) {
+		for (Entry<String, BigInteger> entry : map.entrySet()) {
+			if (Objects.equals(value, entry.getValue())) {
+				return entry.getKey();
+			}
+		}
+		return null;
+	}
+
+	// From Controller.java
+	public List<ECSNode> setReplicationServers(HashMap<String, BigInteger> hashRing, String namePortHostTemp) {
+		Collection<BigInteger> keys = hashRing.values();
+		ArrayList<BigInteger> orderedKeys = new ArrayList<>(keys);
+		Collections.sort(orderedKeys);
+		BigInteger currHash = hashRing.get(namePortHostTemp);
+		List<ECSNode> tempListECSNode = new ArrayList<ECSNode>();
+
+		// If it's the only server in the hashring, no replicates
+		if (orderedKeys.size() == 1) {
+			logger.info("No replicants possible: only 1 node in hashring");
+			return null;
+		}
+
+		// find first replicant
+		Integer firstIdx = orderedKeys.indexOf(currHash);
+		firstIdx = (firstIdx + 1) % orderedKeys.size();
+		String namePortHost = getServerByHash(hashRing, orderedKeys.get(firstIdx));
+		String[] replicant1Info = namePortHost.split(":");
+		ECSNode firstReplicant = new ECSNode(replicant1Info[0], replicant1Info[1], replicant1Info[2]);
+		tempListECSNode.add(firstReplicant);
+
+		// check if second replicant possible
+		if (orderedKeys.size() == 2) {
+			logger.info("Only 1 replicant possible: 2 nodes total in the ring");
+			return tempListECSNode;
+		}
+
+		Integer secondIdx = (firstIdx + 1) % orderedKeys.size();
+		namePortHost = getServerByHash(hashRing, orderedKeys.get(secondIdx));
+		String[] replicant2Info = namePortHost.split(":");
+		ECSNode secondReplicant = new ECSNode(replicant2Info[0], replicant2Info[1], replicant2Info[2]);
+		tempListECSNode.add(secondReplicant);
+
+		return tempListECSNode;
+	}
+
+	public void findNodeIsAReplicaOf(HashMap<String, List<ECSNode>> mapNamePortNostVSListECSNode) {
+		ArrayList<String> keys = new ArrayList<>(mapNamePortNostVSListECSNode.keySet());
+		for (int i = 0; i < keys.size(); i++) {
+			List<ECSNode> tempList = mapNamePortNostVSListECSNode.get(keys.get(i));
+			if (tempList != null) {
+				for (int j = 0; j < tempList.size(); j++) {
+					this.nodePortHostVSListECSNodeKeyIsAReplicaOf.get(tempList.get(j)).add(keys.get(i));
+				}
+			}
 		}
 	}
 
