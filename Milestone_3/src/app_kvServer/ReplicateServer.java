@@ -67,6 +67,7 @@ public class ReplicateServer implements Runnable {
 	}
 
 	public void run() {
+		logger.debug("RUNNING REPLICATE SERVER");
 		while (kvServer.isRunning()) {
 			try {
 				logger.debug("RUN REPLICATE SERVER");

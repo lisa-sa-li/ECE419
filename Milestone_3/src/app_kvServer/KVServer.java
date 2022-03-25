@@ -524,8 +524,10 @@ public class KVServer implements IKVServer, Runnable {
 
 	private void initializeReplicateListener() {
 		try {
+			logger.debug("1");
 			ServerSocket replicateReceiveSocket = new ServerSocket(replicateReceiverPort);
-			new Thread(new ReplicateServer(replicateReceiveSocket, this));
+			new Thread(new ReplicateServer(replicateReceiveSocket, this)).start();
+			logger.debug("2");
 			logger.info("Replicate server listening on port: " + replicateReceiveSocket.getLocalPort());
 		} catch (IOException e) {
 			logger.error("Could not open replicate listening socket");

@@ -18,7 +18,7 @@ import app_kvServer.PersistantStorage;
 public class Replicate {
     private static Logger logger = Logger.getRootLogger();
 
-    private HashMap<String, PersistantStorage> persistantStorages;
+    private HashMap<String, PersistantStorage> persistantStorages = new HashMap<String, PersistantStorage>();
     private String replicateName;
     private String replicateHost;
     private int replicatePort;

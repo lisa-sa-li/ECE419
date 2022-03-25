@@ -71,6 +71,7 @@ public class KVStore implements KVCommInterface, Runnable {
 	@Override
 	public void connect() throws Exception {
 		try {
+			logger.info(this.address + " " + this.port);
 			Socket clientSocket = new Socket(this.address, this.port);
 			this.clientConnection = new ClientConnection(clientSocket);
 			logger.info("Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
@@ -116,12 +117,14 @@ public class KVStore implements KVCommInterface, Runnable {
 		wasSuccessful = false;
 		// System.out.println("Inside runPutGet in kvstore");
 		if (this.currentNode != null && this.ECSNodeOrdered != null
-				&& !isECSNodeResponsibleForKey(key, this.currentNode) ) {
-			if ((getBoolean && this.nodePortHostVSListECSNodeKeyIsAReplicaOf == null) || (!getBoolean)){
-				//System.out.println("Metadata stale: original address: " + this.address + " original port: " + this.port);
+				&& !isECSNodeResponsibleForKey(key, this.currentNode)) {
+			if ((getBoolean && this.nodePortHostVSListECSNodeKeyIsAReplicaOf == null) || (!getBoolean)) {
+				// System.out.println("Metadata stale: original address: " + this.address + "
+				// original port: " + this.port);
 				// metadata already exists (might be stale)
 				this.updateToCorrectNodeFromList(key);
-				//System.out.println("Updated to correct node info: " + this.address + " new port: " + this.port);
+				// System.out.println("Updated to correct node info: " + this.address + " new
+				// port: " + this.port);
 			}
 		}
 
@@ -133,7 +136,7 @@ public class KVStore implements KVCommInterface, Runnable {
 			for (int i = 0; i < tempNodeIsAReplicaOf.size(); i++) {
 				// ECSNode tempNodeAnother = tempNodeIsAReplicaOf.get(i);
 				// String tempNamePortHostAnother = tempNodeAnother.getNodeName() + ":"
-				// 		+ tempNodeAnother.getNodePort() + ":" + tempNodeAnother.getNodeHost();
+				// + tempNodeAnother.getNodePort() + ":" + tempNodeAnother.getNodeHost();
 				// this.currentNode = tempNodeAnother;
 				String tempNamePortHostAnother = tempNodeIsAReplicaOf.get(i);
 				String[] tempNamePortHostAnotherSeparate = tempNamePortHostAnother.split(":");
@@ -157,15 +160,17 @@ public class KVStore implements KVCommInterface, Runnable {
 			this.updateToCorrectNodeFromList(key);
 			this.clientConnection.sendJSONMessage(jsonMessage);
 			JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
-			// System.out.println("sent message before while loop: " + returnMsg.getStatus().toString());
+			// System.out.println("sent message before while loop: " +
+			// returnMsg.getStatus().toString());
 			int retries = 0;
 			while (!wasSuccessful && retries < 3) {
 				try {
 					if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
-						//System.out.println("Server not responsible so switching soon");
+						// System.out.println("Server not responsible so switching soon");
 						this.updateToCorrectNodeInfo(returnMsg, key);
 						this.switchServer();
-						// System.out.println("switched to: " + this.address + " address and port: " + this.port);
+						// System.out.println("switched to: " + this.address + " address and port: " +
+						// this.port);
 						this.clientConnection.sendJSONMessage(jsonMessage);
 						// System.out.println("Sent message");
 						returnMsg = this.clientConnection.receiveJSONMessage();
@@ -173,7 +178,8 @@ public class KVStore implements KVCommInterface, Runnable {
 					} else {
 						wasSuccessful = true;
 						finalMsg = returnMsg;
-						// System.out.println("server was responsible: returned message: " + returnMsg.getStatus().toString());
+						// System.out.println("server was responsible: returned message: " +
+						// returnMsg.getStatus().toString());
 					}
 				} catch (Exception e) {
 					logger.error(e);
@@ -228,8 +234,10 @@ public class KVStore implements KVCommInterface, Runnable {
 				break;
 			} else {
 				ECSNode tempNode = this.ECSNodeOrdered.get(i);
-				String tempNamePortHost = tempNode.getNodeName() + ":" + tempNode.getNodePort() + ":" + tempNode.getNodeHost();
-				List<ECSNode> currECSNodeTempListReplica = this.setReplicationServers(this.metadataOrder, tempNamePortHost);
+				String tempNamePortHost = tempNode.getNodeName() + ":" + tempNode.getNodePort() + ":"
+						+ tempNode.getNodeHost();
+				List<ECSNode> currECSNodeTempListReplica = this.setReplicationServers(this.metadataOrder,
+						tempNamePortHost);
 				this.nodePortHostVSListECSNode.put(tempNamePortHost, currECSNodeTempListReplica);
 			}
 		}
