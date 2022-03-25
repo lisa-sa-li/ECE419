@@ -47,7 +47,7 @@ public class ReplicateServer implements Runnable {
 	 * @param serverSocket the Socket object for the server connection.
 	 */
 	public ReplicateServer(ServerSocket listeningSocket, KVServer kvServer) throws Exception {
-		new ServerLogSetup("logs/serverConnection.log", Level.ALL);
+		new ServerLogSetup("logs/replicateServer.log", Level.ALL);
 
 		this.listeningSocket = listeningSocket;
 		this.isOpen = true;
@@ -69,13 +69,17 @@ public class ReplicateServer implements Runnable {
 	public void run() {
 		while (kvServer.isRunning()) {
 			try {
+				logger.debug("RUN REPLICATE SERVER");
 				Socket client = listeningSocket.accept();
+				logger.debug("Created SOCKET IN REPLICATE SERVER RUN FUNCTION: " + client);
 				ReplicateConnection replicateConnection = new ReplicateConnection(client, this);
+				logger.debug("CREATED replicateConnection");
 				Thread newThread = new Thread(replicateConnection);
 				newThread.start();
 
 				logger.info(
-						"Connected to " + client.getInetAddress().getHostName() + " on port "
+						"Connected to replicate server (on port " + listeningSocket.getLocalPort() + ") "
+								+ client.getInetAddress().getHostName() + " on port "
 								+ client.getPort());
 			} catch (IOException e) {
 				logger.error("Error! Unable to establish connection to master. \n", e);

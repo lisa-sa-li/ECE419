@@ -59,7 +59,7 @@ public class ECSConnection {
 		try {
 			output = this.ecsSocket.getOutputStream();
 			input = this.ecsSocket.getInputStream();
-			logger.info("Connected to " + this.ecsSocket.getInetAddress().getHostName() + " on port "
+			logger.info("Connected to ECS " + this.ecsSocket.getInetAddress().getHostName() + " on port "
 					+ this.ecsSocket.getPort());
 		} catch (IOException e) {
 			logger.error("Error! Unable to establish server connection. \n", e);

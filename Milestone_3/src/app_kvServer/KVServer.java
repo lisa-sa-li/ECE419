@@ -103,7 +103,7 @@ public class KVServer implements IKVServer, Runnable {
 		this.replicateReceiverPort = replicateReceiverPort;
 
 		initCache();
-		initHeartbeat();
+		// initHeartbeat();
 	}
 
 	public KVServer(int port, int cacheSize, String algo, boolean test) {
@@ -212,13 +212,12 @@ public class KVServer implements IKVServer, Runnable {
 	// }
 	// }
 
-	public void initKVServer(Metadata metadata) {
+	public void initKVServer(Metadata metadata) throws Exception {
 		// Initialize the KVServer with the metadata and block it for client requests,
-		stop();
-		update(metadata);
-
-		// Find + send data to replicates
 		this.controller = new Controller(this);
+
+		stop(); // Need this for initial status for the server
+		update(metadata);
 
 		// establish replicate servers within master Replication class
 		this.controller.setReplicationServers(metadata.order, metadata.replicateReceiverPorts);
@@ -361,6 +360,9 @@ public class KVServer implements IKVServer, Runnable {
 		// Update the metadata repository of this server
 		this.hashRing = metadata.order;
 		getHashRange();
+
+		// update replica
+		controller.setReplicationServers(metadata.order, metadata.replicateReceiverPorts);
 	}
 
 	public HashMap<String, BigInteger> getOrder() {
@@ -382,7 +384,7 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	public String getNamePortHost() {
-		return this.serverName + ":" + getPort() + ":" + "127.0.0.1";
+		return this.serverName + ":" + getPort() + ":" + getHostname();
 	}
 
 	@Override
@@ -549,8 +551,8 @@ public class KVServer implements IKVServer, Runnable {
 					this.threads.add(newThread);
 
 					logger.info(
-							"Connected to " + client.getInetAddress().getHostName() + " on port "
-									+ client.getPort());
+							"Connected to KVServer (client port " + port + ") " + client.getInetAddress().getHostName()
+									+ " on port " + client.getPort());
 				} catch (IOException e) {
 					logger.error("Error! Unable to establish connection to server. \n", e);
 				} catch (Exception e) {

@@ -41,6 +41,8 @@ public class ControllerSender implements Runnable {
 
         try {
             Socket socket = new Socket(hostOfReceiver, replicate.getReplicateReceiverPort());
+            logger.debug("ABOUT TO SEND AS CONTROLLER TO REPLICATE from " + socket.getLocalPort() + " to "
+                    + replicate.getReplicateReceiverPort());
             OutputStream output = socket.getOutputStream();
 
             JSONMessage json = new JSONMessage();
@@ -61,11 +63,10 @@ public class ControllerSender implements Runnable {
             output.flush();
             output.close();
             socket.close();
-            logger.error("Sent data to replicant " + nameOfReceiver);
+            logger.info("Sent data to replicant " + nameOfReceiver);
         } catch (Exception e) {
             logger.error("Unable to send data to replicant " + nameOfReceiver + ", " + e);
         }
     }
 
 }
-

@@ -10,6 +10,7 @@ import java.math.BigInteger;
 
 import org.apache.log4j.*;
 import org.apache.log4j.Logger;
+import com.google.gson.Gson;
 import logging.ServerLogSetup;
 import ecs.ECSNode;
 
@@ -61,8 +62,9 @@ public class ServerConnection implements IServerConnection, Runnable {
 			output = this.serverSocket.getOutputStream();
 			input = this.serverSocket.getInputStream();
 
-			logger.info("Connected to " + this.serverSocket.getInetAddress().getHostName() + " on port "
-					+ this.serverSocket.getPort());
+			logger.info(
+					"Connected to ServerConnection " + this.serverSocket.getInetAddress().getHostName() + " on port "
+							+ this.serverSocket.getPort());
 		} catch (IOException e) {
 			logger.error("Error! Unable to establish server connection. \n" + e);
 		}
@@ -150,7 +152,8 @@ public class ServerConnection implements IServerConnection, Runnable {
 		}
 
 		json.deserialize(jsonStr);
-		logger.info("RECEIVE \t<" + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getPort()
+		logger.info("RECEIVE from client \t<" + serverSocket.getInetAddress().getHostAddress() + ":"
+				+ serverSocket.getPort()
 				+ ">: '" + json.getJSON().trim() + "'");
 		return json;
 	}

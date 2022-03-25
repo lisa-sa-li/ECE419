@@ -9,6 +9,7 @@ import java.io.OutputStream;
 
 import org.apache.log4j.*;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 import logging.ServerLogSetup;
 
 import ecs.ECSNode;
@@ -21,14 +22,18 @@ public class Controller {
 
     private final int NUM_REPLICANTS = 2;
 
-    private HashMap<String, ECSNode> replicants;
+    private HashMap<String, ECSNode> replicants = new HashMap<String, ECSNode>();
     private HashMap<String, PersistantStorage> persistantStorages;
     private String controllerName;
     private String controllerHost;
     private int controllerPort;
     private KVServer kvServer;
 
-    public Controller(KVServer kvServer) {
+    public Controller(KVServer kvServer) throws Exception {
+        new ServerLogSetup("logs/Controller.log", Level.ALL);
+
+        logger.info("I'm in the controller constructor");
+
         this.kvServer = kvServer;
 
         this.controllerName = kvServer.serverName;
@@ -53,10 +58,15 @@ public class Controller {
     public void setReplicationServers(HashMap<String, BigInteger> hashRing,
             HashMap<String, Integer> replicateReceiverPorts) {
 
+        HashMap<String, ECSNode> prevReplicateServers = new HashMap<String, ECSNode>();
         // Store previous replicates
-        HashMap<String, ECSNode> prevReplicateServers = new HashMap<String, ECSNode>(replicants);
+        if (replicants != null) {
+            prevReplicateServers = new HashMap<String, ECSNode>(replicants);
+            this.replicants.clear();
+        } else {
+            logger.debug("replicants is null");
+        }
         // clear this.replicants
-        this.replicants.clear();
 
         Collection<BigInteger> keys = hashRing.values();
         ArrayList<BigInteger> orderedKeys = new ArrayList<>(keys);
@@ -95,12 +105,10 @@ public class Controller {
 
         // Array to store which replicates are new and need to be initialized
         ArrayList<ECSNode> needToInit = new ArrayList<>();
-
         // Determine which
         for (Map.Entry<String, ECSNode> entry : replicants.entrySet()) {
             String rNamePortHost = entry.getKey();
             ECSNode r = entry.getValue();
-
             // If the old replicate is still a replicate,
             // remove it from prevReplicateServers
             if (prevReplicateServers.get(rNamePortHost) != null) {
@@ -115,12 +123,12 @@ public class Controller {
 
         // These replicates were just added, send them an init message
         this.initReplicates(needToInit);
-
     }
 
     public void initReplicates(ArrayList<ECSNode> replicates) {
         for (ECSNode replicate : replicates) {
             CyclicBarrier barrier = new CyclicBarrier(1);
+            logger.info("INITIALIZING REPLICATE: " + replicate.getNodePort());
             ControllerSender controllerSender = new ControllerSender(replicate, kvServer, barrier,
                     kvServer.getAllFromStorage(), "init");
             new Thread(controllerSender).start();
@@ -130,6 +138,7 @@ public class Controller {
     public void updateReplicates() {
         for (ECSNode replicate : this.replicants.values()) {
             CyclicBarrier barrier = new CyclicBarrier(1);
+            logger.info("UPDATING REPLICATE: " + replicate.getNodePort());
             ControllerSender controllerSender = new ControllerSender(replicate, kvServer, barrier,
                     kvServer.getStringLogs(true), "update");
             new Thread(controllerSender).start();
@@ -140,6 +149,7 @@ public class Controller {
         // get list of replicates
         for (ECSNode replicate : replicates) {
             CyclicBarrier barrier = new CyclicBarrier(1);
+            logger.info("DELETING REPLICATE: " + replicate.getNodePort());
             ControllerSender controllerSender = new ControllerSender(replicate, kvServer, barrier,
                     "", "delete");
             new Thread(controllerSender).start();

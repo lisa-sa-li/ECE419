@@ -54,8 +54,8 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 			output = this.master.getOutputStream();
 			input = this.master.getInputStream();
 
-			logger.info("Connected to " + this.master.getInetAddress().getHostName() + " on port "
-					+ this.master.getPort());
+			logger.info("ReplicateConnection connected to controller " + this.master.getInetAddress().getHostName()
+					+ " on port " + this.master.getPort());
 		} catch (IOException e) {
 			logger.error("Error! Unable to establish server connection. \n" + e);
 		}
@@ -143,7 +143,7 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 		}
 
 		json.deserialize(jsonStr);
-		logger.info("RECEIVE \t<" + master.getInetAddress().getHostAddress() + ":" + master.getPort()
+		logger.info("RECEIVE from controller \t<" + master.getInetAddress().getHostAddress() + ":" + master.getPort()
 				+ ">: '" + json.getJSON().trim() + "'");
 		return json;
 	}
