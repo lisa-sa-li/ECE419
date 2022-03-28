@@ -36,14 +36,15 @@ public class Replicate {
 
     public void initReplicateData(String data) {
         // Create its persistant storage
-        logger.debug("initReplicateData START");
+        // logger.debug("initReplicateData START");
         if (persistantStorages.size() == 2) {
             logger.error("This server already has 2 replicates");
             return;
         }
-        logger.debug("NAME FOR REPLICA FILE PERSISTENT: " + "repl_" + masterNamePortHost + "_" + getNamePortHost());
+        // logger.debug("NAME FOR REPLICA FILE PERSISTENT: repl_" + masterNamePortHost +
+        // "_" + getNamePortHost());
         PersistantStorage ps = new PersistantStorage("repl_" + masterNamePortHost + "_" + getNamePortHost());
-        logger.debug("CREATED STORAGE FOR REPLICA: " + data);
+        // logger.debug("CREATED STORAGE FOR REPLICA: " + data);
         ps.appendToStorage(data);
         persistantStorages.put(masterNamePortHost, ps);
     }

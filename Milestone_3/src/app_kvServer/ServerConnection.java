@@ -91,7 +91,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		// Check if stream is closed (read returns -1)
 		if (read == -1) {
 			JSONMessage json = new JSONMessage();
-			json.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "disconnected");
+			json.setMessage(StatusType.DISCONNECTED.name(), "disconnected", kvServer.getNamePortHost());
 			return json;
 		}
 
@@ -152,7 +152,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		}
 
 		json.deserialize(jsonStr);
-		logger.info("RECEIVE from client \t<" + serverSocket.getInetAddress().getHostAddress() + ":"
+		logger.info("RECEIVED from client/ecs/server \t<" + serverSocket.getInetAddress().getHostAddress() + ":"
 				+ serverSocket.getPort()
 				+ ">: '" + json.getJSON().trim() + "'");
 		return json;
@@ -327,6 +327,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 							if (serverStatus == ServerStatus.CLOSED) {
 								// If the status is closed, all client requests are responded to with
 								// SERVER_STOPPED messages
+								logger.debug("HERE " + receivedMessage.getKey() + " " + receivedMessage.getValue());
 								sendMessage.setMessage(StatusType.SERVER_STOPPED.name(), receivedMessage.getKey(),
 										receivedMessage.getValue());
 							} else if (serverStatus == ServerStatus.LOCKED

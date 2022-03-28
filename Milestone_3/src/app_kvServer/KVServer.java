@@ -217,10 +217,8 @@ public class KVServer implements IKVServer, Runnable {
 		this.controller = new Controller(this);
 
 		stop(); // Need this for initial status for the server
+		logger.debug("in initKVServer");
 		update(metadata);
-
-		// establish replicate servers within master Replication class
-		this.controller.setReplicationServers(metadata.order, metadata.replicateReceiverPorts);
 
 		if (inHashRing() && this.hashRing.size() == 1) {
 			// Get old data from global storage if it's the first server being booted up
@@ -360,6 +358,8 @@ public class KVServer implements IKVServer, Runnable {
 		// Update the metadata repository of this server
 		this.hashRing = metadata.order;
 		getHashRange();
+
+		logger.debug("in update: setReplicationServers" + getNamePortHost());
 
 		// update replica
 		controller.setReplicationServers(metadata.order, metadata.replicateReceiverPorts);
@@ -524,10 +524,8 @@ public class KVServer implements IKVServer, Runnable {
 
 	private void initializeReplicateListener() {
 		try {
-			logger.debug("1");
 			ServerSocket replicateReceiveSocket = new ServerSocket(replicateReceiverPort);
 			new Thread(new ReplicateServer(replicateReceiveSocket, this)).start();
-			logger.debug("2");
 			logger.info("Replicate server listening on port: " + replicateReceiveSocket.getLocalPort());
 		} catch (IOException e) {
 			logger.error("Could not open replicate listening socket");

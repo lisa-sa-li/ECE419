@@ -45,7 +45,7 @@ public class PersistantStorage implements IPersistantStorage {
             if (directory.mkdirs()) {
                 logger.info("Directory created: " + directory.getName());
             } else {
-                logger.info("Directory already exists.");
+                logger.info("Directory already exists: " + dir);
             }
         } catch (Exception e) {
             logger.error("Error when creating directory " + directory.getName() + ": " + e);
@@ -56,7 +56,7 @@ public class PersistantStorage implements IPersistantStorage {
             if (f.createNewFile()) {
                 logger.info("File created: " + f.getName());
             } else {
-                logger.info("File already exists.");
+                logger.info("File already exists: " + this.pathToFile);
             }
         } catch (Exception e) {
             logger.error("Error when creating file " + f.getName() + ": " + e);
@@ -68,7 +68,7 @@ public class PersistantStorage implements IPersistantStorage {
             if (f_global.createNewFile()) {
                 logger.info("File created: " + f_global.getName());
             } else {
-                logger.info("File already exists.");
+                logger.info("File already exists: " + GLOBAL_STORAGE_PATH);
             }
         } catch (Exception e) {
             logger.error("Error when creating file " + f_global.getName() + ": " + e);

@@ -67,14 +67,14 @@ public class ReplicateServer implements Runnable {
 	}
 
 	public void run() {
-		logger.debug("RUNNING REPLICATE SERVER");
+		// logger.debug("RUNNING REPLICATE SERVER");
 		while (kvServer.isRunning()) {
 			try {
-				logger.debug("RUN REPLICATE SERVER");
+				// logger.debug("RUN REPLICATE SERVER");
 				Socket client = listeningSocket.accept();
-				logger.debug("Created SOCKET IN REPLICATE SERVER RUN FUNCTION: " + client);
+				// logger.debug("Created SOCKET IN REPLICATE SERVER RUN FUNCTION: " + client);
 				ReplicateConnection replicateConnection = new ReplicateConnection(client, this);
-				logger.debug("CREATED replicateConnection");
+				// logger.debug("CREATED replicateConnection");
 				Thread newThread = new Thread(replicateConnection);
 				newThread.start();
 

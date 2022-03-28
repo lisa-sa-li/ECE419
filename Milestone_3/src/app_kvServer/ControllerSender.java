@@ -41,8 +41,9 @@ public class ControllerSender implements Runnable {
 
         try {
             Socket socket = new Socket(hostOfReceiver, replicate.getReplicateReceiverPort());
-            logger.debug("ABOUT TO SEND AS CONTROLLER TO REPLICATE from " + socket.getLocalPort() + " to "
-                    + replicate.getReplicateReceiverPort());
+            // logger.debug("ABOUT TO SEND AS CONTROLLER TO REPLICATE from " +
+            // socket.getLocalPort() + " to "
+            // + replicate.getReplicateReceiverPort());
             OutputStream output = socket.getOutputStream();
 
             JSONMessage json = new JSONMessage();
