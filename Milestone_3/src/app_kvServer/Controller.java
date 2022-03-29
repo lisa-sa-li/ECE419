@@ -191,7 +191,9 @@ public class Controller {
     }
 
     public String getNamePortHost() {
-        return this.controllerName + ":" + this.controllerPort + ":" + this.controllerHost;
+        // "127.0.0.1" is harded coded and required due to legacy code, however, ut
+        // don't actually use the host for anything important
+        return this.controllerName + ":" + this.controllerPort + ":127.0.0.1";
     }
 
 }

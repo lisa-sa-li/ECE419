@@ -380,7 +380,10 @@ public class KVServer implements IKVServer, Runnable {
 
 	@Override
 	public String getHostname() {
-		return serverSocket.getInetAddress().getHostName();
+		// "127.0.0.1" is harded coded and required due to legacy code, however, ut
+		// don't actually use the host for anything important
+		return "127.0.0.1";
+		// return serverSocket.getInetAddress().getHostName();
 	}
 
 	public String getNamePortHost() {
