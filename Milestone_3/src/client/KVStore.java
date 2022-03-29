@@ -173,21 +173,25 @@ public class KVStore implements KVCommInterface, Runnable {
 					returnMsg.getStatus().toString());
 			int retries = 0;
 			while (!wasSuccessful && retries < 3) {
+				System.out.println("INSIDE WHILE LOOP: " + retries);
 				try {
 					if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
-						// System.out.println("Server not responsible so switching soon");
+						System.out.println("Server not responsible so switching soon");
 						this.updateToCorrectNodeInfo(returnMsg, key);
+						System.out.println("updateToCorrectNodeInfo done");
 						this.switchServer();
+						System.out.println("switchServer done");
 						// System.out.println("switched to: " + this.address + " address and port: " +
 						// this.port);
 						this.clientConnection.sendJSONMessage(jsonMessage);
+						System.out.println("clientConnection.sendJSONMessage(jsonMessage) done");
 						// System.out.println("Sent message");
 						returnMsg = this.clientConnection.receiveJSONMessage();
-						// System.out.println("returned message: " + returnMsg.getStatus().toString());
+						System.out.println("this.clientConnection.receiveJSONMessage() done");
+						System.out.println("returned message: " + returnMsg.getStatus().toString());
 					} else {
 						wasSuccessful = true;
 						finalMsg = returnMsg;
-						// System.out.println("server was responsible: returned message: " +
 						// returnMsg.getStatus().toString());
 					}
 				} catch (Exception e) {
@@ -230,6 +234,8 @@ public class KVStore implements KVCommInterface, Runnable {
 	// Iterate over the Array of servers to find the responsible node and update the
 	// server address and server port
 	public void updateToCorrectNodeFromList(String key) {
+		// System.out.println("this.ECSNodeOrdered.size(): " + this.ECSNodeOrdered.size());
+		this.nodePortHostVSListECSNode = new HashMap<String, List<ECSNode>>(); // controller vs [replicas as ECSNode]
 		for (int i = 0; i < this.ECSNodeOrdered.size(); i++) {
 			System.out.println("INSIDE FOR LOOP: " + i);
 			boolean isNodeResponsibleForKey = isECSNodeResponsibleForKey(key, this.ECSNodeOrdered.get(i));
@@ -249,10 +255,12 @@ public class KVStore implements KVCommInterface, Runnable {
 				ECSNode tempNode = this.ECSNodeOrdered.get(i);
 				String tempNamePortHost = tempNode.getNodeName() + ":" + tempNode.getNodePort() + ":"
 						+ tempNode.getNodeHost();
-				System.out.println("tempNamePortHost: " + tempNamePortHost);
+				// System.out.println("tempNamePortHost: " + tempNamePortHost);
 				List<ECSNode> currECSNodeTempListReplica = this.setReplicationServers(this.metadataOrder,
 						tempNamePortHost);
+				// System.out.println("currECSNodeTempListReplica: " + currECSNodeTempListReplica);
 				this.nodePortHostVSListECSNode.put(tempNamePortHost, currECSNodeTempListReplica);
+				System.out.println("this.nodePortHostVSListECSNode.put: " + this.nodePortHostVSListECSNode.size());
 			}
 		}
 		this.findNodeIsAReplicaOf(this.nodePortHostVSListECSNode);
@@ -315,7 +323,7 @@ public class KVStore implements KVCommInterface, Runnable {
 		Collections.sort(orderedVals);
 		BigInteger currHash = hashRing.get(namePortHostTemp);
 		List<ECSNode> tempListECSNode = new ArrayList<ECSNode>();
-		System.out.println("FOUND CURR HASH: " + currHash);
+		// System.out.println("FOUND CURR HASH: " + currHash);
 		// If it's the only server in the hashring, no replicates
 		if (orderedVals.size() == 1) {
 			System.out.println("No replicants possible: only 1 node in hashring");
@@ -327,7 +335,7 @@ public class KVStore implements KVCommInterface, Runnable {
 		firstIdx = (firstIdx + 1) % orderedVals.size();
 		String namePortHost = getServerByHash(hashRing, orderedVals.get(firstIdx));
 		String[] replicant1Info = namePortHost.split(":");
-		System.out.println("FOUND replicant1Info: " + replicant1Info);
+		// System.out.println("FOUND replicant1Info: " + replicant1Info);
 		ECSNode firstReplicant = new ECSNode(replicant1Info[0], replicant1Info[1], replicant1Info[2]);
 		tempListECSNode.add(firstReplicant);
 
@@ -340,7 +348,7 @@ public class KVStore implements KVCommInterface, Runnable {
 		Integer secondIdx = (firstIdx + 1) % orderedVals.size();
 		namePortHost = getServerByHash(hashRing, orderedVals.get(secondIdx));
 		String[] replicant2Info = namePortHost.split(":");
-		System.out.println("FOUND replicant1Info: " + replicant1Info);
+		// System.out.println("FOUND replicant2Info: " + replicant2Info);
 		ECSNode secondReplicant = new ECSNode(replicant2Info[0], replicant2Info[1], replicant2Info[2]);
 		tempListECSNode.add(secondReplicant);
 		System.out.println("size of tempListECSNode: " + tempListECSNode.size());
@@ -349,15 +357,26 @@ public class KVStore implements KVCommInterface, Runnable {
 
 	public void findNodeIsAReplicaOf(HashMap<String, List<ECSNode>> mapNamePortNostVSListECSNode) {
 		System.out.println("InSIDE findNodeIsAReplicaOf");
+		this.nodePortHostVSListECSNodeKeyIsAReplicaOf = new HashMap<String, List<String>>(); // controller vs. [replicas name]
 		ArrayList<String> keys = new ArrayList<>(mapNamePortNostVSListECSNode.keySet());
 		for (int i = 0; i < keys.size(); i++) {
 			List<ECSNode> tempList = mapNamePortNostVSListECSNode.get(keys.get(i));
 			if (tempList != null) {
 				for (int j = 0; j < tempList.size(); j++) {
-					this.nodePortHostVSListECSNodeKeyIsAReplicaOf.get(tempList.get(j)).add(keys.get(i));
+					String tempName = tempList.get(j).getNodeName() + ":" + tempList.get(j).getNodePort() + ":"
+							+ tempList.get(j).getNodeHost();
+					if (this.nodePortHostVSListECSNodeKeyIsAReplicaOf.containsKey(tempName)){ // key exists in hashmap
+						this.nodePortHostVSListECSNodeKeyIsAReplicaOf.get(tempName).add(keys.get(i));
+					} else {
+						ArrayList<String> tempStringList = new ArrayList<String>();
+						tempStringList.add(keys.get(i));
+						this.nodePortHostVSListECSNodeKeyIsAReplicaOf.put(tempName, tempStringList);
+					}
+
 				}
 			}
 		}
+		System.out.println("END OF findNodeIsAReplicaOf: " + this.nodePortHostVSListECSNodeKeyIsAReplicaOf.size());
 	}
 
 	// for testing
