@@ -15,6 +15,8 @@ import logging.ServerLogSetup;
 import ecs.ECSNode;
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
+import shared.Utils;
+
 import app_kvServer.PersistantStorage;
 
 public class Controller {
@@ -28,6 +30,9 @@ public class Controller {
     private String controllerHost;
     private int controllerPort;
     private KVServer kvServer;
+    private HashMap<String, BigInteger> hashRing = new HashMap<String, BigInteger>();
+
+    private Utils utils = new Utils();
 
     public Controller(KVServer kvServer) throws Exception {
         new ServerLogSetup("logs/Controller.log", Level.ALL);
@@ -55,6 +60,8 @@ public class Controller {
 
     public void setReplicationServers(HashMap<String, BigInteger> hashRing,
             HashMap<String, Integer> replicateReceiverPorts) {
+
+        this.hashRing = hashRing;
 
         logger.debug("My name is " + this.controllerName);
         logger.debug("hashRing length " + hashRing.size());
@@ -144,7 +151,6 @@ public class Controller {
         this.deleteReplicates(new ArrayList<ECSNode>(prevReplicateServers.values()));
 
         // These replicates were just added, send them an init message
-        logger.debug("swag");
         this.initReplicates(needToInit);
     }
 
@@ -159,24 +165,54 @@ public class Controller {
     }
 
     public void updateReplicates() {
-        for (ECSNode replicate : this.replicants.values()) {
+        for (ECSNode repl : this.replicants.values()) {
             CyclicBarrier barrier = new CyclicBarrier(1);
-            logger.info("UPDATING REPLICATE: " + replicate.getNodePort());
-            ControllerSender controllerSender = new ControllerSender(replicate, kvServer, barrier,
+            logger.info("UPDATING REPLICATE: " + repl.getNodePort());
+            ControllerSender controllerSender = new ControllerSender(repl, kvServer, barrier,
                     kvServer.getStringLogs(true), "update");
             new Thread(controllerSender).start();
         }
     }
 
-    public void deleteReplicates(ArrayList<ECSNode> replicates) {
-        // get list of replicates
-        for (ECSNode replicate : replicates) {
+    public void deleteReplicates(ArrayList<ECSNode> replicas) {
+        // get list of replicas
+        for (ECSNode repl : replicas) {
             CyclicBarrier barrier = new CyclicBarrier(1);
-            logger.info("DELETING REPLICATE: " + replicate.getNodePort());
-            ControllerSender controllerSender = new ControllerSender(replicate, kvServer, barrier,
+            logger.info("DELETING REPLICATE: " + repl.getNodePort());
+            ControllerSender controllerSender = new ControllerSender(repl, kvServer, barrier,
                     "", "delete");
             new Thread(controllerSender).start();
         }
+    }
+
+    public String keyInReplicasRange(String key) {
+        // Determine if the hash of key falls in the hash ring of the replicas this
+        // server maintains
+        // Returns name of the replica, else null
+
+        ArrayList<BigInteger> orderedKeys = new ArrayList<>(hashRing.values());
+        Collections.sort(orderedKeys);
+
+        // For each replicant, determine its hash range and if the key falls in it
+        for (Map.Entry<String, ECSNode> entry : replicants.entrySet()) {
+            String namePortHost = entry.getKey();
+            ECSNode repl = entry.getValue();
+
+            BigInteger hash = hashRing.get(namePortHost);
+            Integer i = orderedKeys.indexOf(hash);
+            i = (i + 1) % orderedKeys.size();
+            BigInteger endHash = orderedKeys.get(i + 1);
+
+            if (utils.isKeyInRange(hash, endHash, key)) {
+                return namePortHost;
+            }
+        }
+        return null;
+    }
+
+    public String getKVFromReplica(String key, String namePortHost) throws Exception {
+        PersistantStorage ps = persistantStorages.get(namePortHost);
+        return ps.get(key);
     }
 
     // from
@@ -195,5 +231,4 @@ public class Controller {
         // don't actually use the host for anything important
         return this.controllerName + ":" + this.controllerPort + ":127.0.0.1";
     }
-
 }

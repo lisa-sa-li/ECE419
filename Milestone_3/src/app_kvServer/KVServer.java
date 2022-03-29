@@ -183,41 +183,11 @@ public class KVServer implements IKVServer, Runnable {
 		}
 	}
 
-	// public void clearReplicates() {
-	// // check if REPLICATES CHANGED!!!???!!!??!?!?!?!?!?
-	// if (controller.getNumReplicants() > 0) {
-	// // get list of replicates
-	// HashMap<String, ECSNode> replicates = controller.getReplicateServers();
-	// for (ECSNode replicate : replicates.values()) {
-	// CyclicBarrier barrier = new CyclicBarrier(1);
-	// ControllerSender controllerSender = new ControllerSender(replicate, this,
-	// barrier,
-	// "", "delete");
-	// new Thread(controllerSender).start();
-	// }
-	// }
-	// }
-
-	// public void updateReplicates() {
-	// if (controller.getNumReplicants() > 0) {
-	// // get list of replicates
-	// HashMap<String, ECSNode> replicates = controller.getReplicateServers();
-	// for (ECSNode replicate : replicates.values()) {
-	// CyclicBarrier barrier = new CyclicBarrier(1);
-	// ControllerSender controllerSender = new ControllerSender(replicate, this,
-	// barrier,
-	// getStringLogs(true), "update");
-	// new Thread(controllerSender).start();
-	// }
-	// }
-	// }
-
 	public void initKVServer(Metadata metadata) throws Exception {
 		// Initialize the KVServer with the metadata and block it for client requests,
 		this.controller = new Controller(this);
 
 		stop(); // Need this for initial status for the server
-		logger.debug("in initKVServer");
 		update(metadata);
 
 		if (inHashRing() && this.hashRing.size() == 1) {
@@ -359,8 +329,6 @@ public class KVServer implements IKVServer, Runnable {
 		this.hashRing = metadata.order;
 		getHashRange();
 
-		logger.debug("in update: setReplicationServers" + getNamePortHost());
-
 		// update replica
 		controller.setReplicationServers(metadata.order, metadata.replicateReceiverPorts);
 	}
@@ -371,6 +339,21 @@ public class KVServer implements IKVServer, Runnable {
 
 	public boolean isMe(String toHash) {
 		return utils.isKeyInRange(this.hash, this.endHash, toHash);
+	}
+
+	public String keyInReplicasRange(String key) {
+		// Determine if the hash of key falls in the hash ring of the replicas this
+		// server maintains
+		return this.controller.keyInReplicasRange(key);
+	}
+
+	public String getKVFromReplica(String key, String namePortHost) throws Exception {
+		String value = this.controller.getKVFromReplica(key, namePortHost);
+		if (value == null) {
+			logger.warn("Key " + key + " is not found in replica " + namePortHost);
+			throw new Exception("Key is not found in replica");
+		}
+		return value;
 	}
 
 	@Override

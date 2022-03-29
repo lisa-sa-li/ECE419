@@ -207,11 +207,17 @@ public class ServerConnection implements IServerConnection, Runnable {
 				}
 				break;
 			case GET:
+				String replicaName = null;
 				if (this.kvServer.hash != null && !this.kvServer.isMe(key)) {
-					handleMessageStatus = StatusType.SERVER_NOT_RESPONSIBLE;
-					order = this.kvServer.getOrder();
-					// send back metadata
-					break;
+					// Returns the replica whose hash range this key falls in;
+					replicaName = this.kvServer.keyInReplicasRange(key);
+
+					if (replicaName == null) {
+						handleMessageStatus = StatusType.SERVER_NOT_RESPONSIBLE;
+						order = this.kvServer.getOrder();
+						// send back metadata
+						break;
+					}
 				}
 				try {
 					if (key.length() > 20) {
@@ -223,7 +229,13 @@ public class ServerConnection implements IServerConnection, Runnable {
 					if (key.trim().isEmpty() || key == null) {
 						throw new InvalidKeyException("Invalid key: " + key);
 					}
-					handleMessageValue = this.kvServer.getKV(key);
+					// Determine if we should get from the controller or replica
+					if (replicaName != null) {
+						handleMessageValue = this.kvServer.getKVFromReplica(key, replicaName);
+					} else {
+						handleMessageValue = this.kvServer.getKV(key);
+					}
+
 					handleMessageStatus = StatusType.GET_SUCCESS;
 					logger.info("GET_SUCCESS: key " + key + " & value " + handleMessageValue);
 				} catch (Exception e) {
