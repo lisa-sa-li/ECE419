@@ -353,9 +353,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 						}
 						// In the case of a PUT_MANY, we do not need to send a message
 						if (sendMessage != null) {
-							logger.debug("sendMessage is not null");
 							sendJSONMessage(sendMessage);
-							logger.debug("sendJSONMessage sent!");
 						}
 
 					}

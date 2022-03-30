@@ -66,7 +66,7 @@ public class Controller {
             prevReplicateServers = new HashMap<String, ECSNode>(replicants);
             this.replicants.clear();
         } else {
-            logger.debug("replicants is null");
+            logger.info("replicants is null");
         }
 
         ArrayList<BigInteger> orderedKeys = new ArrayList<>(hashRing.values());
@@ -167,10 +167,11 @@ public class Controller {
 
     public void updateReplicates() {
         for (ECSNode repl : this.replicants.values()) {
-            CyclicBarrier barrier = new CyclicBarrier(1);
             String updates = kvServer.getStringLogs(true);
+            CyclicBarrier barrier = new CyclicBarrier(1);
             logger.info("UPDATING REPLICATE: " + repl.getNodePort() + updates);
-            if (!updates.isEmpty()) {
+            logger.info("IS UPDATE EMPTY?: " + updates.isEmpty());
+            if (!(updates.isEmpty())) {
                 ControllerSender controllerSender = new ControllerSender(repl, kvServer, barrier,
                         this.controllerName + "@" + updates, "update");
                 new Thread(controllerSender).start();

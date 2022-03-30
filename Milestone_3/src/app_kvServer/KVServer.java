@@ -143,7 +143,6 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	public void addActingReplicate(Replicate replicate) {
-		logger.info("ADDING ACTIVE REPLICA TO KVSERVER LIST");
 		actingReplicates.put(replicate.getMasterNamePortHost(), replicate);
 	}
 
@@ -549,22 +548,28 @@ public class KVServer implements IKVServer, Runnable {
 
 		if (putStatus == StatusType.PUT_SUCCESS || putStatus == StatusType.DELETE_SUCCESS
 				|| putStatus == StatusType.PUT_UPDATE) {
+			logger.info("CALL about to be ADDED TO LOG: " + putStatus + ":" + key + ":" + value);
 			addToLogs(key, value);
-			controller.updateReplicates();
+			// controller.updateReplicates();
 		}
 		return putStatus;
 	}
 
 	private void addToLogs(String key, String value) {
 		this.logs.put(key, value);
+		logger.info("CALL ADDED TO LOG: " + ":" + key + ":" + value);
 	}
 
 	public String getStringLogs(boolean clearLogs) {
 		StringBuffer buffer = new StringBuffer();
 
+		logger.info("LOGS: " + logs.size());
+
 		for (Map.Entry<String, String> entry : this.logs.entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue();
+
+			logger.info("IN STRING TO LOG: " + key + ":" + value);
 
 			JSONMessage log = new JSONMessage();
 			log.setMessage("PUT", key, value);
@@ -575,6 +580,7 @@ public class KVServer implements IKVServer, Runnable {
 			this.logs.clear();
 		}
 
+		logger.info("BUFFER: " + buffer.toString());
 		return buffer.toString();
 	}
 

@@ -53,7 +53,6 @@ public class Replicate {
         // Create its persistant storage
         String[] splitData = data.split("@", 2);
         masterName = splitData[0];
-        logger.info("CREATE PS " + replicateName + " for " + masterName);
         ps = new PersistantStorage("repl_" + this.masterName + "_" + getNamePortHost());
         ps.clearStorage();
         ps.appendToStorage(splitData[1]);
@@ -65,41 +64,38 @@ public class Replicate {
         masterName = splitData[0];
 
         if (splitData[1].isEmpty()) {
+            logger.info("SPLIT DATA EMPTY :(");
             return;
         }
         if (ps == null) {
             ps = new PersistantStorage("repl_" + masterName + "_" + getNamePortHost());
         }
-
-        logger.info("UPDATE REPLICA ON: " + replicateName + " for " + masterName);
-        logger.info("updateReplicateData data " + Arrays.toString(splitData[1].split("\n")));
-
-        for (String line : splitData[1].split("\n")) {
-            logger.info("1");
+        String[] ops = splitData[1].split("\n");
+        logger.info("UPDATE LIST SPLIT: " + Arrays.toString(ops));
+        logger.info("ops length: " + ops.length);
+        for (String line : ops) {
+            logger.info("OPERATION: " + line);
             JSONMessage msg = new JSONMessage();
-            logger.info("2");
             msg.deserialize(line);
 
-            logger.info("3");
             String key = msg.getKey();
             String value = msg.getValue();
             StatusType status = msg.getStatus();
 
-            logger.info("4 " + status.name());
-            switch (status) {
-                case PUT:
-                    try {
-                        logger.info("In SWITCH: PUT: " + ps);
-                        ps.put(key, value);
-                    } catch (Exception e) {
-                        logger.info("PUT_ERROR in replicate: key " + key + " & value " + value);
-                    }
-                    break;
-                default:
-                    logger.error("Unknown command.");
-                    break;
+            logger.info("OPERATION AFTER SERIALIZE: " + status + ":key:" + key + ":" + value);
+
+            // switch (status) {
+            // case PUT:
+            try {
+                ps.put(key, value);
+            } catch (Exception e) {
+                logger.info("PUT_ERROR in replicate: key " + key + " & value " + value);
             }
-            logger.info("5");
+            // break;
+            // default:
+            // logger.error("Unknown command.");
+            // break;
+            // }
         }
     }
 
