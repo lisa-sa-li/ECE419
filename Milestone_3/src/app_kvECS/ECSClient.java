@@ -146,7 +146,7 @@ public class ECSClient implements IECSClient, Runnable {
 
     private static int findFreePort() {
         ServerSocket socket = null;
-        ArrayList<Integer> foundPorts;
+        ArrayList<Integer> foundPorts = new ArrayList<Integer>();
         try {
             socket = new ServerSocket(0);
             socket.setReuseAddress(true);
