@@ -168,7 +168,7 @@ public class Controller {
             CyclicBarrier barrier_2 = new CyclicBarrier(1);
             logger.info("Sending new info from replicate on MOVEDATA: " + repl.getNodePort());
             ControllerSender controllerInit = new ControllerSender(repl, kvServer, barrier_2,
-                    this.controllerName + "@#@" + kvServer.getAllFromStorage(), "init");
+                    this.controllerName + "@" + kvServer.getAllFromStorage(), "init");
             new Thread(controllerInit).start();
 
         }
@@ -179,7 +179,7 @@ public class Controller {
             CyclicBarrier barrier = new CyclicBarrier(1);
             logger.info("INITIALIZING REPLICATE: " + replicate.getNodePort());
             ControllerSender controllerSender = new ControllerSender(replicate, kvServer, barrier,
-                    this.controllerName + "@#@" + kvServer.getAllFromStorage(), "init");
+                    this.controllerName + "@" + kvServer.getAllFromStorage(), "init");
             new Thread(controllerSender).start();
         }
     }

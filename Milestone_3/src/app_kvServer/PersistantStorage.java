@@ -73,7 +73,6 @@ public class PersistantStorage implements IPersistantStorage {
         } catch (Exception e) {
             logger.error("Error when creating file " + f_global.getName() + ": " + e);
         }
-
     }
 
     public BigInteger getHash(String value) {
@@ -286,7 +285,6 @@ public class PersistantStorage implements IPersistantStorage {
                 inputBuffer.append('\n');
             }
             inputBuffer.append(keyValues);
-
             file.close();
             // Overwrite file with the string buffer data
             FileOutputStream fileOut = new FileOutputStream(this.pathToFile);

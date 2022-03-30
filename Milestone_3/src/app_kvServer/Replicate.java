@@ -57,10 +57,10 @@ public class Replicate {
         // }
         // logger.debug("NAME FOR REPLICA FILE PERSISTENT: repl_" + masterNamePortHost +
         // "_" + getNamePortHost());
-        String[] splitData = data.split("@#@");
+        // logger.debug("INSIDE initReplicateData: " + data);
+        String[] splitData = data.split("@", 2);
         masterName = splitData[0];
         ps = new PersistantStorage("repl_" + getMasterNamePortHost() + "_" + getNamePortHost());
-        // logger.debug("CREATED STORAGE FOR REPLICA: " + data);
         ps.appendToStorage(splitData[1]);
     }
 
