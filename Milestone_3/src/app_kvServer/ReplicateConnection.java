@@ -159,16 +159,15 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 			switch (status) {
 				case INIT_REPLICATE_DATA:
 					replicate.initReplicateData(value);
-					logger.debug("replicate: " + replicate);
 					// add to KVServer replicate list
 					kvServer.addActingReplicate(replicate);
-					logger.debug("kvServer: " + kvServer);
 					break;
 				case UPDATE_REPLICATE_DATA:
 					replicate.updateReplicateData(value);
 					logger.debug("replicate UPDATE_REPLICATE_DATA: " + replicate);
 					break;
 				case DELETE_REPLICATE_DATA:
+					logger.debug("in case DELETE_REPLICATE_DATA");
 					replicate.deleteReplicateData();
 					logger.debug("replicate DELETE_REPLICATE_DATA: " + replicate);
 					// remove from KVServer
