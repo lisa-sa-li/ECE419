@@ -331,7 +331,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 					if (receivedMessage != null) {
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
-						logger.debug("metadata: " + metadata);
 						if (metadata == null) {
 							sendMessage = new JSONMessage();
 							ServerStatus serverStatus = this.kvServer.serverStatus;
@@ -347,7 +346,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 										receivedMessage.getValue());
 							} else {
 								sendMessage = handleMessage(receivedMessage);
-								logger.debug("sendMessage in if: " + sendMessage);
 							}
 						} else {
 							sendMessage = handleMetadataMessage(metadata);

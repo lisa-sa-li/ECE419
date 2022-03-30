@@ -98,15 +98,12 @@ public class ECSClient implements IECSClient, Runnable {
         try {
             int port = node.getNodePort();
             String serverName = node.getNodeName();
-            logger.info("Before client socket connection port " + port + " serverName " + serverName);
 
             Socket clientSocket = new Socket(this.hostname, port);
             ECSConnection ecsConnection = new ECSConnection(clientSocket);
-            logger.info("After client socket connection");
 
             // set socket in ecsConnection
             node.setConnection(ecsConnection);
-            logger.info("After set connection");
 
             logger.info("Server " + serverName + " connected to " + clientSocket.getInetAddress().getHostName()
                     + " on port " + clientSocket.getPort());
@@ -156,10 +153,10 @@ public class ECSClient implements IECSClient, Runnable {
                 socketNum += 1456;
             }
             if (foundPorts.contains(socketNum)) {
+                // here's hoping
                 socketNum += 101;
             }
             foundPorts.add(socketNum);
-            logger.info("FOUND FREE PORT");
             return socketNum;
         } catch (IOException e) {
             logger.info("Could not locate open port: " + e);

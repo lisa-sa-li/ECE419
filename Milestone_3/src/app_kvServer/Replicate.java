@@ -3,6 +3,7 @@ package app_kvServer;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.net.Socket;
 import java.io.OutputStream;
 
@@ -50,32 +51,45 @@ public class Replicate {
 
     public void initReplicateData(String data) {
         // Create its persistant storage
-        // logger.debug("initReplicateData START");
-        // if (persistantStorages.size() == 2) {
-        // logger.error("This server already has 2 replicates");
-        // return;
-        // }
-        // logger.debug("NAME FOR REPLICA FILE PERSISTENT: repl_" + masterNamePortHost +
-        // "_" + getNamePortHost());
-        // logger.debug("INSIDE initReplicateData: " + data);
         String[] splitData = data.split("@", 2);
         masterName = splitData[0];
-        ps = new PersistantStorage("repl_" + getMasterNamePortHost() + "_" + getNamePortHost());
+        logger.info("CREATE PS " + replicateName + " for " + masterName);
+        ps = new PersistantStorage("repl_" + this.masterName + "_" + getNamePortHost());
+        ps.clearStorage();
         ps.appendToStorage(splitData[1]);
+        logger.info("REPLICA CREATED ON: " + replicateName + " for " + masterName);
     }
 
     public void updateReplicateData(String data) {
-        for (String line : data.split("\n")) {
+        String[] splitData = data.split("@", 2);
+        masterName = splitData[0];
+
+        if (splitData[1].isEmpty()) {
+            return;
+        }
+        if (ps == null) {
+            ps = new PersistantStorage("repl_" + masterName + "_" + getNamePortHost());
+        }
+
+        logger.info("UPDATE REPLICA ON: " + replicateName + " for " + masterName);
+        logger.info("updateReplicateData data " + Arrays.toString(splitData[1].split("\n")));
+
+        for (String line : splitData[1].split("\n")) {
+            logger.info("1");
             JSONMessage msg = new JSONMessage();
+            logger.info("2");
             msg.deserialize(line);
 
+            logger.info("3");
             String key = msg.getKey();
             String value = msg.getValue();
             StatusType status = msg.getStatus();
 
+            logger.info("4 " + status.name());
             switch (status) {
                 case PUT:
                     try {
+                        logger.info("In SWITCH: PUT: " + ps);
                         ps.put(key, value);
                     } catch (Exception e) {
                         logger.info("PUT_ERROR in replicate: key " + key + " & value " + value);
@@ -85,6 +99,7 @@ public class Replicate {
                     logger.error("Unknown command.");
                     break;
             }
+            logger.info("5");
         }
     }
 
@@ -104,8 +119,13 @@ public class Replicate {
         ps.clearStorage();
     }
 
-    public void deleteReplicateData() {
+    public void deleteReplicateData(String data) {
+        this.masterName = data;
+        if (ps == null) {
+            ps = new PersistantStorage("repl_" + masterName + "_" + getNamePortHost());
+        }
         ps.deleteStorage();
+
     }
 
     public String getNamePortHost() {

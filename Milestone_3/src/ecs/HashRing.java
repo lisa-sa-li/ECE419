@@ -103,7 +103,6 @@ public class HashRing {
         Collections.sort(orderedKeys);
         // get hash from given namePortHost
         BigInteger currHash = hashRing.get(givenNamePortHost);
-        logger.debug("in getReplicationServers in hashring: " + givenNamePortHost);
 
         // If it's the only server in the hashring, no replicates
         if (orderedKeys.size() == 1) {

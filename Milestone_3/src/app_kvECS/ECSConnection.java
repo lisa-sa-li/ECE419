@@ -87,7 +87,7 @@ public class ECSConnection {
 		// Check if stream is closed (read returns -1)
 		if (read == -1) {
 			JSONMessage json = new JSONMessage();
-			json.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "disconnected");
+			json.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "in ECSConnection");
 			return json;
 		}
 

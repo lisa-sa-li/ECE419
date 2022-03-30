@@ -80,7 +80,7 @@ public class KVStore implements KVCommInterface, Runnable {
 		logger.info("Tearing down the connection ...");
 		try {
 			JSONMessage jsonMessage = new JSONMessage();
-			jsonMessage.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "disconnected", null);
+			jsonMessage.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "in KVStore", null);
 
 			this.clientConnection.sendJSONMessage(jsonMessage);
 			this.clientConnection.receiveJSONMessage();

@@ -34,7 +34,6 @@ public class Controller {
 
     public Controller(KVServer kvServer) throws Exception {
         new ServerLogSetup("logs/Controller.log", Level.ALL);
-
         this.kvServer = kvServer;
 
         this.controllerName = kvServer.serverName;
@@ -61,12 +60,6 @@ public class Controller {
 
         this.hashRing = hashRing;
 
-        logger.debug("My name is " + this.controllerName);
-        logger.debug("hashRing length " + hashRing.size());
-        for (Map.Entry<String, BigInteger> entry : hashRing.entrySet()) {
-            logger.debug(entry.getKey() + " " + entry.getValue());
-        }
-
         HashMap<String, ECSNode> prevReplicateServers = new HashMap<String, ECSNode>();
         // Store previous replicates
         if (replicants != null) {
@@ -79,7 +72,6 @@ public class Controller {
         ArrayList<BigInteger> orderedKeys = new ArrayList<>(hashRing.values());
         Collections.sort(orderedKeys);
         BigInteger currHash = hashRing.get(getNamePortHost());
-        logger.debug("in setReplicationServers: " + getNamePortHost() + " w/ curr hash " + currHash);
 
         // If it's the only server in the hashring, no replicates
         if (orderedKeys.size() == 1) {
@@ -113,16 +105,6 @@ public class Controller {
 
         // Array to store which replicates are new and need to be initialized
         ArrayList<ECSNode> needToInit = new ArrayList<>();
-        // Determine which
-
-        logger.debug("prevReplicateServers1 length " + prevReplicateServers.size());
-        for (Map.Entry<String, ECSNode> entry : prevReplicateServers.entrySet()) {
-            logger.debug(entry.getKey());
-        }
-        logger.debug("replicants1 length " + replicants.size());
-        for (Map.Entry<String, ECSNode> entry : replicants.entrySet()) {
-            logger.debug(entry.getKey());
-        }
 
         for (Map.Entry<String, ECSNode> entry : replicants.entrySet()) {
             String rNamePortHost = entry.getKey();
@@ -136,15 +118,6 @@ public class Controller {
             }
         }
 
-        logger.debug("prevReplicateServers2 length " + prevReplicateServers.size());
-        for (Map.Entry<String, ECSNode> entry : prevReplicateServers.entrySet()) {
-            logger.debug(entry.getKey());
-        }
-        logger.debug("needToInit");
-        for (ECSNode entry : needToInit) {
-            logger.debug(entry.getNodeName());
-        }
-
         // SEND A DELETE MSG TO THESE replicates
         this.deleteReplicates(new ArrayList<ECSNode>(prevReplicateServers.values()));
 
@@ -153,6 +126,11 @@ public class Controller {
     }
 
     public void updateReplicasOnMoveData() {
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (Exception e) {
+            logger.error("Unable to init replicates on MoveData");
+        }
         for (ECSNode repl : this.replicants.values()) {
             // delete old stores
             CyclicBarrier barrier = new CyclicBarrier(1);
@@ -190,10 +168,13 @@ public class Controller {
     public void updateReplicates() {
         for (ECSNode repl : this.replicants.values()) {
             CyclicBarrier barrier = new CyclicBarrier(1);
-            logger.info("UPDATING REPLICATE: " + repl.getNodePort());
-            ControllerSender controllerSender = new ControllerSender(repl, kvServer, barrier,
-                    kvServer.getStringLogs(true), "update");
-            new Thread(controllerSender).start();
+            String updates = kvServer.getStringLogs(true);
+            logger.info("UPDATING REPLICATE: " + repl.getNodePort() + updates);
+            if (!updates.isEmpty()) {
+                ControllerSender controllerSender = new ControllerSender(repl, kvServer, barrier,
+                        this.controllerName + "@" + updates, "update");
+                new Thread(controllerSender).start();
+            }
         }
     }
 
@@ -203,7 +184,7 @@ public class Controller {
             CyclicBarrier barrier = new CyclicBarrier(1);
             logger.info("DELETING REPLICATE: " + repl.getNodePort());
             ControllerSender controllerSender = new ControllerSender(repl, kvServer, barrier,
-                    "", "delete");
+                    this.controllerName, "delete");
             new Thread(controllerSender).start();
         }
     }

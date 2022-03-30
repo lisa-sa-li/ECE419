@@ -84,9 +84,10 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 
 		// Check if stream is closed (read returns -1)
 		if (read == -1) {
-			JSONMessage json = new JSONMessage();
-			json.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "disconnected");
-			return json;
+			// JSONMessage json = new JSONMessage();
+			// json.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "in
+			// ReplicateConnection");
+			return null;
 		}
 
 		int endChar = 0;
@@ -160,24 +161,20 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 		try {
 			switch (status) {
 				case INIT_REPLICATE_DATA:
-					logger.debug(">>1");
+					logger.debug(">>INIT_REPLICATE_DATA");
 					replicate.initReplicateData(value);
 					// add to KVServer replicate list
-					logger.debug("Adding acting replicate: " + replicate);
 					kvServer.addActingReplicate(replicate);
 					break;
 				case UPDATE_REPLICATE_DATA:
-					logger.debug(">>2");
+					logger.info(">>UPDATE_REPLICATE_DATA");
 					replicate.updateReplicateData(value);
-					logger.debug("replicate UPDATE_REPLICATE_DATA: " + replicate);
 					break;
 				case DELETE_REPLICATE_DATA:
-					logger.debug(">>3 in case DELETE_REPLICATE_DATA");
+					logger.debug(">>DELETE_REPLICATE_DATA");
 					replicate.deleteReplicateData();
-					logger.debug("replicate DELETE_REPLICATE_DATA: " + replicate);
 					// remove from KVServer
 					kvServer.removeActingReplicate(replicate);
-					logger.debug("kvServer DELETE_REPLICATE_DATA: " + kvServer);
 					break;
 				default:
 					break;
@@ -198,6 +195,8 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 					if (receivedMessage != null) {
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
+
+						logger.info("RECEIVED MESSAGE: " + receivedMessage);
 
 						handleMessage(receivedMessage);
 						// do we reply?

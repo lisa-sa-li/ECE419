@@ -143,6 +143,7 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	public void addActingReplicate(Replicate replicate) {
+		logger.info("ADDING ACTIVE REPLICA TO KVSERVER LIST");
 		actingReplicates.put(replicate.getMasterNamePortHost(), replicate);
 	}
 
@@ -226,7 +227,8 @@ public class KVServer implements IKVServer, Runnable {
 		};
 
 		// update every 2 minutes (delay by 1 min before starting)
-		timer.scheduleAtFixedRate(updateReplicas, 60000, 120000);
+		// timer.scheduleAtFixedRate(updateReplicas, 60000, 120000);
+		timer.scheduleAtFixedRate(updateReplicas, 30000, 30000);
 	}
 
 	@Override
@@ -357,9 +359,7 @@ public class KVServer implements IKVServer, Runnable {
 		}
 
 		// update replicas after keys are cut + server not dying
-		logger.info("Updating replicas on movedata");
 		controller.updateReplicasOnMoveData();
-		logger.info("Updated replicas on movedata");
 	}
 
 	public void moveReplicateData(Metadata metadata) {
