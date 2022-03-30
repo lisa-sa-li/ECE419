@@ -84,6 +84,7 @@ public class KVServer implements IKVServer, Runnable {
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
 		this.threads = new ArrayList<Thread>();
 
+		this.actingReplicates = new HashMap<String, Replicate>();
 		initCache();
 	}
 
@@ -102,6 +103,7 @@ public class KVServer implements IKVServer, Runnable {
 		this.cacheAlgo = CacheStrategy.valueOf(cacheStrategy);
 
 		this.replicateReceiverPort = replicateReceiverPort;
+		this.actingReplicates = new HashMap<String, Replicate>();
 
 		initCache();
 		// initHeartbeat();
@@ -114,6 +116,7 @@ public class KVServer implements IKVServer, Runnable {
 		this.persistantStorage = new PersistantStorage(String.valueOf(this.port));
 		this.threads = new ArrayList<Thread>();
 
+		this.actingReplicates = new HashMap<String, Replicate>();
 		initCache();
 
 		if (test) {
