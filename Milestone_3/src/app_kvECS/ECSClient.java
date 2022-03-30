@@ -43,10 +43,10 @@ public class ECSClient implements IECSClient, Runnable {
     private String SERVER_JAR = "m3-server.jar";
     private static String CONFIG_FILEPATH = "./servers.cfg";
 
-    private HashMap<String, ECSNode> allServerMap = new HashMap<String, ECSNode>();
-    private HashMap<String, ECSNode> currServerMap = new HashMap<String, ECSNode>();
-    private HashMap<String, String> serverInfo = new HashMap<String, String>();
-    private HashRing hashRing;
+    public HashMap<String, ECSNode> allServerMap = new HashMap<String, ECSNode>();
+    public HashMap<String, ECSNode> currServerMap = new HashMap<String, ECSNode>();
+    public HashMap<String, String> serverInfo = new HashMap<String, String>();
+    public HashRing hashRing;
 
     private int zkPort = 2181;
     private String zkHost = "127.0.0.1";
@@ -84,7 +84,7 @@ public class ECSClient implements IECSClient, Runnable {
             if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH, false) == null) {
                 zkApp.create(ZooKeeperApplication.ZK_NODE_ROOT_PATH, "root_node");
             }
-            if (zk.exists(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, false) == null) {
+            if (zk.exists(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, new HeartbeatWatcher(this)) == null) {
                 zkApp.create(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, "heartbeat_node");
             }
         } catch (KeeperException | InterruptedException e) {

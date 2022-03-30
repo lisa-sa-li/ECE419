@@ -138,6 +138,10 @@ public class ECSNode implements IECSNode {
         return name;
     }
 
+    public void setNodeName(String name) {
+        this.name = name;
+    }
+
     public String getNamePortHost() {
         return name + ":" + port + ":" + host;
     }

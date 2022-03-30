@@ -152,7 +152,7 @@ public class Controller {
         this.initReplicates(needToInit);
     }
 
-    public void updateReplicasOnMoveData() throws Exception{
+    public void updateReplicasOnMoveData() {
         for (ECSNode repl : this.replicants.values()) {
             // delete old stores
             CyclicBarrier barrier = new CyclicBarrier(1);
@@ -162,14 +162,17 @@ public class Controller {
             new Thread(controllerDelete).start();
 
             // wait before sending init
-            TimeUnit.SECONDS.sleep(2);
-
-            // init new stores with cut data
-            CyclicBarrier barrier_2 = new CyclicBarrier(1);
-            logger.info("Sending new info from replicate on MOVEDATA: " + repl.getNodePort());
-            ControllerSender controllerInit = new ControllerSender(repl, kvServer, barrier_2,
-                    this.controllerName + "@" + kvServer.getAllFromStorage(), "init");
-            new Thread(controllerInit).start();
+            try {
+                TimeUnit.SECONDS.sleep(2);
+                // init new stores with cut data
+                CyclicBarrier barrier_2 = new CyclicBarrier(1);
+                logger.info("Sending new info from replicate on MOVEDATA: " + repl.getNodePort());
+                ControllerSender controllerInit = new ControllerSender(repl, kvServer, barrier_2,
+                        this.controllerName + "@" + kvServer.getAllFromStorage(), "init");
+                new Thread(controllerInit).start();
+            } catch (Exception e) {
+                logger.error("Unable to init replicates on MoveData");
+            }
 
         }
     }

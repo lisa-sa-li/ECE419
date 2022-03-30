@@ -369,8 +369,8 @@ public class KVServer implements IKVServer, Runnable {
 		int portOfReceiver = receiverNode.getNodePort();
 		String nameOfReceiver = receiverNode.getNodeName();
 
-		String deadNamePortHost = nameOfReceiver.split("@")[1];
 		nameOfReceiver = nameOfReceiver.split("@")[0];
+		String deadNamePortHost = nameOfReceiver.split("@")[1];
 
 		if (deadNamePortHost.split(":")[0].equals(this.serverName)) {
 			// It's being told to move the data to itself
