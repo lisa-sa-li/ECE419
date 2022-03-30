@@ -189,20 +189,20 @@ public class Controller {
         // Determine if the hash of key falls in the hash ring of the replicas this
         // server maintains
         // Returns name of the replica, else null
-
         ArrayList<BigInteger> orderedKeys = new ArrayList<>(hashRing.values());
         Collections.sort(orderedKeys);
-
         // For each replicant, determine its hash range and if the key falls in it
         for (Map.Entry<String, ECSNode> entry : replicants.entrySet()) {
             String namePortHost = entry.getKey();
             ECSNode repl = entry.getValue();
-
             BigInteger hash = hashRing.get(namePortHost);
             Integer i = orderedKeys.indexOf(hash);
-            i = (i + 1) % orderedKeys.size();
-            BigInteger endHash = orderedKeys.get(i + 1);
-
+            if (i == orderedKeys.size() - 1) {
+                i = 0;
+            } else {
+                i++;
+            }
+            BigInteger endHash = orderedKeys.get(i);
             if (utils.isKeyInRange(hash, endHash, key)) {
                 return namePortHost;
             }
