@@ -130,11 +130,14 @@ public class KVStore implements KVCommInterface, Runnable {
 
 		if (getBoolean && this.nodePortHostVSListECSNodeKeyIsAReplicaOf != null) {
 			System.out.println("GET REQUEST AND have REPLICA INFO");
-			// Check the replicas if one of them are responsible for key
+			// Check the current node's replicas if one of them are responsible for key
 			String tempNamePortHost = this.currentNode.getNodeName() + ":"
 					+ this.currentNode.getNodePort() + ":" + this.currentNode.getNodeHost();
 			List<String> tempNodeIsAReplicaOf = this.nodePortHostVSListECSNodeKeyIsAReplicaOf.get(tempNamePortHost);
+			boolean checkController = false;
+			System.out.println("Replica size for GET request: " + tempNodeIsAReplicaOf.size());
 			for (int i = 0; i < tempNodeIsAReplicaOf.size(); i++) {
+				System.out.println("Checking replica for GET request");
 				// ECSNode tempNodeAnother = tempNodeIsAReplicaOf.get(i);
 				// String tempNamePortHostAnother = tempNodeAnother.getNodeName() + ":"
 				// + tempNodeAnother.getNodePort() + ":" + tempNodeAnother.getNodeHost();
@@ -146,13 +149,30 @@ public class KVStore implements KVCommInterface, Runnable {
 				this.nodeName = tempNamePortHostAnotherSeparate[0];
 				this.namePortHost = tempNamePortHostAnother;
 				this.currentNode = new ECSNode(this.nodeName, this.port, this.address);
-				this.switchServer();
+				this.switchServer(); // switch to replica node
 				this.clientConnection.sendJSONMessage(jsonMessage);
 				JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
-				if (returnMsg.getStatus() == StatusType.GET_SUCCESS || returnMsg.getStatus() == StatusType.GET_ERROR
-						|| returnMsg.getStatus() == StatusType.GET) {
+				if (returnMsg.getStatus() == StatusType.GET_SUCCESS || returnMsg.getStatus() == StatusType.GET) {
 					finalMsg = returnMsg;
+					checkController = false;
 					break;
+				} else if (returnMsg.getStatus() == StatusType.GET_ERROR) {
+					checkController = true;
+				}
+			}
+			if (checkController) { // check current node (the controller) to see if it is responsible for hash
+				System.out.println("Checking controller for GET request");
+				String[] controllerNamePortHostSeparate = tempNamePortHost.split(":");
+				this.address = controllerNamePortHostSeparate[2];
+				this.port = Integer.valueOf(controllerNamePortHostSeparate[1]);
+				this.nodeName = controllerNamePortHostSeparate[0];
+				this.namePortHost = tempNamePortHost;
+				this.currentNode = new ECSNode(this.nodeName, this.port, this.address);
+				this.switchServer(); // switch to replica node
+				this.clientConnection.sendJSONMessage(jsonMessage);
+				JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
+				if (returnMsg.getStatus() == StatusType.GET_SUCCESS || returnMsg.getStatus() == StatusType.GET) {
+					finalMsg = returnMsg;
 				}
 			}
 		}
