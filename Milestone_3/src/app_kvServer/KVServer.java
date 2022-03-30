@@ -440,13 +440,13 @@ public class KVServer implements IKVServer, Runnable {
 
 			BigInteger hash = hashRing.get(masterNamePortHost);
 			Integer i = orderedKeys.indexOf(hash);
-			if (i == orderedKeys.size() - 1) {
-				i = 0;
-			} else {
-				i++;
-			}
-			// i = (i + 1) % orderedKeys.size();
-			BigInteger endHash = orderedKeys.get(i + 1);
+			// if (i == orderedKeys.size() - 1) {
+			// i = 0;
+			// } else {
+			// i++;
+			// }
+			i = (i + 1) % orderedKeys.size();
+			BigInteger endHash = orderedKeys.get(i);
 
 			if (utils.isKeyInRange(hash, endHash, key)) {
 				return masterNamePortHost;

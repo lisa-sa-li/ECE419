@@ -162,12 +162,11 @@ public class ServerConnection implements IServerConnection, Runnable {
 		String key = msg.getKey();
 		String value = msg.getValue();
 		StatusType status = msg.getStatus();
-
 		String handleMessageValue = value; // For PUT or DELETE, send the original value back
 		StatusType handleMessageStatus = StatusType.NO_STATUS;
 		JSONMessage handleMessage = new JSONMessage();
 
-		HashMap<String, BigInteger> order = null;
+		HashMap<String, BigInteger> order = new HashMap<String, BigInteger>();
 
 		switch (status) {
 			case PUT:
@@ -211,7 +210,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 				if (this.kvServer.hash != null && !this.kvServer.isMe(key)) {
 					// Returns the replica whose hash range this key falls in;
 					replicaName = this.kvServer.keyInReplicasRange(key);
-
 					if (replicaName == null) {
 						handleMessageStatus = StatusType.SERVER_NOT_RESPONSIBLE;
 						order = this.kvServer.getOrder();
@@ -262,7 +260,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 		} else {
 			handleMessage.setMessage(handleMessageStatus.name(), key, handleMessageValue);
 		}
-
 		return handleMessage;
 	}
 
@@ -331,11 +328,9 @@ public class ServerConnection implements IServerConnection, Runnable {
 			while (this.isOpen) {
 				try {
 					JSONMessage receivedMessage = receiveJSONMessage();
-
 					if (receivedMessage != null) {
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
-
 						if (metadata == null) {
 							sendMessage = new JSONMessage();
 							ServerStatus serverStatus = this.kvServer.serverStatus;
@@ -355,7 +350,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 						} else {
 							sendMessage = handleMetadataMessage(metadata);
 						}
-
 						// In the case of a PUT_MANY, we do not need to send a message
 						if (sendMessage != null) {
 							sendJSONMessage(sendMessage);
