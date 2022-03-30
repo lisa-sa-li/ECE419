@@ -152,7 +152,7 @@ public class Controller {
         this.initReplicates(needToInit);
     }
 
-    public void updateReplicasOnMoveData() {
+    public void updateReplicasOnMoveData() throws Exception{
         for (ECSNode repl : this.replicants.values()) {
             // delete old stores
             CyclicBarrier barrier = new CyclicBarrier(1);
@@ -205,39 +205,6 @@ public class Controller {
         }
     }
 
-<<<<<<< HEAD
-=======
-    public String keyInReplicasRange(String key) {
-        // Determine if the hash of key falls in the hash ring of the replicas this
-        // server maintains
-        // Returns name of the replica, else null
-        ArrayList<BigInteger> orderedKeys = new ArrayList<>(hashRing.values());
-        Collections.sort(orderedKeys);
-        // For each replicant, determine its hash range and if the key falls in it
-        for (Map.Entry<String, ECSNode> entry : replicants.entrySet()) {
-            String namePortHost = entry.getKey();
-            ECSNode repl = entry.getValue();
-            BigInteger hash = hashRing.get(namePortHost);
-            Integer i = orderedKeys.indexOf(hash);
-            if (i == orderedKeys.size() - 1) {
-                i = 0;
-            } else {
-                i++;
-            }
-            BigInteger endHash = orderedKeys.get(i);
-            if (utils.isKeyInRange(hash, endHash, key)) {
-                return namePortHost;
-            }
-        }
-        return null;
-    }
-
-    public String getKVFromReplica(String key, String namePortHost) throws Exception {
-        PersistantStorage ps = persistantStorages.get(namePortHost);
-        return ps.get(key);
-    }
-
->>>>>>> 951d64177acb349260fc5f0f385f7aa41c985b3e
     // from
     // https://stackoverflow.com/questions/1383797/java-hashmap-how-to-get-key-from-value
     public String getServerByHash(HashMap<String, BigInteger> map, BigInteger value) {

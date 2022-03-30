@@ -288,7 +288,7 @@ public class KVServer implements IKVServer, Runnable {
 		return false;
 	}
 
-	public void moveData(Metadata metadata) {
+	public void moveData(Metadata metadata) throws Exception {
 		// Transfer a subset (range) of the KVServer's data to another KVServer
 
 		// Update internal metadata with the metadata is just recieved in the new
@@ -378,7 +378,7 @@ public class KVServer implements IKVServer, Runnable {
 			return;
 		}
 
-		String replicateData;
+		String replicateData = "";
 		try {
 			// get relevant replica
 			for (Replicate recoveryReplica : actingReplicates.values()) {
@@ -455,7 +455,6 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	public String getKVFromReplica(String key, String masterNamePortHost) throws Exception {
-
 		for (Replicate replica : actingReplicates.values()) {
 			if (replica.getMasterNamePortHost() == masterNamePortHost) {
 				String value = replica.getKVFromReplica(key);
@@ -466,6 +465,7 @@ public class KVServer implements IKVServer, Runnable {
 				return value;
 			}
 		}
+		return null;
 	}
 
 	@Override

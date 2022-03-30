@@ -84,33 +84,7 @@ public class ECSClient implements IECSClient, Runnable {
             if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH, false) == null) {
                 zkApp.create(ZooKeeperApplication.ZK_NODE_ROOT_PATH, "root_node");
             }
-            if (zk.exists(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, new Watcher() {
-                @Override
-                public void process(WatchedEvent event) {
-                    if (EventType.NodeDeleted == event.getType()) {
-                        logger.debug("event.getPath() " + event.getPath());
-                        String name = event.getPath().split("/")[1];
-                        String namePortHost = name + ":" + this.serverInfo.get(name);
-
-                        NodeStatus status = currServerMap.get(name).getStatus();
-
-                        if (status != NodeStatus.SHUTTING_DOWN && status != NodeStatus.OFFLINE) {
-                            logger.info("HEARTBEAT DIED: Server " + name + " is dead");
-
-                            // SEND MESSAGE TO REPLICAS TO RECOVER
-                            hashRing.recoverFromReplicas(namePortHost);
-
-                            allServerMap.remove(name);
-                            currServerMap.remove(name);
-                            // Update all servers' metadata
-                            hashRing.removeNode(name);
-
-                            // Replaced with a new storage server with default cache info
-                            this.addnode("FIFO", 3);
-                        }
-                    }
-                }
-            }) == null) {
+            if (zk.exists(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, false) == null) {
                 zkApp.create(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, "heartbeat_node");
             }
         } catch (KeeperException | InterruptedException e) {
