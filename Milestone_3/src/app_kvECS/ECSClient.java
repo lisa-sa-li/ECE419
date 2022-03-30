@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import logging.ECSLogSetup;
 import shared.exceptions.UnexpectedFormatException;
 import java.util.concurrent.TimeUnit;
-
+import java.util.stream.IntStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -146,18 +146,19 @@ public class ECSClient implements IECSClient, Runnable {
 
     private static int findFreePort() {
         ServerSocket socket = null;
-        int[] foundPorts;
+        ArrayList<Integer> foundPorts;
         try {
             socket = new ServerSocket(0);
             socket.setReuseAddress(true);
-            int socketNum = socket.getLocalPort();
+            Integer socketNum = socket.getLocalPort();
             if (socketNum >= 8000 && socketNum <= 8009) {
                 // in case it picks a provisioned socket
                 socketNum += 1456;
             }
-            // if (socketNum in foundPorts){
-
-            // }
+            if (foundPorts.contains(socketNum)) {
+                socketNum += 101;
+            }
+            foundPorts.add(socketNum);
             logger.info("FOUND FREE PORT");
             return socketNum;
         } catch (IOException e) {

@@ -155,20 +155,25 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 		String key = msg.getKey();
 		String value = msg.getValue();
 		StatusType status = msg.getStatus();
+
+		logger.debug(">>handleMessage" + status.name() + " " + value + " " + key);
 		try {
 			switch (status) {
 				case INIT_REPLICATE_DATA:
+					logger.debug(">>1");
 					replicate.initReplicateData(value);
-					logger.debug("replicate: " + replicate);
 					// add to KVServer replicate list
+					logger.debug("Adding acting replicate: " + replicate);
 					kvServer.addActingReplicate(replicate);
-					logger.debug("kvServer: " + kvServer);
+					logger.debug("Added acting replicate: ");
 					break;
 				case UPDATE_REPLICATE_DATA:
+					logger.debug(">>2");
 					replicate.updateReplicateData(value);
 					logger.debug("replicate UPDATE_REPLICATE_DATA: " + replicate);
 					break;
 				case DELETE_REPLICATE_DATA:
+					logger.debug(">>3");
 					replicate.deleteReplicateData();
 					logger.debug("replicate DELETE_REPLICATE_DATA: " + replicate);
 					// remove from KVServer
@@ -179,7 +184,8 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 					break;
 			}
 		} catch (Exception e) {
-			logger.error("Unknown error when handling replicate metadata message in ReplicateConnection: " + e.getMessage());
+			logger.error(
+					"Unknown error when handling replicate metadata message in ReplicateConnection: " + e.getMessage());
 		}
 	}
 
