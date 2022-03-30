@@ -247,16 +247,35 @@ public class HashRing {
         // ECS determines who the replicas need to send
         // receiverNodePort needs to be REPLICANT receiver port, not client port
 
-        // if (numServers > 1) {
-        // Metadata update = new Metadata(MessageType.MOVE_DATA, hashRing,
-        // replicatePorts, newNode);
-        // prevNode.sendMessage(update);
-        // JSONMessage msg = prevNode.receiveMessage();
-        // // set hash
-        // updateAll(prevNode.getHash());
-        // } else {
-        // updateAll();
-        // }
+        if (numServers == 1) {
+            // Sad, data is lost forever
+            return;
+        }
+
+        HashMap<String, ECSNode> hashRingMap = getHashRingMap();
+        ECSNode crashedNode = hashRingMap.get(namePortHost);
+        BigInteger crashedHash = crashedNode.getHash();
+        BigInteger crashedEndHash = crashedNode.getEndHash();
+
+        // Update end hash of previous node
+        int idx = hashOrder.indexOf(crashedHash);
+        int prevIdx = idx == 0 ? numServers - 1 : idx - 1;
+        ECSNode prevNode = hashServers.get(hashOrder.get(prevIdx));
+        prevNode.setHashRange(prevNode.getHash(), crashedEndHash);
+        // This is how we communicate the crash node's name to the replica
+        prevNode.setNodeName(prevNode.getNodeName() + "@" + namePortHost);
+
+        HashMap<String, ECSNode> replicates = getReplicationServers(namePortHost);
+        // The prevNode tells the replica who to send their replica data to
+        Metadata recover = new Metadata(MessageType.RECOVER, hashRing, prevNode, true);
+
+        for (Map.Entry<String, ECSNode> entry : replicates.entrySet()) {
+            String rNamePortHost = entry.getKey();
+            ECSNode r = entry.getValue();
+
+            r.sendMessage(recover);
+            // JSONMessage msg = prevNode.receiveMessage();
+        }
     }
 
     public boolean isEmpty() {

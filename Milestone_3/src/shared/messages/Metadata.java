@@ -58,6 +58,18 @@ public class Metadata {
         }
     }
 
+    public Metadata(MessageType status, HashMap<String, BigInteger> order, ECSNode receiverNode, boolean replicate) {
+        this.status = status;
+        this.order = order;
+        if (receiverNode != null) {
+            this.receiverNodeName = receiverNode.getNodeName();
+            this.receiverNodePort = receiverNode.getReplicateReceiverPort();
+            this.receiverNodeHost = receiverNode.getNodeHost();
+            this.receiveNodeHash = receiverNode.getHash();
+            this.receiveNodeEndHash = receiverNode.getEndHash();
+        }
+    }
+
     public Metadata(MessageType status, HashMap<String, BigInteger> order,
             HashMap<String, Integer> replicateReceiverPorts, ECSNode receiverNode) {
         this.status = status;
