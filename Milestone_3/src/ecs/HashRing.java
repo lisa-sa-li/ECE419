@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import com.google.gson.Gson;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.security.KeyException;
 import java.security.MessageDigest;
 
@@ -50,7 +51,8 @@ public class HashRing {
         hashOrder.add(hashed);
         Collections.sort(hashOrder);
         hashRing.put(name + ":" + newNode.getNodePort() + ":" + newNode.getNodeHost(), hashed);
-        replicatePorts.put(name + ":" + newNode.getNodePort() + ":" + newNode.getNodeHost(), newNode.getReplicateReceiverPort());
+        replicatePorts.put(name + ":" + newNode.getNodePort() + ":" + newNode.getNodeHost(),
+                newNode.getReplicateReceiverPort());
         hashServers.put(hashed, newNode);
 
         numServers += 1;
@@ -91,6 +93,54 @@ public class HashRing {
                 throw new Exception("Could not add node: " + node.getNodeName());
             }
         }
+    }
+
+    public HashMap<String, ECSNode> getReplicationServers(String givenNamePortHost) {
+
+        HashMap<String, ECSNode> replicates = new HashMap<String, ECSNode>();
+
+        ArrayList<BigInteger> orderedKeys = new ArrayList<>(hashRing.values());
+        Collections.sort(orderedKeys);
+        // get hash from given namePortHost
+        BigInteger currHash = hashRing.get(givenNamePortHost);
+        logger.debug("in getReplicationServers in hashring: " + givenNamePortHost);
+
+        // If it's the only server in the hashring, no replicates
+        if (orderedKeys.size() == 1) {
+            logger.info("No replicates possible: only 1 node in hashring");
+            return null;
+        } else {
+            // get next index after currentHash
+            Integer firstIdx = orderedKeys.indexOf(currHash);
+            firstIdx = (firstIdx + 1) % orderedKeys.size();
+            ECSNode replicate1 = hashServers.get(hashOrder.get(firstIdx));
+
+            // put info into replicate list
+            replicates.put(replicate1.getNamePortHost(), replicate1);
+
+            // check if second replicant possible
+            if (orderedKeys.size() == 2) {
+                logger.info("Only 1 replicate possible: 2 nodes total in the ring");
+            } else {
+                Integer secondIdx = (firstIdx + 1) % orderedKeys.size();
+                ECSNode replicate2 = hashServers.get(hashOrder.get(secondIdx));
+
+                replicates.put(replicate2.getNamePortHost(), replicate2);
+            }
+        }
+
+        return replicates;
+    }
+
+    // from
+    // https://stackoverflow.com/questions/1383797/java-hashmap-how-to-get-key-from-value
+    public String getServerByHash(HashMap<String, BigInteger> map, BigInteger value) {
+        for (Entry<String, BigInteger> entry : map.entrySet()) {
+            if (Objects.equals(value, entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
     public void removeNode(String name) {
@@ -190,6 +240,23 @@ public class HashRing {
         }
 
         return hashRingtoServers;
+    }
+
+    public void recoverFromReplicas(String namePortHost) {
+        // namePortHost must be passed into key or value
+        // ECS determines who the replicas need to send
+        // receiverNodePort needs to be REPLICANT receiver port, not client port
+
+        // if (numServers > 1) {
+        // Metadata update = new Metadata(MessageType.MOVE_DATA, hashRing,
+        // replicatePorts, newNode);
+        // prevNode.sendMessage(update);
+        // JSONMessage msg = prevNode.receiveMessage();
+        // // set hash
+        // updateAll(prevNode.getHash());
+        // } else {
+        // updateAll();
+        // }
     }
 
     public boolean isEmpty() {

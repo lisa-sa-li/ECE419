@@ -18,11 +18,13 @@ import app_kvServer.PersistantStorage;
 public class Replicate {
     private static Logger logger = Logger.getRootLogger();
 
-    private HashMap<String, PersistantStorage> persistantStorages = new HashMap<String, PersistantStorage>();
+    private PersistantStorage ps;
     private String replicateName;
     private String replicateHost;
     private int replicatePort;
-    private String masterNamePortHost;
+    private String masterName;
+    private int masterPort;
+    private String masterHost;
 
     public Replicate(String replicateName, int replicatePort, String replicateHost) {
         this.replicateName = replicateName;
@@ -30,28 +32,39 @@ public class Replicate {
         this.replicateHost = replicateHost;
     }
 
-    public void setMaster(String masterNamePortHost) {
-        this.masterNamePortHost = masterNamePortHost;
+    public void setMasterName(String masterName) {
+        this.masterName = masterName;
+    }
+
+    public void setMasterPort(int masterPort) {
+        this.masterPort = masterPort;
+    }
+
+    public void setMasterHost(String masterHost) {
+        this.masterHost = masterHost;
+    }
+
+    public String getMasterNamePortHost() {
+        return this.masterName + ":" + this.masterPort + ":" + this.masterHost;
     }
 
     public void initReplicateData(String data) {
         // Create its persistant storage
         // logger.debug("initReplicateData START");
-        if (persistantStorages.size() == 2) {
-            logger.error("This server already has 2 replicates");
-            return;
-        }
+        // if (persistantStorages.size() == 2) {
+        // logger.error("This server already has 2 replicates");
+        // return;
+        // }
         // logger.debug("NAME FOR REPLICA FILE PERSISTENT: repl_" + masterNamePortHost +
         // "_" + getNamePortHost());
-        PersistantStorage ps = new PersistantStorage("repl_" + masterNamePortHost + "_" + getNamePortHost());
+        String[] splitData = data.split("@#@");
+        masterName = splitData[0];
+        ps = new PersistantStorage("repl_" + getMasterNamePortHost() + "_" + getNamePortHost());
         // logger.debug("CREATED STORAGE FOR REPLICA: " + data);
-        ps.appendToStorage(data);
-        persistantStorages.put(masterNamePortHost, ps);
+        ps.appendToStorage(splitData[1]);
     }
 
     public void updateReplicateData(String data) {
-        PersistantStorage ps = persistantStorages.get(masterNamePortHost);
-
         for (String line : data.split("\n")) {
             JSONMessage msg = new JSONMessage();
             msg.deserialize(line);
@@ -76,35 +89,23 @@ public class Replicate {
     }
 
     public void clearReplicateData() {
-        if (persistantStorages.get(masterNamePortHost) == null) {
-            logger.error("No replica with the name-port-host " + masterNamePortHost);
-        } else {
-            PersistantStorage ps = persistantStorages.get(masterNamePortHost);
-            ps.clearStorage();
-        }
-        return;
+        ps.clearStorage();
+    }
+
+    public String getAllReplicateData() {
+        return ps.getAllFromStorage();
+    }
+
+    public String getKVFromReplica(String key) throws Exception {
+        return ps.get(key);
     }
 
     public void clearAllReplicateData() {
-        for (PersistantStorage ps : persistantStorages.values()) {
-            ps.clearStorage();
-        }
+        ps.clearStorage();
     }
 
     public void deleteReplicateData() {
-        if (persistantStorages.get(masterNamePortHost) == null) {
-            logger.error("No replica with the name-port-host " + masterNamePortHost);
-        } else {
-            PersistantStorage ps = persistantStorages.get(masterNamePortHost);
-            ps.deleteStorage();
-        }
-        return;
-    }
-
-    public void deleteAllReplicateData() {
-        for (PersistantStorage ps : persistantStorages.values()) {
-            ps.clearStorage();
-        }
+        ps.deleteStorage();
     }
 
     public String getNamePortHost() {

@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
 import java.net.Socket;
 import java.io.OutputStream;
 
@@ -17,15 +18,12 @@ import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
 import shared.Utils;
 
-import app_kvServer.PersistantStorage;
-
 public class Controller {
     private static Logger logger = Logger.getRootLogger();
 
     private final int NUM_REPLICANTS = 2;
 
     private HashMap<String, ECSNode> replicants = new HashMap<String, ECSNode>();
-    private HashMap<String, PersistantStorage> persistantStorages;
     private String controllerName;
     private String controllerHost;
     private int controllerPort;
@@ -154,12 +152,34 @@ public class Controller {
         this.initReplicates(needToInit);
     }
 
+    public void updateReplicasOnMoveData() {
+        for (ECSNode repl : this.replicants.values()) {
+            // delete old stores
+            CyclicBarrier barrier = new CyclicBarrier(1);
+            logger.info("Deleting old info from replicate on MOVEDATA: " + repl.getNodePort());
+            ControllerSender controllerDelete = new ControllerSender(repl, kvServer, barrier,
+                    "", "delete");
+            new Thread(controllerDelete).start();
+
+            // wait before sending init
+            TimeUnit.SECONDS.sleep(2);
+
+            // init new stores with cut data
+            CyclicBarrier barrier_2 = new CyclicBarrier(1);
+            logger.info("Sending new info from replicate on MOVEDATA: " + repl.getNodePort());
+            ControllerSender controllerInit = new ControllerSender(repl, kvServer, barrier_2,
+                    this.controllerName + "@#@" + kvServer.getAllFromStorage(), "init");
+            new Thread(controllerInit).start();
+
+        }
+    }
+
     public void initReplicates(ArrayList<ECSNode> replicates) {
         for (ECSNode replicate : replicates) {
             CyclicBarrier barrier = new CyclicBarrier(1);
             logger.info("INITIALIZING REPLICATE: " + replicate.getNodePort());
             ControllerSender controllerSender = new ControllerSender(replicate, kvServer, barrier,
-                    kvServer.getAllFromStorage(), "init");
+                    this.controllerName + "@#@" + kvServer.getAllFromStorage(), "init");
             new Thread(controllerSender).start();
         }
     }
@@ -183,36 +203,6 @@ public class Controller {
                     "", "delete");
             new Thread(controllerSender).start();
         }
-    }
-
-    public String keyInReplicasRange(String key) {
-        // Determine if the hash of key falls in the hash ring of the replicas this
-        // server maintains
-        // Returns name of the replica, else null
-
-        ArrayList<BigInteger> orderedKeys = new ArrayList<>(hashRing.values());
-        Collections.sort(orderedKeys);
-
-        // For each replicant, determine its hash range and if the key falls in it
-        for (Map.Entry<String, ECSNode> entry : replicants.entrySet()) {
-            String namePortHost = entry.getKey();
-            ECSNode repl = entry.getValue();
-
-            BigInteger hash = hashRing.get(namePortHost);
-            Integer i = orderedKeys.indexOf(hash);
-            i = (i + 1) % orderedKeys.size();
-            BigInteger endHash = orderedKeys.get(i + 1);
-
-            if (utils.isKeyInRange(hash, endHash, key)) {
-                return namePortHost;
-            }
-        }
-        return null;
-    }
-
-    public String getKVFromReplica(String key, String namePortHost) throws Exception {
-        PersistantStorage ps = persistantStorages.get(namePortHost);
-        return ps.get(key);
     }
 
     // from

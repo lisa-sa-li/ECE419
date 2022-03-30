@@ -22,7 +22,6 @@ import shared.messages.KVMessage.StatusType;
 import app_kvServer.KVServer;
 import ecs.ECSNode;
 import ecs.ZooKeeperApplication;
-import ecs.HeartbeatApplication;
 
 /**
  * Represents a connection end point for a particular client that is

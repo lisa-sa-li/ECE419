@@ -21,28 +21,31 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 	private static final int DROP_SIZE = 128 * BUFFER_SIZE;
 
 	private Socket master;
+	private KVServer kvServer;
 	private InputStream input;
 	private OutputStream output;
 	private ReplicateServer replicateServer;
-	private Replicate replicate;
+	public Replicate replicate;
 
 	/**
 	 * Constructs a new ServerConnection object for a given TCP socket.
 	 * 
 	 * @param serverSocket the Socket object for the server connection.
 	 */
-	public ReplicateConnection(Socket master, ReplicateServer replicateServer) throws Exception {
+	public ReplicateConnection(Socket master, ReplicateServer replicateServer, KVServer kvServer) throws Exception {
 		new ServerLogSetup("logs/replicateConnection.log", Level.ALL);
 
 		this.master = master;
+		this.kvServer = kvServer;
 		this.isOpen = true;
 		this.replicateServer = replicateServer;
 
 		// establish itself as a replicate
 		this.replicate = new Replicate(replicateServer.getName(), replicateServer.getPort(),
 				replicateServer.getServerHost());
-		// set master info
-		replicate.setMaster(master.getPort() + ":" + master.getInetAddress().getHostAddress());
+		// set master info (name to come later in init message)
+		replicate.setMasterPort(master.getPort());
+		replicate.setMasterHost(master.getInetAddress().getHostAddress());
 
 		// connect
 		connect();
@@ -157,12 +160,16 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 			switch (status) {
 				case INIT_REPLICATE_DATA:
 					replicate.initReplicateData(value);
+					// add to KVServer replicate list
+					kvServer.addActingReplicate(replicate);
 					break;
 				case UPDATE_REPLICATE_DATA:
 					replicate.updateReplicateData(value);
 					break;
 				case DELETE_REPLICATE_DATA:
 					replicate.deleteReplicateData();
+					// remove from KVServer
+					kvServer.removeActingReplicate(replicate);
 					break;
 				default:
 					break;

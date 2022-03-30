@@ -84,7 +84,33 @@ public class ECSClient implements IECSClient, Runnable {
             if (zk.exists(ZooKeeperApplication.ZK_NODE_ROOT_PATH, false) == null) {
                 zkApp.create(ZooKeeperApplication.ZK_NODE_ROOT_PATH, "root_node");
             }
-            if (zk.exists(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, false) == null) {
+            if (zk.exists(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, new Watcher() {
+                @Override
+                public void process(WatchedEvent event) {
+                    if (EventType.NodeDeleted == event.getType()) {
+                        logger.debug("event.getPath() " + event.getPath());
+                        String name = event.getPath().split("/")[1];
+                        String namePortHost = name + ":" + this.serverInfo.get(name);
+
+                        NodeStatus status = currServerMap.get(name).getStatus();
+
+                        if (status != NodeStatus.SHUTTING_DOWN && status != NodeStatus.OFFLINE) {
+                            logger.info("HEARTBEAT DIED: Server " + name + " is dead");
+
+                            // SEND MESSAGE TO REPLICAS TO RECOVER
+                            hashRing.recoverFromReplicas(namePortHost);
+
+                            allServerMap.remove(name);
+                            currServerMap.remove(name);
+                            // Update all servers' metadata
+                            hashRing.removeNode(name);
+
+                            // Replaced with a new storage server with default cache info
+                            this.addnode("FIFO", 3);
+                        }
+                    }
+                }
+            }) == null) {
                 zkApp.create(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, "heartbeat_node");
             }
         } catch (KeeperException | InterruptedException e) {
@@ -200,34 +226,8 @@ public class ECSClient implements IECSClient, Runnable {
 
     @Override
     public boolean start() {
-        boolean startSuccess = true;
-
-        // Iterator<Map.Entry<String, ECSNode>> it =
-        // currServerMap.entrySet().iterator();
-        // while (it.hasNext()) {
-        // Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
-        // String name = pair.getKey().toString();
-        // ECSNode node = pair.getValue();
-
-        // // String zNodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + name;
-        // // try {
-        // // zkApp.createOrSetData(zNodePath, name);
-        // // } catch (KeeperException | InterruptedException e) {
-        // // startSuccess = false;
-        // // continue;
-        // // } catch (Exception e) {
-        // // startSuccess = false;
-        // // logger.error(e);
-        // // continue;
-        // // }
-
-        // node.setStatus(NodeStatus.STARTING);
-        // allServerMap.put(name, node);
-        // currServerMap.put(name, node);
-        // }
-        // This sends a START message to the servers
         hashRing.startAll();
-        return startSuccess;
+        return true;
     }
 
     @Override
@@ -239,19 +239,6 @@ public class ECSClient implements IECSClient, Runnable {
             Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
             String name = pair.getKey().toString();
             ECSNode node = pair.getValue();
-
-            // String zNodePath = ZooKeeperApplication.ZK_NODE_ROOT_PATH + "/" + name;
-            // try {
-            // zkApp.createOrSetData(zNodePath, name);
-            // } catch (KeeperException | InterruptedException e) {
-            // stopSuccess = false;
-            // logger.error("Cannot stop ZK " + e);
-            // continue;
-            // } catch (Exception e) {
-            // stopSuccess = false;
-            // logger.error(e);
-            // continue;
-            // }
 
             node.setStatus(NodeStatus.STOPPED);
             allServerMap.put(name, node);
@@ -271,6 +258,7 @@ public class ECSClient implements IECSClient, Runnable {
             Map.Entry<String, ECSNode> pair = (Map.Entry) it.next();
             final String name = pair.getKey().toString();
             ECSNode node = pair.getValue();
+            node.setStatus(NodeStatus.SHUTTING_DOWN);
 
             final CountDownLatch countDownLatch = new CountDownLatch(1);
 
@@ -450,18 +438,6 @@ public class ECSClient implements IECSClient, Runnable {
 
     @Override
     public boolean removeNodes(Collection<String> nodeNames) {
-        // if (currServerMap.size() == 1) {
-        // logger.error("You may not remove the last running node: there must be at
-        // least one active server.");
-        // return false;
-        // } else
-        // if (nodeNames.size() > currServerMap.size()) {
-        // logger.error("You are removing too many nodes. There are only " +
-        // currServerMap.size()
-        // + " servers that have started.");
-        // return false;
-        // }
-
         for (String name : nodeNames) {
             ECSNode serverNode = allServerMap.get(name);
             serverNode.setStatus(NodeStatus.OFFLINE);

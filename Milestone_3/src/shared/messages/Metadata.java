@@ -42,6 +42,8 @@ public class Metadata {
         INIT_REPLICATE_DATA,
         UPDATE_REPLICATE_DATA,
         DELETE_REPLICATE_DATA,
+
+        RECOVER,
     }
 
     public Metadata(MessageType status, HashMap<String, BigInteger> order, ECSNode receiverNode) {
@@ -56,7 +58,8 @@ public class Metadata {
         }
     }
 
-    public Metadata(MessageType status, HashMap<String, BigInteger> order, HashMap<String, Integer> replicateReceiverPorts, ECSNode receiverNode) {
+    public Metadata(MessageType status, HashMap<String, BigInteger> order,
+            HashMap<String, Integer> replicateReceiverPorts, ECSNode receiverNode) {
         this.status = status;
         this.order = order;
         this.replicateReceiverPorts = replicateReceiverPorts;

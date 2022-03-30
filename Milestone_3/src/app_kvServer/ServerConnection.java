@@ -312,6 +312,9 @@ public class ServerConnection implements IServerConnection, Runnable {
 				case DELETE_STORAGE:
 					this.kvServer.deleteStorage();
 					break;
+				case RECOVER:
+					this.kvServer.moveReplicateData(message);
+					break;
 				default:
 					break;
 			}
@@ -339,7 +342,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 							if (serverStatus == ServerStatus.CLOSED) {
 								// If the status is closed, all client requests are responded to with
 								// SERVER_STOPPED messages
-								logger.debug("HERE " + receivedMessage.getKey() + " " + receivedMessage.getValue());
 								sendMessage.setMessage(StatusType.SERVER_STOPPED.name(), receivedMessage.getKey(),
 										receivedMessage.getValue());
 							} else if (serverStatus == ServerStatus.LOCKED

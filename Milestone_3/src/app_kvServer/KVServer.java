@@ -52,6 +52,7 @@ public class KVServer implements IKVServer, Runnable {
 	private Controller controller;
 
 	private int replicateReceiverPort;
+	private HashMap<String, Replicate> actingReplicates;
 
 	private ECSConnection ecsConnection;
 	public String serverName;
@@ -138,6 +139,14 @@ public class KVServer implements IKVServer, Runnable {
 
 	}
 
+	public void addActingReplicate(Replicate replicate) {
+		actingReplicates.put(replicate.getMasterNamePortHost(), replicate);
+	}
+
+	public void removeActingReplicate(Replicate replicate) {
+		actingReplicates.remove(replicate.getMasterNamePortHost());
+	}
+
 	private void initHeartbeat() {
 		zkApp = new ZooKeeperApplication(ZooKeeperApplication.ZK_HEARTBEAT_ROOT_PATH, zkPort, zkHost);
 
@@ -190,10 +199,31 @@ public class KVServer implements IKVServer, Runnable {
 		stop(); // Need this for initial status for the server
 		update(metadata);
 
+		// begin updates every 2 minutes, starting 1 minute after init update
+		updateReplicasAsync();
+
 		if (inHashRing() && this.hashRing.size() == 1) {
 			// Get old data from global storage if it's the first server being booted up
 			persistantStorage.getFromGlobalStorage();
 		}
+	}
+
+	public void updateReplicasAsync() {
+		Timer timer = new Timer();
+		TimerTask updateReplicas = new TimerTask() {
+			@Override
+			public void run() {
+				if (controller != null) {
+					controller.updateReplicates();
+					logger.info("Replicas updated <3");
+				} else {
+					logger.error("Controller not successfully implemented for updates");
+				}
+			}
+		};
+
+		// update every 2 minutes (delay by 1 min before starting)
+		timer.scheduleAtFixedRate(updateReplicas, 60000, 120000);
 	}
 
 	@Override
@@ -313,8 +343,8 @@ public class KVServer implements IKVServer, Runnable {
 		}
 
 		unLockWrite();
-		if (die == true) {
 
+		if (die == true) {
 			try {
 				TimeUnit.SECONDS.sleep(5);
 				kill();
@@ -322,6 +352,60 @@ public class KVServer implements IKVServer, Runnable {
 				logger.error("Unable to kill server");
 			}
 		}
+
+		// update replicas after keys are cut + server not dying
+		logger.info("Updating replicas on movedata");
+		controller.updateReplicasOnMoveData();
+		logger.info("Updated replicas on movedata");
+	}
+
+	public void moveReplicateData(Metadata metadata) {
+		// Transfer a subset (range) of the KVServer's data to another KVServer
+		lockWrite();
+
+		ECSNode receiverNode = metadata.getReceiverNode();
+		String hostOfReceiver = receiverNode.getNodeHost();
+		// needs to be REPLICATE RECEIVER PORT
+		int portOfReceiver = receiverNode.getNodePort();
+		String nameOfReceiver = receiverNode.getNodeName();
+		BigInteger hash = receiverNode.getHash();
+		BigInteger endHash = receiverNode.getEndHash();
+
+		String deadNamePortHost = metadata.getValue();
+
+		if (deadNamePortHost.split(":")[0].equals(this.serverName)) {
+			// It's being told to move the data to itself
+			unLockWrite();
+			return;
+		}
+
+		String replicateData;
+		try {
+			// get relevant replica
+			for (Replicate recoveryReplica : actingReplicates.values()) {
+				if (recoveryReplica.getMasterNamePortHost() == deadNamePortHost) {
+					// get the data
+					replicateData = recoveryReplica.getAllReplicateData();
+				}
+			}
+
+			// Figure out where to send to
+			Socket socket = new Socket(hostOfReceiver, portOfReceiver);
+			OutputStream output = socket.getOutputStream();
+
+			JSONMessage json = new JSONMessage();
+			json.setMessage(StatusType.PUT_MANY.name(), "put_many", replicateData, null);
+			byte[] jsonBytes = json.getJSONByte();
+
+			output.write(jsonBytes, 0, jsonBytes.length);
+			output.flush();
+			output.close();
+			socket.close();
+		} catch (Exception e) {
+			logger.error("Unable to send recovery replicate data to node " + nameOfReceiver + ", " + e);
+		}
+
+		unLockWrite();
 	}
 
 	public void update(Metadata metadata) {
@@ -344,16 +428,45 @@ public class KVServer implements IKVServer, Runnable {
 	public String keyInReplicasRange(String key) {
 		// Determine if the hash of key falls in the hash ring of the replicas this
 		// server maintains
-		return this.controller.keyInReplicasRange(key);
+		// Returns name of the replica, else null
+
+		ArrayList<BigInteger> orderedKeys = new ArrayList<>(hashRing.values());
+		Collections.sort(orderedKeys);
+
+		// For each replicant, determine its hash range and if the key falls in it
+		// actingReplicates
+		for (Replicate currReplicate : actingReplicates.values()) {
+			String masterNamePortHost = currReplicate.getMasterNamePortHost();
+
+			BigInteger hash = hashRing.get(masterNamePortHost);
+			Integer i = orderedKeys.indexOf(hash);
+			if (i == orderedKeys.size() - 1) {
+				i = 0;
+			} else {
+				i++;
+			}
+			// i = (i + 1) % orderedKeys.size();
+			BigInteger endHash = orderedKeys.get(i + 1);
+
+			if (utils.isKeyInRange(hash, endHash, key)) {
+				return masterNamePortHost;
+			}
+		}
+		return null;
 	}
 
-	public String getKVFromReplica(String key, String namePortHost) throws Exception {
-		String value = this.controller.getKVFromReplica(key, namePortHost);
-		if (value == null) {
-			logger.warn("Key " + key + " is not found in replica " + namePortHost);
-			throw new Exception("Key is not found in replica");
+	public String getKVFromReplica(String key, String masterNamePortHost) throws Exception {
+
+		for (Replicate replica : actingReplicates.values()) {
+			if (replica.getMasterNamePortHost() == masterNamePortHost) {
+				String value = replica.getKVFromReplica(key);
+				if (value == null) {
+					logger.warn("Key " + key + " is not found in replica " + masterNamePortHost);
+					throw new Exception("Key is not found in replica");
+				}
+				return value;
+			}
 		}
-		return value;
 	}
 
 	@Override

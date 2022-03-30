@@ -7,6 +7,7 @@ public interface IECSNode {
         STARTING, // added, waiting to be written to
         WRITELOCK, // added but being written to
         STOPPED, // removed but not yet offline
+        SHUTTING_DOWN, // when we call shutdown or removenodes, but before it becomes OFFLINE
     }
 
     /**
