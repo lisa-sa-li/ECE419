@@ -152,7 +152,7 @@ public class Controller {
         this.initReplicates(needToInit);
     }
 
-    public void updateReplicasOnMoveData() {
+    public void updateReplicasOnMoveData() throws Exception{
         for (ECSNode repl : this.replicants.values()) {
             // delete old stores
             CyclicBarrier barrier = new CyclicBarrier(1);

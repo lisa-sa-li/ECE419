@@ -331,6 +331,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 					if (receivedMessage != null) {
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
+						logger.debug("metadata: " + metadata);
 						if (metadata == null) {
 							sendMessage = new JSONMessage();
 							ServerStatus serverStatus = this.kvServer.serverStatus;
@@ -346,13 +347,17 @@ public class ServerConnection implements IServerConnection, Runnable {
 										receivedMessage.getValue());
 							} else {
 								sendMessage = handleMessage(receivedMessage);
+								logger.debug("sendMessage in if: " + sendMessage);
 							}
 						} else {
 							sendMessage = handleMetadataMessage(metadata);
+							logger.debug("sendMessage: " + sendMessage);
 						}
 						// In the case of a PUT_MANY, we do not need to send a message
 						if (sendMessage != null) {
+							logger.debug("sendMessage is not null");
 							sendJSONMessage(sendMessage);
+							logger.debug("sendJSONMessage sent!");
 						}
 
 					}
