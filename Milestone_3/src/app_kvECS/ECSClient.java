@@ -16,6 +16,7 @@ import java.lang.StringBuffer;
 import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.lang.IllegalStateException;
 import java.lang.Runtime;
 import java.util.ArrayList;
@@ -100,6 +101,7 @@ public class ECSClient implements IECSClient, Runnable {
             String serverName = node.getNodeName();
 
             Socket clientSocket = new Socket(this.hostname, port);
+			clientSocket.setSoTimeout(7000);
             ECSConnection ecsConnection = new ECSConnection(clientSocket);
 
             // set socket in ecsConnection
@@ -107,7 +109,9 @@ public class ECSClient implements IECSClient, Runnable {
 
             logger.info("Server " + serverName + " connected to " + clientSocket.getInetAddress().getHostName()
                     + " on port " + clientSocket.getPort());
-        } catch (IOException e) {
+        } catch (SocketTimeoutException s){
+			logger.info("Socket timeout in KVServer: retrying " + s);
+		} catch (IOException e) {
             logger.error("ERROR MAKING NEW CONNECTION IN ECSCLIENT");
             throw e;
         }

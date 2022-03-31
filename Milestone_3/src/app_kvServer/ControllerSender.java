@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CyclicBarrier;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
@@ -42,6 +43,7 @@ public class ControllerSender implements Runnable {
 
         try {
             Socket socket = new Socket(hostOfReceiver, replicate.getReplicateReceiverPort());
+			socket.setSoTimeout(7000);
             OutputStream output = socket.getOutputStream();
 
             // ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
@@ -73,7 +75,9 @@ public class ControllerSender implements Runnable {
             // // oos.close();
 
             logger.info("Sent data to replicant " + nameOfReceiver);
-        } catch (Exception e) {
+        } catch (SocketTimeoutException s){
+			logger.info("Socket timeout in Controller sender: retrying " + s);
+		} catch (Exception e) {
             logger.error("Unable to send data to replicant " + nameOfReceiver + ", " + e);
         }
     }

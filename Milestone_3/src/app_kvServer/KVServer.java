@@ -3,9 +3,11 @@ package app_kvServer;
 import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.io.OutputStream;
 import java.io.IOException;
 import java.net.BindException;
+import java.net.InetSocketAddress;
 import java.util.*;
 import java.math.BigInteger;
 import java.util.concurrent.CyclicBarrier;
@@ -257,14 +259,14 @@ public class KVServer implements IKVServer, Runnable {
 		// logger.error("Controller not successfully implemented for updates");
 		// }
 		// }
-		// }, 30, 60, TimeUnit.SECONDS);
+		// }, 30, 30, TimeUnit.SECONDS);
 
 		// scheduler.schedule(new Runnable() {
 		// public void run() {
 		// longTaskHandler.cancel(true);
-		// // This will cancel your LongTask after 90 sec without effecting ShortTask
+		// // This will cancel your LongTask after 90 sec without affecting ShortTask
 		// }
-		// }, 90, TimeUnit.SECONDS);
+		// }, 10, TimeUnit.SECONDS);
 	}
 
 	@Override
@@ -369,6 +371,7 @@ public class KVServer implements IKVServer, Runnable {
 			String dataInRange = persistantStorage.getDataInRange(hash, endHash, die);
 
 			Socket socket = new Socket(hostOfReceiver, portOfReceiver);
+			socket.setSoTimeout(7000);
 			OutputStream output = socket.getOutputStream();
 
 			JSONMessage json = new JSONMessage();
@@ -379,9 +382,11 @@ public class KVServer implements IKVServer, Runnable {
 			output.flush();
 			output.close();
 			socket.close();
+		} catch (SocketTimeoutException s){
+			logger.info("Socket timeout in KVServer: retrying " + s);
 		} catch (Exception e) {
 			logger.error("Unable to send data to node " + nameOfReceiver + ", " + e);
-		}
+		} 
 
 		unLockWrite();
 
@@ -429,6 +434,7 @@ public class KVServer implements IKVServer, Runnable {
 
 			// Figure out where to send to
 			Socket socket = new Socket(hostOfReceiver, portOfReceiver);
+			socket.setSoTimeout(7000);
 			OutputStream output = socket.getOutputStream();
 
 			JSONMessage json = new JSONMessage();
@@ -439,6 +445,8 @@ public class KVServer implements IKVServer, Runnable {
 			output.flush();
 			output.close();
 			socket.close();
+		} catch (SocketTimeoutException s){
+			logger.info("Socket timeout in KVServer: retrying? " + s);
 		} catch (Exception e) {
 			logger.error("Unable to send recovery replicate data to node " + nameOfReceiver + ", " + e);
 		}
@@ -658,6 +666,7 @@ public class KVServer implements IKVServer, Runnable {
 		logger.info("Initialize server ...");
 		try {
 			serverSocket = new ServerSocket(port);
+			serverSocket.setSoTimeout(5000);
 			logger.info("Server listening on port: " + serverSocket.getLocalPort());
 			return true;
 
@@ -673,6 +682,7 @@ public class KVServer implements IKVServer, Runnable {
 	private void initializeReplicateListener() {
 		try {
 			ServerSocket replicateReceiveSocket = new ServerSocket(replicateReceiverPort);
+			// replicateReceiveSocket.setSoTimeout(5000);
 			new Thread(new ReplicateServer(replicateReceiveSocket, this)).start();
 			logger.info("Replicate server listening on port: " + replicateReceiveSocket.getLocalPort());
 		} catch (IOException e) {
