@@ -41,6 +41,7 @@ public class ClientConnection implements IClientConnection {
 		input = clientSocket.getInputStream();
 
 		// oos = new ObjectOutputStream(output);
+		// oos.flush();
 		// ois = new ObjectInputStream(input);
 	}
 
@@ -51,10 +52,12 @@ public class ClientConnection implements IClientConnection {
 		// output.flush();
 
 		oos = new ObjectOutputStream(output);
+		oos.flush();
 
 		String msgText = kvJson.serializeMsg();
 		oos.writeObject(msgText);
 		oos.flush();
+		// oos.reset();
 		// oos.close();
 
 		logger.info(

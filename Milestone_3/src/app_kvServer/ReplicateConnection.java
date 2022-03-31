@@ -64,6 +64,7 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 			input = this.master.getInputStream();
 
 			// oos = new ObjectOutputStream(output);
+			// oos.flush();
 			// ois = new ObjectInputStream(input);
 
 			logger.info("ReplicateConnection connected to controller " + this.master.getInetAddress().getHostName()
@@ -163,7 +164,7 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 		// return json;
 
 		// oos = new ObjectOutputStream(output);
-		// oos = new ObjectOutputStream(output);
+		// oos.flush();
 		ois = new ObjectInputStream(input);
 
 		String jsonStr = null;
@@ -189,6 +190,7 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 	}
 
 	private void handleMessage(JSONMessage msg) {
+		logger.info("IN REPLICATE HANDLE MESSAGE");
 		String key = msg.getKey();
 		String value = msg.getValue();
 		StatusType status = msg.getStatus();
@@ -231,7 +233,7 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 					if (receivedMessage != null) {
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
-
+						logger.info("swag");
 						handleMessage(receivedMessage);
 						// do we reply?
 						// sendJSONMessage(sendMessage);

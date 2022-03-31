@@ -68,7 +68,7 @@ public class Replicate {
         if (ps == null) {
             ps = new PersistantStorage("repl_" + masterName + "_" + getNamePortHost());
         }
-        logger.info("Created ps in updatereplicatedata");
+
         String[] ops = splitData[1].split("\n");
         for (String line : ops) {
             JSONMessage msg = new JSONMessage();
