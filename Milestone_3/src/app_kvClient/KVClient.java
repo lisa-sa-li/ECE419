@@ -220,7 +220,6 @@ public class KVClient implements IKVClient, Runnable {
                     break;
                 case "help":
                     printHelp();
-                    logger.info("Printed out help.");
                     break;
                 default:
                     logger.error("Unknown command.");

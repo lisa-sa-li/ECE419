@@ -9,7 +9,12 @@ import java.net.BindException;
 import java.util.*;
 import java.math.BigInteger;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -59,6 +64,8 @@ public class KVServer implements IKVServer, Runnable {
 	private String zkHost;
 	private int zkPort;
 
+	private ReadWriteLock logLock;
+
 	private int zkTimeout = 1000;
 	private ZooKeeper zk;
 	private ZooKeeperApplication zkApp;
@@ -74,6 +81,8 @@ public class KVServer implements IKVServer, Runnable {
 	private int cacheSize;
 	private CacheStrategy cacheAlgo;
 	private Cache cache;
+
+	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
 
 	private HashMap<String, String> logs = new HashMap<String, String>();
 
@@ -202,6 +211,9 @@ public class KVServer implements IKVServer, Runnable {
 		stop(); // Need this for initial status for the server
 		update(metadata);
 
+		// log lock
+		logLock = new ReentrantReadWriteLock();
+
 		// begin updates every 2 minutes, starting 1 minute after init update
 		updateReplicasAsync();
 
@@ -227,7 +239,27 @@ public class KVServer implements IKVServer, Runnable {
 
 		// update every 2 minutes (delay by 1 min before starting)
 		// timer.scheduleAtFixedRate(updateReplicas, 60000, 120000);
-		timer.scheduleAtFixedRate(updateReplicas, 30000, 30000);
+		timer.scheduleAtFixedRate(updateReplicas, 60000, 30000);
+
+		// final ScheduledFuture<?> longTaskHandler = scheduler.scheduleAtFixedRate(new
+		// TimerTask() {
+		// @Override
+		// public void run() {
+		// if (controller != null) {
+		// controller.updateReplicates();
+		// logger.info("Replicas updated <3");
+		// } else {
+		// logger.error("Controller not successfully implemented for updates");
+		// }
+		// }
+		// }, 30, 60, TimeUnit.SECONDS);
+
+		// scheduler.schedule(new Runnable() {
+		// public void run() {
+		// longTaskHandler.cancel(true);
+		// // This will cancel your LongTask after 90 sec without effecting ShortTask
+		// }
+		// }, 90, TimeUnit.SECONDS);
 	}
 
 	@Override
@@ -548,7 +580,6 @@ public class KVServer implements IKVServer, Runnable {
 
 		if (putStatus == StatusType.PUT_SUCCESS || putStatus == StatusType.DELETE_SUCCESS
 				|| putStatus == StatusType.PUT_UPDATE) {
-			logger.info("CALL about to be ADDED TO LOG: " + putStatus + ":" + key + ":" + value);
 			addToLogs(key, value);
 			// controller.updateReplicates();
 		}
@@ -556,20 +587,20 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	private void addToLogs(String key, String value) {
-		this.logs.put(key, value);
-		logger.info("CALL ADDED TO LOG: " + ":" + key + ":" + value);
+		logLock.writeLock().lock();
+		try {
+			this.logs.put(key, value);
+		} finally {
+			logLock.writeLock().unlock();
+		}
 	}
 
 	public String getStringLogs(boolean clearLogs) {
 		StringBuffer buffer = new StringBuffer();
 
-		logger.info("LOGS: " + logs.size());
-
 		for (Map.Entry<String, String> entry : this.logs.entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue();
-
-			logger.info("IN STRING TO LOG: " + key + ":" + value);
 
 			JSONMessage log = new JSONMessage();
 			log.setMessage("PUT", key, value);
@@ -577,10 +608,14 @@ public class KVServer implements IKVServer, Runnable {
 		}
 
 		if (clearLogs) {
-			this.logs.clear();
+			logLock.writeLock().lock();
+			try {
+				this.logs.clear();
+			} finally {
+				logLock.writeLock().unlock();
+			}
 		}
 
-		logger.info("BUFFER: " + buffer.toString());
 		return buffer.toString();
 	}
 

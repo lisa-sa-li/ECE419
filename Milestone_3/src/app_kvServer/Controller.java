@@ -129,12 +129,13 @@ public class Controller {
         try {
             TimeUnit.SECONDS.sleep(2);
         } catch (Exception e) {
-            logger.error("Unable to init replicates on MoveData");
+            logger.info("Unable to init replicates on MoveData");
         }
         for (ECSNode repl : this.replicants.values()) {
             // delete old stores
             CyclicBarrier barrier = new CyclicBarrier(1);
-            logger.info("Deleting old info from replicate on MOVEDATA: " + repl.getNodePort());
+            // logger.info("Deleting old info from replicate on MOVEDATA: " +
+            // repl.getNodePort());
             ControllerSender controllerDelete = new ControllerSender(repl, kvServer, barrier,
                     "", "delete");
             new Thread(controllerDelete).start();
@@ -158,23 +159,26 @@ public class Controller {
     public void initReplicates(ArrayList<ECSNode> replicates) {
         for (ECSNode replicate : replicates) {
             CyclicBarrier barrier = new CyclicBarrier(1);
-            logger.info("INITIALIZING REPLICATE: " + replicate.getNodePort());
+            // logger.info("INITIALIZING REPLICATE: " + replicate.getNodePort());
             ControllerSender controllerSender = new ControllerSender(replicate, kvServer, barrier,
                     this.controllerName + "@" + kvServer.getAllFromStorage(), "init");
             new Thread(controllerSender).start();
         }
     }
 
+    // synchronized void updateReplicates() {
     public void updateReplicates() {
         for (ECSNode repl : this.replicants.values()) {
-            String updates = kvServer.getStringLogs(true);
+            String updates = kvServer.getStringLogs(false);
             CyclicBarrier barrier = new CyclicBarrier(1);
-            logger.info("UPDATING REPLICATE: " + repl.getNodePort() + updates);
-            logger.info("IS UPDATE EMPTY?: " + updates.isEmpty());
+            // logger.info("UPDATING REPLICATE: " + repl.getNodePort() + updates);
+            // logger.info("IS UPDATE EMPTY?: " + updates.isEmpty());
             if (!(updates.isEmpty())) {
+                // logger.info("SENDING NON-EMPTY UPDATE: " + updates);
                 ControllerSender controllerSender = new ControllerSender(repl, kvServer, barrier,
                         this.controllerName + "@" + updates, "update");
                 new Thread(controllerSender).start();
+                // kvServer.getStringLogs(true);
             }
         }
     }
