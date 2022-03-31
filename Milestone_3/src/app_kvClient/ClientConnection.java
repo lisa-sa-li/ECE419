@@ -38,7 +38,6 @@ public class ClientConnection implements IClientConnection {
 
 	@Override
 	public void sendJSONMessage(JSONMessage kvJson) throws IOException {
-		System.out.println("SENDING MESSAGE TO SERVER");
 		byte[] jsonBytes = kvJson.getJSONByte();
 		output.write(jsonBytes, 0, jsonBytes.length);
 		output.flush();
@@ -49,14 +48,12 @@ public class ClientConnection implements IClientConnection {
 
 	@Override
 	public JSONMessage receiveJSONMessage() throws IOException {
-		System.out.println("RECEIVED MESSAGE FROM SERVER");
 		int index = 0;
 		byte[] msgBytes = null, tmp = null;
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
 		logger.debug("Initial setup: " + input);
 		// Read first char from stream
 		byte read = (byte) input.read();
-		logger.debug("what is read: " + (char) read);
 		logger.debug("what is read: " + (char) read);
 		boolean reading = true;
 		// Check if stream is closed (read returns -1)

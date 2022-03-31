@@ -83,11 +83,12 @@ public class ServerConnection implements IServerConnection, Runnable {
 	public JSONMessage receiveJSONMessage() throws IOException {
 		// logger.debug("RECEIVED JSON MESSAGE");
 		int index = 0;
+		byte read = 0;
 		byte[] msgBytes = null, tmp = null;
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
-		logger.debug("Initial setup server conn: " + input);
-		byte read = (byte) input.read();
-		logger.debug("what is read server conn: " + (char) read);
+		logger.debug("Initial setup server conn: " + read);
+		read = (byte) input.read();
+		logger.debug("what is read server conn: " + (char) read + " : " + read);
 		boolean reading = true;
 		// Check if stream is closed (read returns -1)
 		if (read == -1) {
@@ -328,9 +329,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 	public void run() {
 		// while connection is open, listen for messages
 		try {
-			logger.debug("this.isOpen: " + this.isOpen);
 			while (this.isOpen) {
-				logger.debug("WHILE THIS IS OPEN");
 				try {
 					JSONMessage receivedMessage = receiveJSONMessage();
 					logger.debug("MESSAGE RECEIVED: " + receivedMessage);
@@ -362,14 +361,13 @@ public class ServerConnection implements IServerConnection, Runnable {
 							sendMessage = handleMetadataMessage(metadata);
 							// logger.debug("sendMessage: " + sendMessage);
 						}
-						logger.debug("IF IS OVER: SEND MESSAGE is set");
 						// In the case of a PUT_MANY, we do not need to send a message
 						if (sendMessage != null) {
 							logger.debug("sending sendMessage: " + sendMessage);
 							sendJSONMessage(sendMessage);
 							// logger.debug("sent success");
 						}
-
+						logger.debug("this.isOpen? : " + this.isOpen);
 					}
 				} catch (IOException e) {
 					logger.error("Server connection lost: " + e);

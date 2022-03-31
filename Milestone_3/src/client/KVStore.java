@@ -66,10 +66,16 @@ public class KVStore implements KVCommInterface, Runnable {
 	@Override
 	public void connect() throws Exception {
 		try {
+			System.out.println("CONNECTING TO: " + this.address + " : " + this.port);
 			Socket clientSocket = new Socket(this.address, this.port);
 			this.clientConnection = new ClientConnection(clientSocket);
 			logger.info("Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
 					+ clientSocket.getPort());
+			try {
+				TimeUnit.SECONDS.sleep(2);
+			} catch (Exception e) {
+				logger.error("Unable to init replicates on MoveData");
+			}
 		} catch (IOException e) {
 			logger.error("Error! Unable to establish connection to store. \n", e);
 			throw e;
@@ -83,14 +89,9 @@ public class KVStore implements KVCommInterface, Runnable {
 			jsonMessage.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "in KVStore", null);
 
 			this.clientConnection.sendJSONMessage(jsonMessage);
-			logger.info("Tearing down the connection ...");
-			try {
-				TimeUnit.SECONDS.sleep(2);
-			} catch (Exception e) {
-				logger.error("Unable to init replicates on MoveData");
-			}
+			// logger.info("Tearing down the connection ...");
 			this.clientConnection.receiveJSONMessage();
-			System.out.println("received JSON");
+			// System.out.println("received JSON");
 			this.clientConnection.close();
 			logger.info("Client connection closed!");
 		} catch (IOException e) {
@@ -122,18 +123,11 @@ public class KVStore implements KVCommInterface, Runnable {
 			System.out.println("Metadata stale: original address: " + this.address + " original port: " + this.port);
 			// metadata already exists (might be stale)
 			this.updateToCorrectNodeFromList(key);
-			System.out.println("Updated to correct node info: " + this.address + " new port: " + this.port);
 			this.switchServer();
 			// System.out.println("switched servers");
 		}
-
 		this.clientConnection.sendJSONMessage(jsonMessage);
 		System.out.println("Sent JSON");
-		try {
-			TimeUnit.SECONDS.sleep(2);
-		} catch (Exception e) {
-			logger.error("Unable to init replicates on MoveData");
-		}
 		JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
 		System.out.println("sent message before while loop: " + returnMsg.getStatus().toString());
 		int retries = 0;
