@@ -608,7 +608,7 @@ public class KVServer implements IKVServer, Runnable {
 
 			JSONMessage log = new JSONMessage();
 			log.setMessage("PUT", key, value);
-			buffer.append(log.serializeMsg(false) + "\n");
+			buffer.append(log.serialize(false) + "\n");
 		}
 
 		if (clearLogs) {
