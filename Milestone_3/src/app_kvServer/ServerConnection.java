@@ -360,7 +360,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 							}
 						} else {
 							sendMessage = handleMetadataMessage(metadata);
-							logger.debug("sendMessage: " + sendMessage);
+							// logger.debug("sendMessage: " + sendMessage);
 						}
 						logger.debug("IF IS OVER: SEND MESSAGE is set");
 						// In the case of a PUT_MANY, we do not need to send a message
