@@ -66,6 +66,7 @@ public class ECSConnection {
 			input = this.ecsSocket.getInputStream();
 
 			// oos = new ObjectOutputStream(output);
+			// oos.flush();
 			// ois = new ObjectInputStream(input);
 
 			logger.info("Connected to ECS " + this.ecsSocket.getInetAddress().getHostName() + " on port "
@@ -82,17 +83,14 @@ public class ECSConnection {
 		// output.write(jsonBytes, 0, jsonBytes.length);
 		// output.flush();
 
-		System.out.println("IN SEND JSONMessage output: " + output);
 		oos = new ObjectOutputStream(output);
-		System.out.println("2");
+		oos.flush();
 
 		String msgText = json.serializeMsg();
 		oos.writeObject(msgText);
-		System.out.println("3");
 
 		oos.flush();
-		System.out.println("4");
-
+		// oos.reset();
 		// oos.close();
 
 		logger.info("SEND \t<" + ecsSocket.getInetAddress().getHostAddress() + ":" + ecsSocket.getPort() + ">: '"
@@ -178,6 +176,7 @@ public class ECSConnection {
 		// return json;
 
 		// oos = new ObjectOutputStream(output);
+		// oos.flush();
 		ois = new ObjectInputStream(input);
 
 		String jsonStr = null;

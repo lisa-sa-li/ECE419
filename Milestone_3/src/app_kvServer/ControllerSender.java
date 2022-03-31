@@ -45,6 +45,7 @@ public class ControllerSender implements Runnable {
             // OutputStream output = socket.getOutputStream();
 
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            oos.flush();
 
             JSONMessage json = new JSONMessage();
             switch (action) {
@@ -68,6 +69,7 @@ public class ControllerSender implements Runnable {
             String msgText = json.serializeMsg();
             oos.writeObject(msgText);
             oos.flush();
+            // oos.reset();
             // oos.close();
 
             logger.info("Sent data to replicant " + nameOfReceiver);

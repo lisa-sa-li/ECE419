@@ -244,7 +244,7 @@ public class KVServer implements IKVServer, Runnable {
 
 		// update every 2 minutes (delay by 1 min before starting)
 		// timer.scheduleAtFixedRate(updateReplicas, 60000, 120000);
-		timer.scheduleAtFixedRate(updateReplicas, 60000, 30000);
+		timer.scheduleAtFixedRate(updateReplicas, 30000, 30000);
 
 		// final ScheduledFuture<?> longTaskHandler = scheduler.scheduleAtFixedRate(new
 		// TimerTask() {

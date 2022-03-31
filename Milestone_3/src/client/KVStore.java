@@ -129,7 +129,8 @@ public class KVStore implements KVCommInterface, Runnable {
 		this.clientConnection.sendJSONMessage(jsonMessage);
 		System.out.println("Sent JSON");
 		JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
-		System.out.println("sent message before while loop: " + returnMsg.getStatus().toString());
+		// System.out.println("sent message before while loop: " +
+		// returnMsg.getStatus().toString());
 		int retries = 0;
 		while (!wasSuccessful && retries < 3) {
 			// System.out.println("retires: " + retries);

@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.util.HashMap;
 import java.math.BigInteger;
+import java.io.StreamCorruptedException;
 
 import org.apache.log4j.*;
 import org.apache.log4j.Logger;
@@ -69,6 +70,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 			input = this.serverSocket.getInputStream();
 
 			// oos = new ObjectOutputStream(output);
+			// oos.flush();
 			// ois = new ObjectInputStream(input);
 
 			logger.info(
@@ -86,10 +88,12 @@ public class ServerConnection implements IServerConnection, Runnable {
 		// output.flush();
 
 		oos = new ObjectOutputStream(output);
+		oos.flush();
 
 		String msgText = json.serializeMsg();
 		oos.writeObject(msgText);
 		oos.flush();
+		// oos.reset();
 		// oos.close();
 
 		logger.info("SEND \t<" + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getPort() + ">: '"
@@ -177,6 +181,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 		// return json;
 
 		// oos = new ObjectOutputStream(output);
+		// oos.flush();
 		ois = new ObjectInputStream(input);
 
 		String jsonStr = null;
@@ -408,6 +413,9 @@ public class ServerConnection implements IServerConnection, Runnable {
 						}
 						logger.debug("this.isOpen? : " + this.isOpen);
 					}
+				} catch (StreamCorruptedException e) {
+					logger.error("ServerConnection Stream Corrupted Exception: " + e);
+					this.isOpen = false;
 				} catch (IOException e) {
 					logger.error("ServerConnection connection lost: " + e);
 					this.isOpen = false;
@@ -421,7 +429,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 			try {
 				// close connection
 				if (serverSocket != null) {
-
 					input.close();
 					output.close();
 					serverSocket.close();
