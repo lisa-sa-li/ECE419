@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.FileNotFoundException;
 import shared.Utils;
-import ecs.HashRing;
 
 public class PersistantStorage implements IPersistantStorage {
     private static Logger logger = Logger.getRootLogger();
@@ -22,14 +21,27 @@ public class PersistantStorage implements IPersistantStorage {
     private String pathToFile;
     private String dir = "./storage";
     private String GLOBAL_STORAGE_PATH = dir + "/global_storage.txt";
-    private HashRing hashRing;
     private Utils utils;
 
     public PersistantStorage(String name) {
         this.fileName = name.trim() + "_storage.txt";
         this.pathToFile = dir + "/" + this.fileName;
-        this.hashRing = new HashRing();
         this.utils = new Utils();
+
+        try {
+            initFile();
+        } catch (Exception e) {
+            logger.error(e);
+        }
+    }
+
+    public PersistantStorage(String name, String globalStorageFile) {
+        // Use this for testing
+        this.fileName = name.trim() + "_storage.txt";
+        this.pathToFile = dir + "/" + this.fileName;
+        this.utils = new Utils();
+
+        GLOBAL_STORAGE_PATH = dir + "/" + globalStorageFile;
 
         try {
             initFile();
@@ -95,7 +107,7 @@ public class PersistantStorage implements IPersistantStorage {
             while ((line = file.readLine()) != null) {
                 // Covert each line to a JSON so we can read the key and value
                 json = new JSONMessage();
-                json.deserialize(line);
+                json.deserializeMsg(line);
                 keyFromFile = json.getKey();
 
                 // The key exists in the file, update the old value with the new value
@@ -108,7 +120,7 @@ public class PersistantStorage implements IPersistantStorage {
                         putStatus = StatusType.DELETE_SUCCESS;
                     } else {
                         json.setValue(value);
-                        line = json.serialize(false);
+                        line = json.serializeMsg(false);
                         inputBuffer.append(line);
                         inputBuffer.append('\n');
                         putStatus = StatusType.PUT_UPDATE;
@@ -135,7 +147,7 @@ public class PersistantStorage implements IPersistantStorage {
                 } else {
                     json = new JSONMessage();
                     json.setMessage("NO_STATUS", key, value); // We don't care about status here
-                    line = json.serialize(false);
+                    line = json.serializeMsg(false);
                     inputBuffer.append(line);
                     inputBuffer.append('\n');
                     putStatus = StatusType.PUT_SUCCESS;
@@ -167,7 +179,7 @@ public class PersistantStorage implements IPersistantStorage {
             while ((line = file.readLine()) != null) {
                 // Covert each line to a JSON so we can read the key and value
                 json = new JSONMessage();
-                json.deserialize(line);
+                json.deserializeMsg(line);
                 keyFromFile = json.getKey();
 
                 // The key exists in the file
@@ -239,7 +251,7 @@ public class PersistantStorage implements IPersistantStorage {
             while ((line = file.readLine()) != null) {
                 // Covert each line to a JSON so we can read the key and value
                 json = new JSONMessage();
-                json.deserialize(line);
+                json.deserializeMsg(line);
                 keyFromFile = json.getKey();
 
                 if (die == true) {

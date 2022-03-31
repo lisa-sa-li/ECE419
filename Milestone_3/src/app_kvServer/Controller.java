@@ -158,6 +158,7 @@ public class Controller {
         for (ECSNode replicate : replicates) {
             CyclicBarrier barrier = new CyclicBarrier(1);
             // logger.info("INITIALIZING REPLICATE: " + replicate.getNodePort());
+            logger.info("TO USE CONTROLLER SENDER FOR INIT REPLICAS");
             ControllerSender controllerSender = new ControllerSender(replicate, kvServer, barrier,
                     this.controllerName + "@" + kvServer.getAllFromStorage(), "init");
             new Thread(controllerSender).start();
@@ -169,13 +170,15 @@ public class Controller {
         for (ECSNode repl : this.replicants.values()) {
             String updates = kvServer.getStringLogs(false);
             CyclicBarrier barrier = new CyclicBarrier(1);
-            // logger.info("UPDATING REPLICATE: " + repl.getNodePort() + updates);
+            logger.info("UPDATING REPLICATES from " + this.controllerName + ": " + updates);
             // logger.info("IS UPDATE EMPTY?: " + updates.isEmpty());
             if (!(updates.isEmpty())) {
                 // logger.info("SENDING NON-EMPTY UPDATE: " + updates);
                 ControllerSender controllerSender = new ControllerSender(repl, kvServer, barrier,
                         this.controllerName + "@" + updates, "update");
+                // logger.info("after updateReplicates");
                 new Thread(controllerSender).start();
+                // logger.info("after after updateReplicates");
                 // kvServer.getStringLogs(true);
             }
         }

@@ -229,8 +229,13 @@ public class KVServer implements IKVServer, Runnable {
 			@Override
 			public void run() {
 				if (controller != null) {
-					controller.updateReplicates();
-					// logger.info("Replicas updated <3");
+					try {
+						// logger.info("Updating replicas");
+						controller.updateReplicates();
+						logger.info("Replicas updated <3");
+					} catch (Exception e) {
+						logger.info("Error when async updating: " + e);
+					}
 				} else {
 					logger.error("Controller not successfully implemented for updates");
 				}
@@ -603,13 +608,14 @@ public class KVServer implements IKVServer, Runnable {
 
 			JSONMessage log = new JSONMessage();
 			log.setMessage("PUT", key, value);
-			buffer.append(log.serialize(false) + "\n");
+			buffer.append(log.serializeMsg(false) + "\n");
 		}
 
 		if (clearLogs) {
 			logLock.writeLock().lock();
 			try {
-				this.logs.clear();
+				// this.logs.clear();
+				int i = 9;
 			} finally {
 				logLock.writeLock().unlock();
 			}
