@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.io.EOFException;
 
 import org.apache.log4j.*;
 import org.apache.log4j.Logger;
@@ -235,6 +236,10 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 						// do we reply?
 						// sendJSONMessage(sendMessage);
 					}
+
+				} catch (EOFException e) {
+					logger.error("ReplicateConnection EOF " + e);
+					// this.isOpen = false;
 				} catch (IOException e) {
 					logger.error("ReplicateConnection connection lost: " + e);
 					this.isOpen = false;

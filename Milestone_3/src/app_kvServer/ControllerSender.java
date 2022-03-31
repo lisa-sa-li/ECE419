@@ -68,7 +68,7 @@ public class ControllerSender implements Runnable {
             String msgText = json.serializeMsg();
             oos.writeObject(msgText);
             oos.flush();
-            oos.close();
+            // oos.close();
 
             logger.info("Sent data to replicant " + nameOfReceiver);
         } catch (Exception e) {
