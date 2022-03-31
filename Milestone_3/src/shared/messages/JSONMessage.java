@@ -63,7 +63,7 @@ public class JSONMessage implements KVMessage, Serializable {
 
     public byte[] getJSONByte() {
         if (this.json == null) {
-            serialize();
+            serializeMsg();
         }
         if (this.byteJSON == null) {
             this.stringToByte(this.json);
@@ -75,7 +75,7 @@ public class JSONMessage implements KVMessage, Serializable {
         setStatus(inStatus);
         setKey(inKey);
         setValue(inValue);
-        this.json = this.serialize();
+        this.json = this.serializeMsg();
     }
 
     public void setMessage(String inStatus, String inKey, String inValue, Metadata metadata) {
@@ -83,7 +83,7 @@ public class JSONMessage implements KVMessage, Serializable {
         setKey(inKey);
         setValue(inValue);
         setMetadata(metadata);
-        this.json = this.serialize();
+        this.json = this.serializeMsg();
     }
 
     public StatusType getStatus() {
@@ -144,7 +144,7 @@ public class JSONMessage implements KVMessage, Serializable {
         return rval;
     }
 
-    public String serialize(boolean setThisJson) {
+    public String serializeMsg(boolean setThisJson) {
         Gson gson = new Gson();
         String jsonStr;
         if (setThisJson == true) {
@@ -157,14 +157,14 @@ public class JSONMessage implements KVMessage, Serializable {
         return jsonStr;
     }
 
-    public String serialize() {
+    public String serializeMsg() {
         Gson gson = new Gson();
         this.json = gson.toJson(this);
         return this.json;
 
     }
 
-    public void deserialize(String inJSON) {
+    public void deserializeMsg(String inJSON) {
         inJSON = inJSON.trim();
         this.json = inJSON;
 

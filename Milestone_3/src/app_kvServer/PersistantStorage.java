@@ -107,7 +107,7 @@ public class PersistantStorage implements IPersistantStorage {
             while ((line = file.readLine()) != null) {
                 // Covert each line to a JSON so we can read the key and value
                 json = new JSONMessage();
-                json.deserialize(line);
+                json.deserializeMsg(line);
                 keyFromFile = json.getKey();
 
                 // The key exists in the file, update the old value with the new value
@@ -120,7 +120,7 @@ public class PersistantStorage implements IPersistantStorage {
                         putStatus = StatusType.DELETE_SUCCESS;
                     } else {
                         json.setValue(value);
-                        line = json.serialize(false);
+                        line = json.serializeMsg(false);
                         inputBuffer.append(line);
                         inputBuffer.append('\n');
                         putStatus = StatusType.PUT_UPDATE;
@@ -147,7 +147,7 @@ public class PersistantStorage implements IPersistantStorage {
                 } else {
                     json = new JSONMessage();
                     json.setMessage("NO_STATUS", key, value); // We don't care about status here
-                    line = json.serialize(false);
+                    line = json.serializeMsg(false);
                     inputBuffer.append(line);
                     inputBuffer.append('\n');
                     putStatus = StatusType.PUT_SUCCESS;
@@ -179,7 +179,7 @@ public class PersistantStorage implements IPersistantStorage {
             while ((line = file.readLine()) != null) {
                 // Covert each line to a JSON so we can read the key and value
                 json = new JSONMessage();
-                json.deserialize(line);
+                json.deserializeMsg(line);
                 keyFromFile = json.getKey();
 
                 // The key exists in the file
@@ -251,7 +251,7 @@ public class PersistantStorage implements IPersistantStorage {
             while ((line = file.readLine()) != null) {
                 // Covert each line to a JSON so we can read the key and value
                 json = new JSONMessage();
-                json.deserialize(line);
+                json.deserializeMsg(line);
                 keyFromFile = json.getKey();
 
                 if (die == true) {

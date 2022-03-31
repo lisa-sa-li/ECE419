@@ -24,6 +24,9 @@ import shared.messages.Metadata;
 import app_kvServer.KVServer;
 import app_kvServer.IKVServer.ServerStatus;
 
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+
 /**
  * Represents a connection end point for a particular client that is
  * connected to the server. This class is responsible for message reception
@@ -41,6 +44,9 @@ public class ServerConnection implements IServerConnection, Runnable {
 	private InputStream input;
 	private OutputStream output;
 	private KVServer kvServer;
+
+	ObjectInputStream ois;
+	ObjectOutputStream oos;
 
 	/**
 	 * Constructs a new ServerConnection object for a given TCP socket.
@@ -62,6 +68,9 @@ public class ServerConnection implements IServerConnection, Runnable {
 			output = this.serverSocket.getOutputStream();
 			input = this.serverSocket.getInputStream();
 
+			// oos = new ObjectOutputStream(output);
+			// ois = new ObjectInputStream(input);
+
 			logger.info(
 					"Connected to ServerConnection " + this.serverSocket.getInetAddress().getHostName() + " on port "
 							+ this.serverSocket.getPort());
@@ -72,90 +81,125 @@ public class ServerConnection implements IServerConnection, Runnable {
 
 	@Override
 	public void sendJSONMessage(JSONMessage json) throws IOException {
-		byte[] jsonBytes = json.getJSONByte();
-		output.write(jsonBytes, 0, jsonBytes.length);
-		output.flush();
+		// byte[] jsonBytes = json.getJSONByte();
+		// output.write(jsonBytes, 0, jsonBytes.length);
+		// output.flush();
+
+		oos = new ObjectOutputStream(output);
+
+		String msgText = json.serializeMsg();
+		oos.writeObject(msgText);
+		oos.flush();
+		// oos.close();
+
 		logger.info("SEND \t<" + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getPort() + ">: '"
 				+ json.getJSON() + "'");
 	}
 
 	@Override
 	public JSONMessage receiveJSONMessage() throws IOException {
-		int index = 0;
-		byte[] msgBytes = null, tmp = null;
-		byte[] bufferBytes = new byte[BUFFER_SIZE];
+		// int index = 0;
+		// byte[] msgBytes = null, tmp = null;
+		// byte[] bufferBytes = new byte[BUFFER_SIZE];
 
-		byte read = (byte) input.read();
-		boolean reading = true;
+		// byte read = (byte) input.read();
+		// boolean reading = true;
 
-		// Check if stream is closed (read returns -1)
-		if (read == -1) {
-			JSONMessage json = new JSONMessage();
-			json.setMessage(StatusType.DISCONNECTED.name(), "disconnected", kvServer.getNamePortHost());
-			return json;
+		// // Check if stream is closed (read returns -1)
+		// if (read == -1) {
+		// JSONMessage json = new JSONMessage();
+		// json.setMessage(StatusType.DISCONNECTED.name(), "disconnected",
+		// kvServer.getNamePortHost());
+		// return json;
+		// }
+
+		// int endChar = 0;
+		// while (reading && endChar < 3 && read != -1) {
+		// // Keep a count of EOMs to know when to stop reading
+		// // 13 = CR, 10 = LF/NL
+		// if (read == 13 || read == 10) {
+		// endChar++;
+		// }
+
+		// // If buffer filled, copy to msg array
+		// if (index == BUFFER_SIZE) {
+		// if (msgBytes == null) {
+		// tmp = new byte[BUFFER_SIZE];
+		// System.arraycopy(bufferBytes, 0, tmp, 0, BUFFER_SIZE);
+		// } else {
+		// tmp = new byte[msgBytes.length + BUFFER_SIZE];
+		// System.arraycopy(msgBytes, 0, tmp, 0, msgBytes.length);
+		// System.arraycopy(bufferBytes, 0, tmp, msgBytes.length, BUFFER_SIZE);
+		// }
+
+		// msgBytes = tmp;
+		// bufferBytes = new byte[BUFFER_SIZE];
+		// index = 0;
+		// }
+
+		// // Only read valid characters, i.e. letters and constants
+		// bufferBytes[index] = read;
+		// index++;
+
+		// // Stop reading is DROP_SIZE is reached
+		// if (msgBytes != null && msgBytes.length + index >= DROP_SIZE) {
+		// reading = false;
+		// }
+
+		// // Read next char from stream
+		// read = (byte) input.read();
+		// }
+
+		// if (msgBytes == null) {
+		// tmp = new byte[index];
+		// System.arraycopy(bufferBytes, 0, tmp, 0, index);
+		// } else {
+		// tmp = new byte[msgBytes.length + index];
+		// System.arraycopy(msgBytes, 0, tmp, 0, msgBytes.length);
+		// System.arraycopy(bufferBytes, 0, tmp, msgBytes.length, index);
+		// }
+
+		// msgBytes = tmp;
+
+		// // Build final Object and convert from bytes to string
+		// JSONMessage json = new JSONMessage();
+		// String jsonStr = json.byteToString(msgBytes);
+
+		// if (jsonStr == null || jsonStr.trim().isEmpty()) {
+		// return null;
+		// }
+
+		// json.deserialize(jsonStr);
+		// logger.info("RECEIVED from client/ecs/server \t<" +
+		// serverSocket.getInetAddress().getHostAddress() + ":"
+		// + serverSocket.getPort()
+		// + ">: '" + json.getJSON().trim() + "'");
+		// return json;
+
+		// oos = new ObjectOutputStream(output);
+		ois = new ObjectInputStream(input);
+
+		String jsonStr = null;
+		try {
+			jsonStr = (String) ois.readObject();
+		} catch (Exception e) {
+			logger.error("Unable to read input stream in server connection: " + e);
 		}
-
-		int endChar = 0;
-		while (reading && endChar < 3 && read != -1) {
-			// Keep a count of EOMs to know when to stop reading
-			// 13 = CR, 10 = LF/NL
-			if (read == 13 || read == 10) {
-				endChar++;
-			}
-
-			// If buffer filled, copy to msg array
-			if (index == BUFFER_SIZE) {
-				if (msgBytes == null) {
-					tmp = new byte[BUFFER_SIZE];
-					System.arraycopy(bufferBytes, 0, tmp, 0, BUFFER_SIZE);
-				} else {
-					tmp = new byte[msgBytes.length + BUFFER_SIZE];
-					System.arraycopy(msgBytes, 0, tmp, 0, msgBytes.length);
-					System.arraycopy(bufferBytes, 0, tmp, msgBytes.length, BUFFER_SIZE);
-				}
-
-				msgBytes = tmp;
-				bufferBytes = new byte[BUFFER_SIZE];
-				index = 0;
-			}
-
-			// Only read valid characters, i.e. letters and constants
-			bufferBytes[index] = read;
-			index++;
-
-			// Stop reading is DROP_SIZE is reached
-			if (msgBytes != null && msgBytes.length + index >= DROP_SIZE) {
-				reading = false;
-			}
-
-			// Read next char from stream
-			read = (byte) input.read();
-		}
-
-		if (msgBytes == null) {
-			tmp = new byte[index];
-			System.arraycopy(bufferBytes, 0, tmp, 0, index);
-		} else {
-			tmp = new byte[msgBytes.length + index];
-			System.arraycopy(msgBytes, 0, tmp, 0, msgBytes.length);
-			System.arraycopy(bufferBytes, 0, tmp, msgBytes.length, index);
-		}
-
-		msgBytes = tmp;
-
-		// Build final Object and convert from bytes to string
-		JSONMessage json = new JSONMessage();
-		String jsonStr = json.byteToString(msgBytes);
 
 		if (jsonStr == null || jsonStr.trim().isEmpty()) {
 			return null;
 		}
 
-		json.deserialize(jsonStr);
+		// ois.close();
+
+		JSONMessage json = new JSONMessage();
+		json.deserializeMsg(jsonStr);
 		logger.info("RECEIVED from client/ecs/server \t<" + serverSocket.getInetAddress().getHostAddress() + ":"
 				+ serverSocket.getPort()
 				+ ">: '" + json.getJSON().trim() + "'");
+
 		return json;
+
 	}
 
 	private JSONMessage handleMessage(JSONMessage msg) throws IOException {
@@ -330,7 +374,9 @@ public class ServerConnection implements IServerConnection, Runnable {
 					JSONMessage receivedMessage = receiveJSONMessage();
 					if (receivedMessage != null) {
 						JSONMessage sendMessage;
+						logger.info(">1");
 						Metadata metadata = receivedMessage.getMetadata();
+						logger.info(">2");
 						if (metadata == null) {
 							sendMessage = new JSONMessage();
 							ServerStatus serverStatus = this.kvServer.serverStatus;
@@ -358,19 +404,22 @@ public class ServerConnection implements IServerConnection, Runnable {
 
 					}
 				} catch (IOException e) {
-					logger.error("Server connection lost: " + e);
+					logger.error("ServerConnection connection lost: " + e);
 					this.isOpen = false;
 				} catch (Exception e) {
-					logger.error("Server connection failed: " + e);
+					logger.error("ServerConnection connection failed: " + e);
 				}
 			}
 		} finally {
 			try {
 				// close connection
 				if (serverSocket != null) {
+
 					input.close();
 					output.close();
 					serverSocket.close();
+					oos.close();
+					ois.close();
 				}
 			} catch (IOException ioe) {
 				logger.error("Error! Unable to tear down connection!" + ioe);

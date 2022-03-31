@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CyclicBarrier;
 import java.net.Socket;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
 import org.apache.log4j.*;
@@ -41,7 +42,9 @@ public class ControllerSender implements Runnable {
 
         try {
             Socket socket = new Socket(hostOfReceiver, replicate.getReplicateReceiverPort());
-            OutputStream output = socket.getOutputStream();
+            // OutputStream output = socket.getOutputStream();
+
+            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 
             JSONMessage json = new JSONMessage();
             switch (action) {
@@ -55,12 +58,18 @@ public class ControllerSender implements Runnable {
                     json.setMessage(StatusType.DELETE_REPLICATE_DATA.name(), "delete", msg);
                     break;
             }
-            byte[] jsonBytes = json.getJSONByte();
+            // byte[] jsonBytes = json.getJSONByte();
 
-            output.write(jsonBytes, 0, jsonBytes.length);
-            output.flush();
-            output.close();
-            socket.close();
+            // output.write(jsonBytes, 0, jsonBytes.length);
+            // output.flush();
+            // output.close();
+            // socket.close();
+
+            String msgText = json.serializeMsg();
+            oos.writeObject(msgText);
+            oos.flush();
+            oos.close();
+
             logger.info("Sent data to replicant " + nameOfReceiver);
         } catch (Exception e) {
             logger.error("Unable to send data to replicant " + nameOfReceiver + ", " + e);

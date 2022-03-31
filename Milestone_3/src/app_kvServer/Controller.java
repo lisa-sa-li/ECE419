@@ -160,6 +160,7 @@ public class Controller {
         for (ECSNode replicate : replicates) {
             CyclicBarrier barrier = new CyclicBarrier(1);
             // logger.info("INITIALIZING REPLICATE: " + replicate.getNodePort());
+            logger.info("TO USE CONTROLLER SENDER FOR INIT REPLICAS");
             ControllerSender controllerSender = new ControllerSender(replicate, kvServer, barrier,
                     this.controllerName + "@" + kvServer.getAllFromStorage(), "init");
             new Thread(controllerSender).start();
