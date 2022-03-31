@@ -168,6 +168,7 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 				case UPDATE_REPLICATE_DATA:
 					logger.info(">>UPDATE_REPLICATE_DATA");
 					replicate.updateReplicateData(value);
+					logger.info(">>Done replicate data update on replicate side");
 					break;
 				case DELETE_REPLICATE_DATA:
 					// logger.info(">>DELETE_REPLICATE_DATA");

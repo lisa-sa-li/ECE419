@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.FileNotFoundException;
 import shared.Utils;
-import ecs.HashRing;
 
 public class PersistantStorage implements IPersistantStorage {
     private static Logger logger = Logger.getRootLogger();
@@ -22,14 +21,27 @@ public class PersistantStorage implements IPersistantStorage {
     private String pathToFile;
     private String dir = "./storage";
     private String GLOBAL_STORAGE_PATH = dir + "/global_storage.txt";
-    private HashRing hashRing;
     private Utils utils;
 
     public PersistantStorage(String name) {
         this.fileName = name.trim() + "_storage.txt";
         this.pathToFile = dir + "/" + this.fileName;
-        this.hashRing = new HashRing();
         this.utils = new Utils();
+
+        try {
+            initFile();
+        } catch (Exception e) {
+            logger.error(e);
+        }
+    }
+
+    public PersistantStorage(String name, String globalStorageFile) {
+        // Use this for testing
+        this.fileName = name.trim() + "_storage.txt";
+        this.pathToFile = dir + "/" + this.fileName;
+        this.utils = new Utils();
+
+        GLOBAL_STORAGE_PATH = dir + "/" + globalStorageFile;
 
         try {
             initFile();

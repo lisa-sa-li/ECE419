@@ -77,6 +77,8 @@ public class Replicate {
             String value = msg.getValue();
             StatusType status = msg.getStatus();
 
+            logger.info("Replicate operation: " + status + ":" + key + ":" + value);
+
             try {
                 ps.put(key, value);
             } catch (Exception e) {
