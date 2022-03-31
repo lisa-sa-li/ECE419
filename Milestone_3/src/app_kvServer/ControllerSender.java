@@ -42,10 +42,10 @@ public class ControllerSender implements Runnable {
 
         try {
             Socket socket = new Socket(hostOfReceiver, replicate.getReplicateReceiverPort());
-            // OutputStream output = socket.getOutputStream();
+            OutputStream output = socket.getOutputStream();
 
-            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-            oos.flush();
+            // ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            // oos.flush();
 
             JSONMessage json = new JSONMessage();
             switch (action) {
@@ -59,18 +59,18 @@ public class ControllerSender implements Runnable {
                     json.setMessage(StatusType.DELETE_REPLICATE_DATA.name(), "delete", msg);
                     break;
             }
-            // byte[] jsonBytes = json.getJSONByte();
+            byte[] jsonBytes = json.getJSONByte();
 
-            // output.write(jsonBytes, 0, jsonBytes.length);
-            // output.flush();
-            // output.close();
-            // socket.close();
+            output.write(jsonBytes, 0, jsonBytes.length);
+            output.flush();
+            output.close();
+            socket.close();
 
-            String msgText = json.serializeMsg();
-            oos.writeObject(msgText);
-            oos.flush();
-            // oos.reset();
-            // oos.close();
+            // String msgText = json.serialize();
+            // oos.writeObject(msgText);
+            // oos.flush();
+            // // oos.reset();
+            // // oos.close();
 
             logger.info("Sent data to replicant " + nameOfReceiver);
         } catch (Exception e) {

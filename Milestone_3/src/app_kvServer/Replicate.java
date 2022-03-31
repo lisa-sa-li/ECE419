@@ -72,7 +72,7 @@ public class Replicate {
         String[] ops = splitData[1].split("\n");
         for (String line : ops) {
             JSONMessage msg = new JSONMessage();
-            msg.deserializeMsg(line);
+            msg.deserialize(line);
 
             String key = msg.getKey();
             String value = msg.getValue();
