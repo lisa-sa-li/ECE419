@@ -134,7 +134,7 @@ public class Controller {
         for (ECSNode repl : this.replicants.values()) {
             // delete old stores
             CyclicBarrier barrier = new CyclicBarrier(1);
-            logger.info("Deleting old info from replicate on MOVEDATA: " + repl.getNodePort());
+            // logger.info("Deleting old info from replicate on MOVEDATA: " + repl.getNodePort());
             ControllerSender controllerDelete = new ControllerSender(repl, kvServer, barrier,
                     "", "delete");
             new Thread(controllerDelete).start();
@@ -144,7 +144,7 @@ public class Controller {
                 TimeUnit.SECONDS.sleep(2);
                 // init new stores with cut data
                 CyclicBarrier barrier_2 = new CyclicBarrier(1);
-                logger.info("Sending new info from replicate on MOVEDATA: " + repl.getNodePort());
+                // logger.info("Sending new info from replicate on MOVEDATA: " + repl.getNodePort());
                 ControllerSender controllerInit = new ControllerSender(repl, kvServer, barrier_2,
                         this.controllerName + "@" + kvServer.getAllFromStorage(), "init");
                 new Thread(controllerInit).start();
@@ -158,7 +158,7 @@ public class Controller {
     public void initReplicates(ArrayList<ECSNode> replicates) {
         for (ECSNode replicate : replicates) {
             CyclicBarrier barrier = new CyclicBarrier(1);
-            logger.info("INITIALIZING REPLICATE: " + replicate.getNodePort());
+            // logger.info("INITIALIZING REPLICATE: " + replicate.getNodePort());
             ControllerSender controllerSender = new ControllerSender(replicate, kvServer, barrier,
                     this.controllerName + "@" + kvServer.getAllFromStorage(), "init");
             new Thread(controllerSender).start();
@@ -169,8 +169,8 @@ public class Controller {
         for (ECSNode repl : this.replicants.values()) {
             String updates = kvServer.getStringLogs(true);
             CyclicBarrier barrier = new CyclicBarrier(1);
-            logger.info("UPDATING REPLICATE: " + repl.getNodePort() + updates);
-            logger.info("IS UPDATE EMPTY?: " + updates.isEmpty());
+            // logger.info("UPDATING REPLICATE: " + repl.getNodePort() + updates);
+            // logger.info("IS UPDATE EMPTY?: " + updates.isEmpty());
             if (!(updates.isEmpty())) {
                 ControllerSender controllerSender = new ControllerSender(repl, kvServer, barrier,
                         this.controllerName + "@" + updates, "update");
@@ -183,7 +183,7 @@ public class Controller {
         // get list of replicas
         for (ECSNode repl : replicas) {
             CyclicBarrier barrier = new CyclicBarrier(1);
-            logger.info("DELETING REPLICATE: " + repl.getNodePort());
+            // logger.info("DELETING REPLICATE: " + repl.getNodePort());
             ControllerSender controllerSender = new ControllerSender(repl, kvServer, barrier,
                     this.controllerName, "delete");
             new Thread(controllerSender).start();

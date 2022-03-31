@@ -43,9 +43,9 @@ public class PersistantStorage implements IPersistantStorage {
         File directory = new File(dir);
         try {
             if (directory.mkdirs()) {
-                logger.info("Directory created: " + directory.getName());
+                // logger.info("Directory created: " + directory.getName());
             } else {
-                logger.info("Directory already exists: " + dir);
+                // logger.info("Directory already exists: " + dir);
             }
         } catch (Exception e) {
             logger.error("Error when creating directory " + directory.getName() + ": " + e);
@@ -54,9 +54,9 @@ public class PersistantStorage implements IPersistantStorage {
         File f = new File(this.pathToFile);
         try {
             if (f.createNewFile()) {
-                logger.info("File created: " + f.getName());
+                // logger.info("File created: " + f.getName());
             } else {
-                logger.info("File already exists: " + this.pathToFile);
+                // logger.info("File already exists: " + this.pathToFile);
             }
         } catch (Exception e) {
             logger.error("Error when creating file " + f.getName() + ": " + e);
@@ -66,9 +66,9 @@ public class PersistantStorage implements IPersistantStorage {
         File f_global = new File(GLOBAL_STORAGE_PATH);
         try {
             if (f_global.createNewFile()) {
-                logger.info("File created: " + f_global.getName());
+                // logger.info("File created: " + f_global.getName());
             } else {
-                logger.info("File already exists: " + GLOBAL_STORAGE_PATH);
+                // logger.info("File already exists: " + GLOBAL_STORAGE_PATH);
             }
         } catch (Exception e) {
             logger.error("Error when creating file " + f_global.getName() + ": " + e);
@@ -148,7 +148,7 @@ public class PersistantStorage implements IPersistantStorage {
             fileOut.write(inputBuffer.toString().getBytes());
             fileOut.close();
 
-            logger.info("Completed 'put' operation into storage server " + putStatus.name());
+            // logger.info("Completed 'put' operation into storage server " + putStatus.name());
             return putStatus;
         } catch (Exception e) {
             logger.error("Problem reading file to put.");
@@ -178,7 +178,7 @@ public class PersistantStorage implements IPersistantStorage {
                 }
             }
             file.close();
-            logger.info("Completed 'get' operation into storage server");
+            // logger.info("Completed 'get' operation into storage server");
         } catch (Exception e) {
             logger.error("Problem reading file to get.");
         }
@@ -198,9 +198,9 @@ public class PersistantStorage implements IPersistantStorage {
         File file = new File(this.pathToFile);
 
         if (file.delete()) {
-            logger.info("File deleted successfully");
+            // logger.info("File deleted successfully");
         } else {
-            logger.info("Failed to delete the file");
+            // logger.info("Failed to delete the file");
         }
     }
 
@@ -291,7 +291,7 @@ public class PersistantStorage implements IPersistantStorage {
             fileOut.write(inputBuffer.toString().getBytes());
             fileOut.close();
 
-            logger.info("Completed 'put_many' operation into storage server");
+            // logger.info("Completed 'put_many' operation into storage server");
             return StatusType.PUT_SUCCESS;
         } catch (Exception e) {
             logger.error("Problem reading file to put_many.");
@@ -312,7 +312,7 @@ public class PersistantStorage implements IPersistantStorage {
             }
 
             file.close();
-            logger.info("Retrieved all key-value pairs from storage");
+            // logger.info("Retrieved all key-value pairs from storage");
             return buffer.toString();
         } catch (Exception e) {
             logger.error("Problem retrieving all key-value pairs from storage.");
@@ -339,7 +339,7 @@ public class PersistantStorage implements IPersistantStorage {
             fileOut.write(buffer.toString().getBytes());
             fileOut.close();
 
-            logger.info("Successfully moved kv-pairs to global_storage.txt");
+            // logger.info("Successfully moved kv-pairs to global_storage.txt");
         } catch (Exception e) {
             logger.error("Problem moving kv-pairs to global_storage.txt");
         }
@@ -366,7 +366,7 @@ public class PersistantStorage implements IPersistantStorage {
 
             // Append the kv-pairs to its own storage
             this.appendToStorage(buffer.toString());
-            logger.info("Successfully retrieved kv-pairs from global_storage.txt");
+            // logger.info("Successfully retrieved kv-pairs from global_storage.txt");
         } catch (Exception e) {
             logger.error("Problem retrieving kv-pairs from global_storage.txt");
         }

@@ -160,17 +160,17 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 		try {
 			switch (status) {
 				case INIT_REPLICATE_DATA:
-					logger.info(">>INIT_REPLICATE_DATA");
+					// logger.info(">>INIT_REPLICATE_DATA");
 					replicate.initReplicateData(value);
 					// add to KVServer replicate list
 					kvServer.addActingReplicate(replicate);
 					break;
 				case UPDATE_REPLICATE_DATA:
-					logger.info(">>UPDATE_REPLICATE_DATA");
+					// logger.info(">>UPDATE_REPLICATE_DATA");
 					replicate.updateReplicateData(value);
 					break;
 				case DELETE_REPLICATE_DATA:
-					logger.info(">>DELETE_REPLICATE_DATA");
+					// logger.info(">>DELETE_REPLICATE_DATA");
 					replicate.deleteReplicateData(value);
 					// remove from KVServer
 					kvServer.removeActingReplicate(replicate);
@@ -195,7 +195,7 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
 
-						logger.info("RECEIVED MESSAGE: " + receivedMessage);
+						// logger.info("RECEIVED MESSAGE: " + receivedMessage);
 
 						handleMessage(receivedMessage);
 						// do we reply?

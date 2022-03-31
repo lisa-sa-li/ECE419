@@ -38,6 +38,7 @@ public class ClientConnection implements IClientConnection {
 
 	@Override
 	public void sendJSONMessage(JSONMessage kvJson) throws IOException {
+		System.out.println("SENDING MESSAGE TO SERVER");
 		byte[] jsonBytes = kvJson.getJSONByte();
 		output.write(jsonBytes, 0, jsonBytes.length);
 		output.flush();
@@ -48,22 +49,24 @@ public class ClientConnection implements IClientConnection {
 
 	@Override
 	public JSONMessage receiveJSONMessage() throws IOException {
+		System.out.println("RECEIVED MESSAGE FROM SERVER");
 		int index = 0;
 		byte[] msgBytes = null, tmp = null;
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
-
+		logger.debug("Initial setup: " + input);
 		// Read first char from stream
 		byte read = (byte) input.read();
+		logger.debug("what is read: " + (char) read);
+		logger.debug("what is read: " + (char) read);
 		boolean reading = true;
-
 		// Check if stream is closed (read returns -1)
 		if (read == -1) {
 			JSONMessage json = new JSONMessage();
 			json.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "in ClientConnection", null);
 			return json;
 		}
-
 		int endChar = 0;
+		logger.debug("BEFORE WHILE SERVER CONN: " + reading + " : " + endChar + " : " + read);
 		while (reading && endChar < 3 && read != -1) {
 			// Keep a count of EOMs to know when to stop reading
 			// 13 = CR, 10 = LF/NL
@@ -99,7 +102,7 @@ public class ClientConnection implements IClientConnection {
 			// Read next char from stream
 			read = (byte) input.read();
 		}
-
+		System.out.println("msgBytes: " + msgBytes);
 		if (msgBytes == null) {
 			tmp = new byte[index];
 			System.arraycopy(bufferBytes, 0, tmp, 0, index);

@@ -56,7 +56,7 @@ public class Replicate {
         ps = new PersistantStorage("repl_" + this.masterName + "_" + getNamePortHost());
         ps.clearStorage();
         ps.appendToStorage(splitData[1]);
-        logger.info("REPLICA CREATED ON: " + replicateName + " for " + masterName);
+        // logger.info("REPLICA CREATED ON: " + replicateName + " for " + masterName);
     }
 
     public void updateReplicateData(String data) {
@@ -64,17 +64,17 @@ public class Replicate {
         masterName = splitData[0];
 
         if (splitData[1].isEmpty()) {
-            logger.info("SPLIT DATA EMPTY :(");
+            // logger.info("SPLIT DATA EMPTY :(");
             return;
         }
         if (ps == null) {
             ps = new PersistantStorage("repl_" + masterName + "_" + getNamePortHost());
         }
         String[] ops = splitData[1].split("\n");
-        logger.info("UPDATE LIST SPLIT: " + Arrays.toString(ops));
-        logger.info("ops length: " + ops.length);
+        // logger.info("UPDATE LIST SPLIT: " + Arrays.toString(ops));
+        // logger.info("ops length: " + ops.length);
         for (String line : ops) {
-            logger.info("OPERATION: " + line);
+            // logger.info("OPERATION: " + line);
             JSONMessage msg = new JSONMessage();
             msg.deserialize(line);
 
@@ -82,7 +82,7 @@ public class Replicate {
             String value = msg.getValue();
             StatusType status = msg.getStatus();
 
-            logger.info("OPERATION AFTER SERIALIZE: " + status + ":key:" + key + ":" + value);
+            // logger.info("OPERATION AFTER SERIALIZE: " + status + ":key:" + key + ":" + value);
 
             // switch (status) {
             // case PUT:

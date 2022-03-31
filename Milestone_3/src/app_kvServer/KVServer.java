@@ -218,7 +218,7 @@ public class KVServer implements IKVServer, Runnable {
 			public void run() {
 				if (controller != null) {
 					controller.updateReplicates();
-					logger.info("Replicas updated <3");
+					// logger.info("Replicas updated <3");
 				} else {
 					logger.error("Controller not successfully implemented for updates");
 				}
@@ -548,7 +548,7 @@ public class KVServer implements IKVServer, Runnable {
 
 		if (putStatus == StatusType.PUT_SUCCESS || putStatus == StatusType.DELETE_SUCCESS
 				|| putStatus == StatusType.PUT_UPDATE) {
-			logger.info("CALL about to be ADDED TO LOG: " + putStatus + ":" + key + ":" + value);
+			// logger.info("CALL about to be ADDED TO LOG: " + putStatus + ":" + key + ":" + value);
 			addToLogs(key, value);
 			// controller.updateReplicates();
 		}
@@ -557,19 +557,19 @@ public class KVServer implements IKVServer, Runnable {
 
 	private void addToLogs(String key, String value) {
 		this.logs.put(key, value);
-		logger.info("CALL ADDED TO LOG: " + ":" + key + ":" + value);
+		// logger.info("CALL ADDED TO LOG: " + ":" + key + ":" + value);
 	}
 
 	public String getStringLogs(boolean clearLogs) {
 		StringBuffer buffer = new StringBuffer();
 
-		logger.info("LOGS: " + logs.size());
+		// logger.info("LOGS: " + logs.size());
 
 		for (Map.Entry<String, String> entry : this.logs.entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue();
 
-			logger.info("IN STRING TO LOG: " + key + ":" + value);
+			// logger.info("IN STRING TO LOG: " + key + ":" + value);
 
 			JSONMessage log = new JSONMessage();
 			log.setMessage("PUT", key, value);
@@ -580,7 +580,7 @@ public class KVServer implements IKVServer, Runnable {
 			this.logs.clear();
 		}
 
-		logger.info("BUFFER: " + buffer.toString());
+		// logger.info("BUFFER: " + buffer.toString());
 		return buffer.toString();
 	}
 
@@ -589,7 +589,7 @@ public class KVServer implements IKVServer, Runnable {
 		if (this.cache != null) {
 			this.cache.clear();
 		}
-		logger.info("Cache cleared");
+		// logger.info("Cache cleared");
 	}
 
 	public String getAllFromStorage() {
@@ -614,10 +614,10 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	private boolean initializeServer() {
-		logger.info("Initialize server ...");
+		// logger.info("Initialize server ...");
 		try {
 			serverSocket = new ServerSocket(port);
-			logger.info("Server listening on port: " + serverSocket.getLocalPort());
+			// logger.info("Server listening on port: " + serverSocket.getLocalPort());
 			return true;
 
 		} catch (IOException e) {
@@ -633,7 +633,7 @@ public class KVServer implements IKVServer, Runnable {
 		try {
 			ServerSocket replicateReceiveSocket = new ServerSocket(replicateReceiverPort);
 			new Thread(new ReplicateServer(replicateReceiveSocket, this)).start();
-			logger.info("Replicate server listening on port: " + replicateReceiveSocket.getLocalPort());
+			// logger.info("Replicate server listening on port: " + replicateReceiveSocket.getLocalPort());
 		} catch (IOException e) {
 			logger.error("Could not open replicate listening socket");
 			e.printStackTrace();
