@@ -374,9 +374,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 					JSONMessage receivedMessage = receiveJSONMessage();
 					if (receivedMessage != null) {
 						JSONMessage sendMessage;
-						logger.info(">1");
 						Metadata metadata = receivedMessage.getMetadata();
-						logger.info(">2");
 						if (metadata == null) {
 							sendMessage = new JSONMessage();
 							ServerStatus serverStatus = this.kvServer.serverStatus;
