@@ -377,11 +377,13 @@ public class ServerConnection implements IServerConnection, Runnable {
 		try {
 			while (this.isOpen) {
 				try {
+
 					JSONMessage receivedMessage = receiveJSONMessage();
 					logger.debug("MESSAGE RECEIVED: " + receivedMessage);
 					if (receivedMessage != null) {
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
+						
 						if (metadata == null) {
 							sendMessage = new JSONMessage();
 							ServerStatus serverStatus = this.kvServer.serverStatus;

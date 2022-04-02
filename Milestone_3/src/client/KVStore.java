@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import java.math.BigInteger;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.*;
@@ -68,14 +69,12 @@ public class KVStore implements KVCommInterface, Runnable {
 		try {
 			System.out.println("CONNECTING TO: " + this.address + " : " + this.port);
 			Socket clientSocket = new Socket(this.address, this.port);
+			// clientSocket.setSoTimeout(7000);
 			this.clientConnection = new ClientConnection(clientSocket);
 			logger.info("Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
 					+ clientSocket.getPort());
-			try {
-				TimeUnit.SECONDS.sleep(2);
-			} catch (Exception e) {
-				logger.error("Unable to init replicates on MoveData");
-			}
+		} catch (SocketTimeoutException s){
+			logger.info("Socket timeout in KVStore: retrying? " + s);
 		} catch (IOException e) {
 			logger.error("Error! Unable to establish connection to store. \n", e);
 			throw e;

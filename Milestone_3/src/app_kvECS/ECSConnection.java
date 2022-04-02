@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 
 import org.apache.log4j.*;
@@ -12,6 +13,8 @@ import org.apache.zookeeper.*;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.KeeperException;
+
+import org.apache.commons.io.IOUtils;
 
 import shared.exceptions.KeyValueTooLongException;
 import shared.exceptions.UnexpectedValueException;
@@ -102,6 +105,8 @@ public class ECSConnection {
 		byte[] msgBytes = null, tmp = null;
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
 
+		// String jsonStr = IOUtils.toString(input, StandardCharsets.UTF_8);
+
 		// Read first char from stream
 		byte read = (byte) input.read();
 		boolean reading = true;
@@ -161,7 +166,7 @@ public class ECSConnection {
 
 		msgBytes = tmp;
 
-		// Build final Object and convert from bytes to string
+		// // Build final Object and convert from bytes to string
 		JSONMessage json = new JSONMessage();
 		String jsonStr = json.byteToString(msgBytes);
 		if (jsonStr == null || jsonStr.trim().isEmpty()) {

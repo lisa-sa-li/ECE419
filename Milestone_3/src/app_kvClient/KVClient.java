@@ -10,6 +10,7 @@ import org.apache.log4j.Level;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
@@ -130,6 +131,15 @@ public class KVClient implements IKVClient, Runnable {
                                             printMsgFromServer(msg);
                                         } catch (Exception e) {
                                             System.out.println("Socket connection to server is closed.");
+                                        }
+                                    } catch (SocketTimeoutException s){
+                                        logger.info("Socket timeout in KVClient: retrying");
+                                        try {
+                                            this.kvStore.connect();
+                                            JSONMessage msg = this.kvStore.put(tokens[1], valStr);
+                                            printMsgFromServer(msg);
+                                        } catch (Exception e) {
+                                            System.out.println("Retry failed: " + e);
                                         }
                                     } catch (Exception e) {
                                         System.out.println("Error putting key: " + e);

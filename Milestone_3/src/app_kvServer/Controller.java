@@ -136,7 +136,8 @@ public class Controller {
             CyclicBarrier barrier = new CyclicBarrier(1);
             ControllerSender controllerDelete = new ControllerSender(repl, kvServer, barrier,
                     "", "delete");
-            new Thread(controllerDelete).start();
+            controllerDelete.sendMsg();
+            // new Thread(controllerDelete).start();
 
             // wait before sending init
             try {
@@ -146,7 +147,8 @@ public class Controller {
                 // logger.info("Sending new info from replicate on MOVEDATA: " + repl.getNodePort());
                 ControllerSender controllerInit = new ControllerSender(repl, kvServer, barrier_2,
                         this.controllerName + "@" + kvServer.getAllFromStorage(), "init");
-                new Thread(controllerInit).start();
+                controllerInit.sendMsg();
+                // new Thread(controllerInit).start();
             } catch (Exception e) {
                 logger.error("Unable to init replicates on MoveData");
             }
@@ -160,7 +162,8 @@ public class Controller {
             // logger.info("INITIALIZING REPLICATE: " + replicate.getNodePort());
             ControllerSender controllerSender = new ControllerSender(replicate, kvServer, barrier,
                     this.controllerName + "@" + kvServer.getAllFromStorage(), "init");
-            new Thread(controllerSender).start();
+            controllerSender.sendMsg();
+            // new Thread(controllerSender).start();
         }
     }
 
@@ -175,8 +178,9 @@ public class Controller {
                 // logger.info("SENDING NON-EMPTY UPDATE: " + updates);
                 ControllerSender controllerSender = new ControllerSender(repl, kvServer, barrier,
                         this.controllerName + "@" + updates, "update");
+                controllerSender.sendMsg();
                 // logger.info("after updateReplicates");
-                new Thread(controllerSender).start();
+                // new Thread(controllerSender).start();
                 // logger.info("after after updateReplicates");
                 // kvServer.getStringLogs(true);
             }
@@ -190,7 +194,8 @@ public class Controller {
             // logger.info("DELETING REPLICATE: " + repl.getNodePort());
             ControllerSender controllerSender = new ControllerSender(repl, kvServer, barrier,
                     this.controllerName, "delete");
-            new Thread(controllerSender).start();
+            // new Thread(controllerSender).start();
+            controllerSender.sendMsg();
         }
     }
 

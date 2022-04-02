@@ -231,9 +231,10 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 					JSONMessage receivedMessage = receiveJSONMessage();
 
 					if (receivedMessage != null) {
+						logger.info("Received message not null: " + receivedMessage);
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
-						logger.info("swag");
+						// logger.info("swag");
 						handleMessage(receivedMessage);
 						// do we reply?
 						// sendJSONMessage(sendMessage);

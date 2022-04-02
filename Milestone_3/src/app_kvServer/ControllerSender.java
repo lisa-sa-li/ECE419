@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.CyclicBarrier;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
@@ -17,7 +18,8 @@ import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
 import app_kvServer.PersistantStorage;
 
-public class ControllerSender implements Runnable {
+// public class ControllerSender implements Runnable {
+public class ControllerSender {
     private static Logger logger = Logger.getRootLogger();
 
     private ECSNode replicate;
@@ -35,15 +37,16 @@ public class ControllerSender implements Runnable {
         this.action = action;
     }
 
-    @Override
-    public void run() {
+    // @Override
+    // public void run() {
+    public void sendMsg() {
         String hostOfReceiver = replicate.getNodeHost();
         String nameOfReceiver = replicate.getNodeName();
 
         try {
             Socket socket = new Socket(hostOfReceiver, replicate.getReplicateReceiverPort());
+			// socket.setSoTimeout(7000);
             OutputStream output = socket.getOutputStream();
-
             // ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
             // oos.flush();
 
@@ -73,7 +76,9 @@ public class ControllerSender implements Runnable {
             // // oos.close();
 
             logger.info("Sent data to replicant " + nameOfReceiver);
-        } catch (Exception e) {
+        } catch (SocketTimeoutException s){
+			logger.info("Socket timeout in Controller sender: retrying " + s);
+		} catch (Exception e) {
             logger.error("Unable to send data to replicant " + nameOfReceiver + ", " + e);
         }
     }
