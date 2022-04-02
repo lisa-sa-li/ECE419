@@ -101,7 +101,7 @@ public class ECSClient implements IECSClient, Runnable {
             String serverName = node.getNodeName();
 
             Socket clientSocket = new Socket(this.hostname, port);
-			clientSocket.setSoTimeout(7000);
+			// clientSocket.setSoTimeout(7000);
             ECSConnection ecsConnection = new ECSConnection(clientSocket);
 
             // set socket in ecsConnection

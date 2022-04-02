@@ -4,8 +4,10 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.log4j.*;
+import org.apache.commons.io.IOUtils;
 
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage;
@@ -71,9 +73,17 @@ public class ClientConnection implements IClientConnection {
 		byte[] msgBytes = null, tmp = null;
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
 
+		// System.out.println("Receiving msg");
+		// String jsonStr = IOUtils.toString(input, StandardCharsets.UTF_8);
+		// System.out.println("Received msg: " + jsonStr);
+
+
 		// Read first char from stream
+		// System.out.println("Receiving msg");
 		byte read = (byte) input.read();
+		// System.out.println("done reading");
 		boolean reading = true;
+
 
 		// Check if stream is closed (read returns -1)
 		if (read == -1) {

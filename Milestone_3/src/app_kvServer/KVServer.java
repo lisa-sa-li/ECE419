@@ -117,7 +117,7 @@ public class KVServer implements IKVServer, Runnable {
 		this.actingReplicates = new HashMap<String, Replicate>();
 
 		initCache();
-		// initHeartbeat();
+		initHeartbeat();
 	}
 
 	public KVServer(int port, int cacheSize, String algo, boolean test) {
@@ -371,7 +371,7 @@ public class KVServer implements IKVServer, Runnable {
 			String dataInRange = persistantStorage.getDataInRange(hash, endHash, die);
 
 			Socket socket = new Socket(hostOfReceiver, portOfReceiver);
-			socket.setSoTimeout(7000);
+			// socket.setSoTimeout(7000);
 			OutputStream output = socket.getOutputStream();
 
 			JSONMessage json = new JSONMessage();
@@ -434,7 +434,7 @@ public class KVServer implements IKVServer, Runnable {
 
 			// Figure out where to send to
 			Socket socket = new Socket(hostOfReceiver, portOfReceiver);
-			socket.setSoTimeout(7000);
+			// socket.setSoTimeout(7000);
 			OutputStream output = socket.getOutputStream();
 
 			JSONMessage json = new JSONMessage();
@@ -666,7 +666,7 @@ public class KVServer implements IKVServer, Runnable {
 		logger.info("Initialize server ...");
 		try {
 			serverSocket = new ServerSocket(port);
-			serverSocket.setSoTimeout(5000);
+			// serverSocket.setSoTimeout(5000);
 			logger.info("Server listening on port: " + serverSocket.getLocalPort());
 			return true;
 

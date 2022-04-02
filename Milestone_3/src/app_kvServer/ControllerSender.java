@@ -18,7 +18,8 @@ import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
 import app_kvServer.PersistantStorage;
 
-public class ControllerSender implements Runnable {
+// public class ControllerSender implements Runnable {
+public class ControllerSender {
     private static Logger logger = Logger.getRootLogger();
 
     private ECSNode replicate;
@@ -36,16 +37,16 @@ public class ControllerSender implements Runnable {
         this.action = action;
     }
 
-    @Override
-    public void run() {
+    // @Override
+    // public void run() {
+    public void sendMsg() {
         String hostOfReceiver = replicate.getNodeHost();
         String nameOfReceiver = replicate.getNodeName();
 
         try {
             Socket socket = new Socket(hostOfReceiver, replicate.getReplicateReceiverPort());
-			socket.setSoTimeout(7000);
+			// socket.setSoTimeout(7000);
             OutputStream output = socket.getOutputStream();
-
             // ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
             // oos.flush();
 

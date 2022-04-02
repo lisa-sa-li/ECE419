@@ -67,7 +67,7 @@ public class KVStore implements KVCommInterface, Runnable {
 	public void connect() throws Exception {
 		try {
 			Socket clientSocket = new Socket(this.address, this.port);
-			clientSocket.setSoTimeout(7000);
+			// clientSocket.setSoTimeout(7000);
 			this.clientConnection = new ClientConnection(clientSocket);
 			logger.info("Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
 					+ clientSocket.getPort());

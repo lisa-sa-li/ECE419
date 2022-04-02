@@ -73,9 +73,7 @@ public class ReplicateServer implements Runnable {
 				Socket client = listeningSocket.accept();
 				logger.info("Created SOCKET IN REPLICATE SERVER RUN FUNCTION: " + client);
 				ReplicateConnection replicateConnection = new ReplicateConnection(client, this, kvServer);
-				Thread newThread = new Thread(replicateConnection);
-				newThread.start();
-
+				new Thread(replicateConnection).start();
 				logger.info(
 						"Connected to replicate server (on port " + listeningSocket.getLocalPort() + ") "
 								+ client.getInetAddress().getHostName() + " on port "
