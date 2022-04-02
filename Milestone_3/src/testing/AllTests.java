@@ -33,6 +33,7 @@ public class AllTests {
 		clientSuite.addTestSuite(LRUCacheTest.class);
 		clientSuite.addTestSuite(LFUCacheTest.class);
 		clientSuite.addTestSuite(ECSInteractionTest.class);
+		clientSuite.addTestSuite(ReplicaTest.class);
 		return clientSuite;
 	}
 
