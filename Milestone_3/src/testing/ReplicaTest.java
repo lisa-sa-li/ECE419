@@ -48,12 +48,12 @@ public class ReplicaTest extends TestCase {
 	}
 
 	public void tearDown() {
-		ecs.shutdown();
+		/*ecs.shutdown();
 		try {
 			TimeUnit.SECONDS.sleep(10);
 		} catch (Exception e) {
 
-		}
+		}*/
 	}
 
 	public JSONMessage sendAndRecieve(KVStore inKVStore, String key, String value) {
@@ -127,7 +127,7 @@ public class ReplicaTest extends TestCase {
 		}
 		return "";
 	}
-
+	/*
 	@Test
 	public void testReplicasCreated() {
 		Path path;
@@ -464,4 +464,183 @@ public class ReplicaTest extends TestCase {
 		kvStore.disconnect();
 	}
 
+	@Test
+	public void testGetWhenNonExistent() {
+		Path path;
+		File f;
+
+		ecs.addNodes(2, "None", 0);
+		ecs.start();
+
+		for (String name : ecs.currServerMap.keySet()) {
+			ECSNode node = ecs.currServerMap.get(name);
+			String namePortHost = node.getNamePortHost();
+
+			for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
+				String nameR = entry.getKey();
+				ECSNode nodeR = entry.getValue();
+
+				if (nameR.equals(name)) {
+					continue;
+				}
+
+				String pathToFile = "./storage/repl_" + name + "_" + nodeR.getNamePortHost() + ".txt";
+				clearFile(pathToFile);
+			}
+		}
+
+		// collect available servers
+		ArrayList<Integer> ports = ecs.getCurrentPorts();
+		int port = ports.get(0);
+		String serverName = serverInfo.get(port);
+		String host = "127.0.0.1";
+
+		// connect with KVStore and run one put and get
+		KVStore kvStore = new KVStore(host, port);
+		Exception ex_1 = null;
+		String returnString = "something :)";
+		try {
+			kvStore.connect();
+			returnString = sendAndRecieve(kvStore, "testing!", "yay");
+			returnString = sendAndRecieve(kvStore, "testing!", "");
+		} catch (Exception e) {
+		}
+
+		assertTrue(returnString == null); /////
+		for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
+			String nameR = entry.getKey();
+			ECSNode nodeR = entry.getValue();
+
+			if (nameR.equals(serverName)) {
+				continue;
+			}
+
+			String pathToFile = "./storage/repl_" + serverName + "_" + nodeR.getNamePortHost() + ".txt";
+			assertTrue(getFileLength(pathToFile) == 1);
+		}
+
+		try {
+			returnString = sendAndRecieve(kvStore, "testing!");
+		} catch (Exception e) {
+		}
+
+		assertTrue(returnString == null);
+		for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
+			String nameR = entry.getKey();
+			ECSNode nodeR = entry.getValue();
+
+			if (nameR.equals(serverName)) {
+				continue;
+			}
+
+			String pathToFile = "./storage/repl_" + serverName + "_" + nodeR.getNamePortHost() + ".txt";
+			assertTrue(getFileLength(pathToFile) == 0);
+		}
+		kvStore.disconnect();
+	}
+	*/
+	@Test
+	public void testRemoveNodeWhatHappensToReplica() {
+		Path path;
+		File f;
+
+		ecs.addNodes(1, "None", 0);
+		ecs.start();
+
+		for (String name : ecs.currServerMap.keySet()) {
+			ECSNode node = ecs.currServerMap.get(name);
+			String namePortHost = node.getNamePortHost();
+
+			for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
+				String nameR = entry.getKey();
+				ECSNode nodeR = entry.getValue();
+
+				if (nameR.equals(name)) {
+					continue;
+				}
+
+				String pathToFile = "./storage/repl_" + name + "_" + nodeR.getNamePortHost() + ".txt";
+				clearFile(pathToFile);
+			}
+		}
+
+		// collect available servers
+		ArrayList<Integer> ports = ecs.getCurrentPorts();
+		System.out.println("ports: " + ports);
+		int port = ports.get(0);
+		String serverName = serverInfo.get(port);
+		System.out.println("serverName: " + serverName);
+		String host = "127.0.0.1";
+
+		// connect with KVStore
+		KVStore kvStore = new KVStore(host, port);
+		Exception ex_1 = null;
+		try {
+			kvStore.connect();
+			sendAndRecieve(kvStore, "test", "1");
+		} catch (Exception e) {
+		}
+
+		for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
+			String nameR = entry.getKey();
+			ECSNode nodeR = entry.getValue();
+
+			if (nameR.equals(serverName)) {
+				continue;
+			}
+
+			String pathToFile = "./storage/repl_" + serverName + "_" + nodeR.getNamePortHost() + ".txt";
+			System.out.println("pathToFile: " + pathToFile);
+			// path = Paths.get(pathToFile);
+			assertTrue(getFileLength(pathToFile) == 1);
+			assertTrue(getAllFromFile(pathToFile) == "{\"status\":\"NO_STATUS\",\"key\":\"test\",\"value\":\"1\"}\n");
+			System.out.println("getAllFromFile(pathToFile): " + getAllFromFile(pathToFile));
+		}
+		// Remove a node
+		ArrayList<String> servers = ecs.getCurrentServers();
+		ArrayList<String> nodeNames = new ArrayList<String>();
+		nodeNames.add(servers.get(0));
+		ecs.removeNodes(nodeNames);
+
+		// connect to another client and check if the key is there
+		ArrayList<Integer> portsAnother = ecs.getCurrentPorts();
+		System.out.println("portsAnother: " + portsAnother);
+		int port_another = 0;
+		for (int i = 0; i < portsAnother.size(); i++){
+			int potentialPort = portsAnother.get(i);
+			if (potentialPort != port){
+				port_another = potentialPort;
+			}
+		}
+		System.out.println("port_another: " + port_another);
+		String serverNameAnother = serverInfo.get(port);
+		System.out.println("serverNameAnother: " + serverNameAnother);
+		KVStore kvStore2 = new KVStore(host, port_another);
+
+		String output = "";
+		try {
+			kvStore2.connect();
+			output = sendAndRecieve(kvStore2, "test");
+		} catch (Exception e) {
+		}
+
+		kvStore2.disconnect();
+		kvStore.disconnect();
+		System.out.println("output: " + output);
+		assertTrue(output.equals("1"));
+		for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
+			String nameR = entry.getKey();
+			ECSNode nodeR = entry.getValue();
+
+			if (nameR.equals(serverName)) {
+				continue;
+			}
+
+			String pathToFileAnother = "./storage/repl_" + serverNameAnother + "_" + nodeR.getNamePortHost() + ".txt";
+			System.out.println("pathToFile: " + pathToFileAnother);
+			// path = Paths.get(pathToFile);
+			assertTrue(getFileLength(pathToFileAnother) == 1);
+			assertTrue(getAllFromFile(pathToFileAnother) == "{\"status\":\"NO_STATUS\",\"key\":\"test\",\"value\":\"1\"}\n");
+		}
+	}
 }
