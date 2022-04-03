@@ -70,7 +70,7 @@ public class ReplicaTest extends TestCase {
 		return response;
 	}
 
-	public String sendAndRecieve(KVStore inKVStore, String key) {
+	public JSONMessage sendAndRecieve(KVStore inKVStore, String key) {
 		JSONMessage jsonMessage = new JSONMessage();
 		jsonMessage.setMessage(StatusType.GET.name(), key, null, null);
 
@@ -81,10 +81,10 @@ public class ReplicaTest extends TestCase {
 			response = inKVStore.clientConnection.receiveJSONMessage();
 		} catch (Exception e) {
 			System.out.println("Error sending or recieving message in ECS interaction test");
-			return "";
+			return null;
 		}
 
-		return response.getValue();
+		return response;
 	}
 
 	public void clearFile(String pathToFile) {
@@ -124,7 +124,7 @@ public class ReplicaTest extends TestCase {
 		}
 		return "";
 	}
-	
+
 	@Test
 	public void testReplicasCreated() {
 		Path path;
@@ -362,7 +362,7 @@ public class ReplicaTest extends TestCase {
 		System.out.println("testGetFromReplica");
 		Path path;
 		File f;
-		String value = "";
+		JSONMessage value = null;
 
 		ecs.addNodes(2, "FIFO", 3);
 		ecs.start();
@@ -414,7 +414,7 @@ public class ReplicaTest extends TestCase {
 		} catch (Exception e) {
 		}
 
-		assertTrue(value.equals("1"));
+		assertTrue(value.getValue().equals("1"));
 
 		kvStore.disconnect();
 	}
@@ -424,7 +424,7 @@ public class ReplicaTest extends TestCase {
 		System.out.println("testMoveReplicaData");
 		Path path;
 		File f;
-		String value = "";
+		JSONMessage value = null;
 
 		ecs.addNodes(2, "FIFO", 3);
 		ecs.start();
@@ -476,7 +476,7 @@ public class ReplicaTest extends TestCase {
 		} catch (Exception e) {
 		}
 
-		assertTrue(value.equals("1"));
+		assertTrue(value.getValue().equals("1"));
 
 		kvStore.disconnect();
 	}
@@ -516,7 +516,7 @@ public class ReplicaTest extends TestCase {
 		// connect with KVStore and run one put and get
 		KVStore kvStore = new KVStore(host, port);
 		Exception ex_1 = null;
-		String returnString = "something :)";
+		JSONMessage returnString = null;
 		try {
 			kvStore.connect();
 			returnString = sendAndRecieve(kvStore, "testing!", "yay");
@@ -533,7 +533,7 @@ public class ReplicaTest extends TestCase {
 				continue;
 			}
 
-			String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+			String pathToFile = "./storage/repl_" + serverName + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
 						+ ":127.0.0.1_storage.txt";
 			assertTrue(getFileLength(pathToFile) == 1);
 		}
@@ -552,7 +552,7 @@ public class ReplicaTest extends TestCase {
 				continue;
 			}
 
-			String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+			String pathToFile = "./storage/repl_" + serverName + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
 						+ ":127.0.0.1_storage.txt";
 
 			assertTrue(getFileLength(pathToFile) == 0);
@@ -595,7 +595,7 @@ public class ReplicaTest extends TestCase {
 
 				String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
 						+ ":127.0.0.1_storage.txt";
-				f = new File(pathToFile);
+				// f = new File(pathToFile);
 				clearFile(pathToFile);
 			}
 		}
@@ -647,7 +647,7 @@ public class ReplicaTest extends TestCase {
 		System.out.println("serverNameAnother: " + serverNameAnother);
 		KVStore kvStore2 = new KVStore(host, port_another);
 
-		String output = "";
+		JSONMessage output = null;
 		try {
 			kvStore2.connect();
 			output = sendAndRecieve(kvStore2, "test");
@@ -656,8 +656,8 @@ public class ReplicaTest extends TestCase {
 
 		kvStore2.disconnect();
 		kvStore.disconnect();
-		System.out.println("output: " + output);
-		assertTrue(output.equals("1"));
+		System.out.println("output: " + output.getValue());
+		assertTrue(output.getValue().equals("1"));
 		for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
 			String nameR = entry.getKey();
 			ECSNode nodeR = entry.getValue();
