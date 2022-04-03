@@ -46,12 +46,12 @@ public class ReplicaTest extends TestCase {
 	}
 
 	public void tearDown() {
-		ecs.shutdown();
+		/*ecs.shutdown();
 		try {
 			TimeUnit.SECONDS.sleep(10);
 		} catch (Exception e) {
 
-		}
+		}*/
 	}
 
 	public JSONMessage sendAndRecieve(KVStore inKVStore, String key, String value) {
@@ -489,6 +489,8 @@ public class ReplicaTest extends TestCase {
 		ecs.addNodes(2, "None", 0);
 		ecs.start();
 
+		String serverName = "";
+		String serverNameAnother = "";
 		for (String name : ecs.currServerMap.keySet()) {
 			ECSNode node = ecs.currServerMap.get(name);
 			String namePortHost = node.getNamePortHost();
@@ -498,7 +500,10 @@ public class ReplicaTest extends TestCase {
 				ECSNode nodeR = entry.getValue();
 
 				if (nameR.equals(name)) {
+					serverName = name;
 					continue;
+				} else {
+					serverNameAnother = nameR;
 				}
 
 				String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
@@ -510,7 +515,7 @@ public class ReplicaTest extends TestCase {
 		// collect available servers
 		ArrayList<Integer> ports = ecs.getCurrentPorts();
 		int port = ports.get(0);
-		String serverName = serverInfo.get(port);
+		int portAnother = ports.get(1);
 		String host = "127.0.0.1";
 
 		// connect with KVStore and run one put and get
@@ -520,12 +525,20 @@ public class ReplicaTest extends TestCase {
 		try {
 			kvStore.connect();
 			returnString = sendAndRecieve(kvStore, "testing!", "yay");
+			if (returnString.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE){
+				kvStore.disconnect();
+				try {
+					kvStore = new KVStore(host, portAnother);
+					kvStore.connect();
+				} catch (Exception e) {
+				}
+				returnString = sendAndRecieve(kvStore, "testing!", "yay");
+			}
 			returnString = sendAndRecieve(kvStore, "testing!", "");
 		} catch (Exception e) {
 		}
-
-		assertTrue(returnString == null); /////
-		for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
+		assertTrue(returnString.getStatus() == StatusType.DELETE_SUCCESS);
+		/* for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
 			String nameR = entry.getKey();
 			ECSNode nodeR = entry.getValue();
 
@@ -535,29 +548,17 @@ public class ReplicaTest extends TestCase {
 
 			String pathToFile = "./storage/repl_" + serverName + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
 						+ ":127.0.0.1_storage.txt";
-			assertTrue(getFileLength(pathToFile) > 0);
-		}
-
+			// assertTrue(getFileLength(pathToFile) > 0);
+		}*/
 		try {
 			returnString = sendAndRecieve(kvStore, "testing!");
 		} catch (Exception e) {
 		}
+		assertTrue(returnString.getStatus() == StatusType.GET_ERROR);
 
-		assertTrue(returnString == null);
-		for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
-			String nameR = entry.getKey();
-			ECSNode nodeR = entry.getValue();
-
-			if (nameR.equals(serverName)) {
-				continue;
-			}
-
-			String pathToFile = "./storage/repl_" + serverName + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
-						+ ":127.0.0.1_storage.txt";
-			assertTrue(getFileLength(pathToFile) > 0);
-		}
 		kvStore.disconnect();
 	}
+
 
 	@Test
 	public void testRemoveNodeWhatHappensToReplica() {
