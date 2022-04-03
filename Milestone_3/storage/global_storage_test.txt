@@ -1,2 +1,0 @@
-{"status":"NO_STATUS","key":"key1","value":"value1"}
-{"status":"NO_STATUS","key":"key2","value":"value2"}

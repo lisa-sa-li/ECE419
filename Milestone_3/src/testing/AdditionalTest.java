@@ -422,20 +422,16 @@ public class AdditionalTest extends TestCase {
 		Exception ex = null;
 
 		try {
-			System.out.println("testMoveToGlobalStorage");
 			persistantStorage.put("key1", "value1");
-			System.out.println("Put 1");
 			persistantStorage.put("key2", "value2");
-			System.out.println("Put 2");
 			persistantStorage.moveToGlobalStorage();
-			System.out.println("moved to");
 		} catch (Exception e) {
 			ex = e;
 		}
-		System.out.println("getAllFromFile(GLOBAL_STORAGE_PATH): " + getAllFromFile(GLOBAL_STORAGE_PATH));
+
 		assertTrue(ex == null && getAllFromFile(GLOBAL_STORAGE_PATH).equals(
 				"{\"status\":\"NO_STATUS\",\"key\":\"key1\",\"value\":\"value1\"}\n{\"status\":\"NO_STATUS\",\"key\":\"key2\",\"value\":\"value2\"}\n"));
-		System.out.println("persistantStorage.isEmpty(): " + persistantStorage.isEmpty());
+
 		assertTrue(persistantStorage.isEmpty() == true);
 	}
 
@@ -445,18 +441,15 @@ public class AdditionalTest extends TestCase {
 		Exception ex = null;
 
 		try {
-			System.out.println("testGetFromGlobalStorage");
 			writeToStorage(GLOBAL_STORAGE_PATH,
 					"{\"status\":\"NO_STATUS\",\"key\":\"key1\",\"value\":\"value1\"}\n{\"status\":\"NO_STATUS\",\"key\":\"key2\",\"value\":\"value2\"}\n");
-			System.out.println("writeToStorage");
 			persistantStorage.getFromGlobalStorage();
 		} catch (Exception e) {
 			ex = e;
 		}
-		System.out.println("persistantStorage.getAllFromStorage(): " + persistantStorage.getAllFromStorage());
+
 		assertTrue(ex == null && persistantStorage.getAllFromStorage().equals(
 				"{\"status\":\"NO_STATUS\",\"key\":\"key1\",\"value\":\"value1\"}\n{\"status\":\"NO_STATUS\",\"key\":\"key2\",\"value\":\"value2\"}\n"));
-		System.out.println("persistantStorage.isEmpty(): " + persistantStorage.isEmpty());
 		assertTrue(persistantStorage.isEmpty() == false);
 	}
 
