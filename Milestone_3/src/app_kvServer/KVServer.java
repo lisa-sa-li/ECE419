@@ -680,6 +680,7 @@ public class KVServer implements IKVServer, Runnable {
 	private void initializeReplicateListener() {
 		try {
 			ServerSocket replicateReceiveSocket = new ServerSocket(replicateReceiverPort);
+			System.out.println("CALLING initializeReplicateListener: " + replicateReceiveSocket);
 			// replicateReceiveSocket.setSoTimeout(5000);
 			new Thread(new ReplicateServer(replicateReceiveSocket, this)).start();
 			// logger.info("Replicate server listening on port: " + replicateReceiveSocket.getLocalPort());

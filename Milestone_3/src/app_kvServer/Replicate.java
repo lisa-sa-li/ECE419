@@ -54,6 +54,7 @@ public class Replicate {
         String[] splitData = data.split("@", 2);
         masterName = splitData[0];
         ps = new PersistantStorage("repl_" + this.masterName + "_" + getNamePortHost());
+        System.out.println("INSIDE REPLICATE: " + "repl_" + masterName + "_" + getNamePortHost());
         ps.clearStorage();
         ps.appendToStorage(splitData[1]);
     }

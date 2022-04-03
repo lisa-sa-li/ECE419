@@ -124,7 +124,7 @@ public class ReplicaTest extends TestCase {
 		}
 		return "";
 	}
-	/*
+	
 	@Test
 	public void testReplicasCreated() {
 		Path path;
@@ -501,7 +501,8 @@ public class ReplicaTest extends TestCase {
 					continue;
 				}
 
-				String pathToFile = "./storage/repl_" + name + "_" + nodeR.getNamePortHost() + ".txt";
+				String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
 				clearFile(pathToFile);
 			}
 		}
@@ -532,7 +533,8 @@ public class ReplicaTest extends TestCase {
 				continue;
 			}
 
-			String pathToFile = "./storage/repl_" + serverName + "_" + nodeR.getNamePortHost() + ".txt";
+			String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
 			assertTrue(getFileLength(pathToFile) == 1);
 		}
 
@@ -550,23 +552,37 @@ public class ReplicaTest extends TestCase {
 				continue;
 			}
 
-			String pathToFile = "./storage/repl_" + serverName + "_" + nodeR.getNamePortHost() + ".txt";
+			String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
 			assertTrue(getFileLength(pathToFile) == 0);
 		}
 		kvStore.disconnect();
 	}
-	*/
+
 	@Test
 	public void testRemoveNodeWhatHappensToReplica() {
 		Path path;
 		File f;
 
-		ecs.addNodes(1, "None", 0);
+		ecs.addNodes(2, "None", 0);
 		ecs.start();
+
+		// collect available servers
+		ArrayList<Integer> ports = ecs.getCurrentPorts();
+		System.out.println("ports: " + ports);
+		int port = ports.get(0);
+		String serverName = "";
+		String host = "127.0.0.1";
 
 		for (String name : ecs.currServerMap.keySet()) {
 			ECSNode node = ecs.currServerMap.get(name);
 			String namePortHost = node.getNamePortHost();
+			String[] details = namePortHost.split(":");
+			int portNumber = Integer.valueOf(details[1]);
+
+			if (portNumber == port){
+				serverName = details[0];
+			}
 
 			for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
 				String nameR = entry.getKey();
@@ -576,18 +592,14 @@ public class ReplicaTest extends TestCase {
 					continue;
 				}
 
-				String pathToFile = "./storage/repl_" + name + "_" + nodeR.getNamePortHost() + ".txt";
+				String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
+				f = new File(pathToFile);
 				clearFile(pathToFile);
 			}
 		}
 
-		// collect available servers
-		ArrayList<Integer> ports = ecs.getCurrentPorts();
-		System.out.println("ports: " + ports);
-		int port = ports.get(0);
-		String serverName = serverInfo.get(port);
 		System.out.println("serverName: " + serverName);
-		String host = "127.0.0.1";
 
 		// connect with KVStore
 		KVStore kvStore = new KVStore(host, port);
@@ -606,9 +618,9 @@ public class ReplicaTest extends TestCase {
 				continue;
 			}
 
-			String pathToFile = "./storage/repl_" + serverName + "_" + nodeR.getNamePortHost() + ".txt";
+			String pathToFile = "./storage/repl_" + serverName + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+					+ ":127.0.0.1_storage.txt";
 			System.out.println("pathToFile: " + pathToFile);
-			// path = Paths.get(pathToFile);
 			assertTrue(getFileLength(pathToFile) == 1);
 			assertTrue(getAllFromFile(pathToFile) == "{\"status\":\"NO_STATUS\",\"key\":\"test\",\"value\":\"1\"}\n");
 			System.out.println("getAllFromFile(pathToFile): " + getAllFromFile(pathToFile));
@@ -649,11 +661,12 @@ public class ReplicaTest extends TestCase {
 			String nameR = entry.getKey();
 			ECSNode nodeR = entry.getValue();
 
-			if (nameR.equals(serverName)) {
+			if (nameR.equals(serverNameAnother)) {
 				continue;
 			}
 
-			String pathToFileAnother = "./storage/repl_" + serverNameAnother + "_" + nodeR.getNamePortHost() + ".txt";
+			String pathToFileAnother = "./storage/repl_" + serverNameAnother + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+					+ ":127.0.0.1_storage.txt";
 			System.out.println("pathToFile: " + pathToFileAnother);
 			// path = Paths.get(pathToFile);
 			assertTrue(getFileLength(pathToFileAnother) == 1);

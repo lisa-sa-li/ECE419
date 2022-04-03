@@ -225,6 +225,7 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 
 	public void run() {
 		// while connection is open, listen for messages
+		System.out.println("RUNNING REPLICATE CONNECTION");
 		try {
 			while (this.isOpen) {
 				try {

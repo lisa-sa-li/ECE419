@@ -68,12 +68,17 @@ public class ReplicateServer implements Runnable {
 
 	public void run() {
 		// logger.debug("RUNNING REPLICATE SERVER");
+		System.out.println("RUNNING REPLICATE SERVER");
 		while (kvServer.isRunning()) {
+			System.out.println("IN WHILE: listeningSocket: " + listeningSocket);
 			try {
 				Socket client = listeningSocket.accept();
+				System.out.println("IN WHILE listeningSocket");
 				logger.info("Created SOCKET IN REPLICATE SERVER RUN FUNCTION: " + client);
 				ReplicateConnection replicateConnection = new ReplicateConnection(client, this, kvServer);
+				System.out.println("IN WHILE replicateConnection");
 				new Thread(replicateConnection).start();
+				System.out.println("IN WHILE replicateConnection start");
 				logger.info(
 						"Connected to replicate server (on port " + listeningSocket.getLocalPort() + ") "
 								+ client.getInetAddress().getHostName() + " on port "
