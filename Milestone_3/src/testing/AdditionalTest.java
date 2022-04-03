@@ -67,14 +67,7 @@ public class AdditionalTest extends TestCase {
 	}
 
 	public void writeToStorage(String pathToFile, String str) {
-		// Appends kv-pairs to the end of the storage file
 		try {
-			// BufferedReader file = new BufferedReader(new FileReader(pathToFile));
-			// StringBuffer inputBuffer = new StringBuffer();
-			// String line;
-
-			// inputBuffer.append(str);
-			// file.close();
 			// Overwrite file with the string buffer data
 			FileOutputStream fileOut = new FileOutputStream(pathToFile);
 			fileOut.write(str.getBytes());

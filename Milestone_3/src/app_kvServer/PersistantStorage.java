@@ -41,7 +41,7 @@ public class PersistantStorage implements IPersistantStorage {
         this.pathToFile = dir + "/" + this.fileName;
         this.utils = new Utils();
 
-        GLOBAL_STORAGE_PATH = dir + "/" + globalStorageFile;
+        GLOBAL_STORAGE_PATH = globalStorageFile;
 
         try {
             initFile();
@@ -351,9 +351,9 @@ public class PersistantStorage implements IPersistantStorage {
             fileOut.write(buffer.toString().getBytes());
             fileOut.close();
 
-            logger.info("Successfully moved kv-pairs to global_storage.txt");
+            logger.info("Successfully moved kv-pairs to " + GLOBAL_STORAGE_PATH);
         } catch (Exception e) {
-            logger.error("Problem moving kv-pairs to global_storage.txt");
+            logger.error("Problem moving kv-pairs to " + GLOBAL_STORAGE_PATH);
         }
     }
 
@@ -378,9 +378,9 @@ public class PersistantStorage implements IPersistantStorage {
 
             // Append the kv-pairs to its own storage
             this.appendToStorage(buffer.toString());
-            logger.info("Successfully retrieved kv-pairs from global_storage.txt");
+            logger.info("Successfully retrieved kv-pairs from " + GLOBAL_STORAGE_PATH);
         } catch (Exception e) {
-            logger.error("Problem retrieving kv-pairs from global_storage.txt");
+            logger.error("Problem retrieving kv-pairs from " + GLOBAL_STORAGE_PATH);
         }
     }
 
