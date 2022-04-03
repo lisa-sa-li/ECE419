@@ -554,6 +554,7 @@ public class ReplicaTest extends TestCase {
 
 			String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
 						+ ":127.0.0.1_storage.txt";
+
 			assertTrue(getFileLength(pathToFile) == 0);
 		}
 		kvStore.disconnect();
