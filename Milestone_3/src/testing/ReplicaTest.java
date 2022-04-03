@@ -37,8 +37,6 @@ public class ReplicaTest extends TestCase {
 			while ((line = file.readLine()) != null) {
 				// Get info from each line: name, host, port
 				String[] info = line.split(" ");
-				// int port = Integer.parseInt(serverInfo[2]);
-				// Name, port:host
 				serverInfo.put(info[1], info[0]);
 			}
 		} catch (Exception e) {
@@ -110,7 +108,6 @@ public class ReplicaTest extends TestCase {
 	}
 
 	public String getAllFromFile(String pathToFile) {
-		// Appends kv-pairs to the end of the storage file
 		try {
 			BufferedReader file = new BufferedReader(new FileReader(pathToFile));
 			StringBuffer buffer = new StringBuffer();
@@ -133,8 +130,14 @@ public class ReplicaTest extends TestCase {
 		Path path;
 		File f;
 
-		ecs.addNodes(3, "FIFO", 3);
+		ecs.addNodes(2, "FIFO", 3);
 		ecs.start();
+		// HashMap<String, Integer> replicatePorts = ecs.getReplicatePorts();
+
+		try {
+			TimeUnit.SECONDS.sleep(5);
+		} catch (Exception e) {
+		}
 
 		for (String name : ecs.currServerMap.keySet()) {
 			ECSNode node = ecs.currServerMap.get(name);
@@ -148,17 +151,19 @@ public class ReplicaTest extends TestCase {
 					continue;
 				}
 
-				String pathToFile = "./storage/repl_" + name + "_" + nodeR.getNamePortHost() + ".txt";
-				path = Paths.get(pathToFile);
-				assertTrue(Files.exists(path));
+				String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
+				f = new File(pathToFile);
+				assertTrue(f.exists());
 
-				deleteFile(pathToFile);
+				// deleteFile(pathToFile);
 			}
 		}
 	}
 
 	@Test
 	public void testPutGetsReplicated() {
+		System.out.println("testPutGetsReplicated");
 		Path path;
 		File f;
 
@@ -177,7 +182,8 @@ public class ReplicaTest extends TestCase {
 					continue;
 				}
 
-				String pathToFile = "./storage/repl_" + name + "_" + nodeR.getNamePortHost() + ".txt";
+				String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
 				clearFile(pathToFile);
 			}
 		}
@@ -210,7 +216,8 @@ public class ReplicaTest extends TestCase {
 				continue;
 			}
 
-			String pathToFile = "./storage/repl_" + serverName + "_" + nodeR.getNamePortHost() + ".txt";
+			String pathToFile = "./storage/repl_" + serverName + "_" +
+					nodeR.getNamePortHost() + ".txt";
 			// path = Paths.get(pathToFile);
 			assertTrue(getFileLength(pathToFile) == 1);
 			assertTrue(getAllFromFile(pathToFile) == "{\"status\":\"NO_STATUS\",\"key\":\"test\",\"value\":\"1\"}\n");
@@ -221,6 +228,7 @@ public class ReplicaTest extends TestCase {
 
 	@Test
 	public void testPutUpdateGetsReplicated() {
+		System.out.println("testPutUpdateGetsReplicated");
 		Path path;
 		File f;
 
@@ -239,7 +247,8 @@ public class ReplicaTest extends TestCase {
 					continue;
 				}
 
-				String pathToFile = "./storage/repl_" + name + "_" + nodeR.getNamePortHost() + ".txt";
+				String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
 				clearFile(pathToFile);
 			}
 		}
@@ -273,7 +282,8 @@ public class ReplicaTest extends TestCase {
 				continue;
 			}
 
-			String pathToFile = "./storage/repl_" + serverName + "_" + nodeR.getNamePortHost() + ".txt";
+			String pathToFile = "./storage/repl_" + serverName + "_" +
+					nodeR.getNamePortHost() + ".txt";
 			assertTrue(getFileLength(pathToFile) == 1);
 			assertTrue(getAllFromFile(pathToFile) == "{\"status\":\"NO_STATUS\",\"key\":\"test\",\"value\":\"2\"}\n");
 		}
@@ -283,6 +293,7 @@ public class ReplicaTest extends TestCase {
 
 	@Test
 	public void testDeleteGetsReplicated() {
+		System.out.println("testDeleteGetsReplicated");
 		Path path;
 		File f;
 
@@ -301,7 +312,8 @@ public class ReplicaTest extends TestCase {
 					continue;
 				}
 
-				String pathToFile = "./storage/repl_" + name + "_" + nodeR.getNamePortHost() + ".txt";
+				String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
 				clearFile(pathToFile);
 			}
 		}
@@ -335,7 +347,8 @@ public class ReplicaTest extends TestCase {
 				continue;
 			}
 
-			String pathToFile = "./storage/repl_" + serverName + "_" + nodeR.getNamePortHost() + ".txt";
+			String pathToFile = "./storage/repl_" + serverName + "_" +
+					nodeR.getNamePortHost() + ".txt";
 			assertTrue(getFileLength(pathToFile) == 0);
 			// assertTrue(getAllFromFile(pathToFile) ==
 			// "{\"status\":\"NO_STATUS\",\"key\":\"test\",\"value\":\"2\"}\n");
@@ -346,6 +359,7 @@ public class ReplicaTest extends TestCase {
 
 	@Test
 	public void testGetFromReplica() {
+		System.out.println("testGetFromReplica");
 		Path path;
 		File f;
 		String value = "";
@@ -365,7 +379,8 @@ public class ReplicaTest extends TestCase {
 					continue;
 				}
 
-				String pathToFile = "./storage/repl_" + name + "_" + nodeR.getNamePortHost() + ".txt";
+				String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
 				clearFile(pathToFile);
 			}
 		}
@@ -406,6 +421,7 @@ public class ReplicaTest extends TestCase {
 
 	@Test
 	public void testMoveReplicaData() {
+		System.out.println("testMoveReplicaData");
 		Path path;
 		File f;
 		String value = "";
@@ -425,7 +441,8 @@ public class ReplicaTest extends TestCase {
 					continue;
 				}
 
-				String pathToFile = "./storage/repl_" + name + "_" + nodeR.getNamePortHost() + ".txt";
+				String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
 				clearFile(pathToFile);
 			}
 		}

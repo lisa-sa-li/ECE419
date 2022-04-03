@@ -18,7 +18,6 @@ public class ECSInteractionTest extends TestCase {
 	private ECSClient ecs;
 
 	public void setUp() {
-		System.out.println("hi");
 		ecs = new ECSClient("./test_servers.cfg");
 	}
 
@@ -258,8 +257,6 @@ public class ECSInteractionTest extends TestCase {
 			ex = e;
 		}
 
-		// System.out.println("response.getStatus() " + response.getStatus().name());
-		// System.out.println("ex " + ex);
 		assertTrue(ex == null && response.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE);
 		kvStore.disconnect();
 	}
