@@ -67,9 +67,7 @@ public class KVStore implements KVCommInterface, Runnable {
 	@Override
 	public void connect() throws Exception {
 		try {
-			System.out.println("CONNECTING TO: " + this.address + " : " + this.port);
 			Socket clientSocket = new Socket(this.address, this.port);
-			// clientSocket.setSoTimeout(7000);
 			this.clientConnection = new ClientConnection(clientSocket);
 			logger.info("Connected to " + clientSocket.getInetAddress().getHostName() + " on port "
 					+ clientSocket.getPort());
@@ -88,9 +86,8 @@ public class KVStore implements KVCommInterface, Runnable {
 			jsonMessage.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "in KVStore", null);
 
 			this.clientConnection.sendJSONMessage(jsonMessage);
-			// logger.info("Tearing down the connection ...");
+			logger.info("Tearing down the connection ...");
 			this.clientConnection.receiveJSONMessage();
-			// System.out.println("received JSON");
 			this.clientConnection.close();
 			logger.info("Client connection closed!");
 		} catch (IOException e) {
@@ -116,43 +113,35 @@ public class KVStore implements KVCommInterface, Runnable {
 	public JSONMessage runPutGet(JSONMessage jsonMessage, String key) throws Exception {
 		JSONMessage finalMsg = null;
 		wasSuccessful = false;
-		// System.out.println("Inside runPutGet in kvstore");
 		if (this.currentNode != null && this.ECSNodeOrdered != null
 				&& !isECSNodeResponsibleForKey(key, this.currentNode)) {
 			System.out.println("Metadata stale: original address: " + this.address + " original port: " + this.port);
 			// metadata already exists (might be stale)
 			this.updateToCorrectNodeFromList(key);
 			this.switchServer();
-			// System.out.println("switched servers");
 		}
 		this.clientConnection.sendJSONMessage(jsonMessage);
-		System.out.println("Sent JSON");
 		JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
-		// System.out.println("sent message before while loop: " +
-		// returnMsg.getStatus().toString());
 		int retries = 0;
 		while (!wasSuccessful && retries < 3) {
-			// System.out.println("retires: " + retries);
 			try {
 				if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
-					System.out.println("originally connected to: " + this.address + " address and port: " + this.port);
-					// System.out.println("Server not responsible so switching");
+					// System.out.println("originally connected to: " + this.address + " address and port: " + this.port);
 					this.updateToCorrectNodeInfo(returnMsg, key);
-					System.out.println("switching to: " + this.address + " address and port: " + this.port);
+					// System.out.println("switching to: " + this.address + " address and port: " + this.port);
 					this.switchServer();
 					this.clientConnection.sendJSONMessage(jsonMessage);
 					System.out.println("Sent message");
 					try {
 						TimeUnit.SECONDS.sleep(2);
 					} catch (Exception e) {
-						logger.error("Unable to init replicates on MoveData");
+						logger.error("Unable to switch");
 					}
 					returnMsg = this.clientConnection.receiveJSONMessage();
-					System.out.println("returned message: " + returnMsg.getStatus().toString());
 				} else {
 					wasSuccessful = true;
 					finalMsg = returnMsg;
-					System.out.println("server was responsible: returned message: " + returnMsg.getStatus().toString());
+					// System.out.println("Server was responsible: returned message: " + returnMsg.getStatus().toString());
 				}
 			} catch (Exception e) {
 				logger.error(e);

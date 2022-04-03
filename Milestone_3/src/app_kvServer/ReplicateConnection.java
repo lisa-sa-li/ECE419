@@ -2,8 +2,6 @@ package app_kvServer;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.io.EOFException;
@@ -29,9 +27,6 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 	private OutputStream output;
 	private ReplicateServer replicateServer;
 	public Replicate replicate;
-
-	private ObjectOutputStream oos;
-	ObjectInputStream ois;
 
 	/**
 	 * Constructs a new ServerConnection object for a given TCP socket.
@@ -62,10 +57,6 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 		try {
 			output = this.master.getOutputStream();
 			input = this.master.getInputStream();
-
-			// oos = new ObjectOutputStream(output);
-			// oos.flush();
-			// ois = new ObjectInputStream(input);
 
 			logger.info("ReplicateConnection connected to controller " + this.master.getInetAddress().getHostName()
 					+ " on port " + this.master.getPort());
@@ -162,35 +153,9 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 				master.getInetAddress().getHostAddress() + ":" + master.getPort()
 				+ ">: '" + json.getJSON().trim() + "'");
 		return json;
-
-		// // oos = new ObjectOutputStream(output);
-		// // oos.flush();
-		// ois = new ObjectInputStream(input);
-
-		// String jsonStr = null;
-		// try {
-		// jsonStr = (String) ois.readObject();
-		// } catch (Exception e) {
-		// logger.error("Unable to read input stream in replicate connection: " + e);
-		// }
-
-		// if (jsonStr == null || jsonStr.trim().isEmpty()) {
-		// return null;
-		// }
-
-		// // ois.close();
-
-		// JSONMessage json = new JSONMessage();
-		// json.deserialize(jsonStr);
-		// logger.info("RECEIVE from controller \t<" +
-		// master.getInetAddress().getHostAddress() + ":" + master.getPort()
-		// + ">: '" + json.getJSON().trim() + "'");
-		// return json;
-
 	}
 
 	private void handleMessage(JSONMessage msg) {
-		logger.info("IN REPLICATE HANDLE MESSAGE");
 		String key = msg.getKey();
 		String value = msg.getValue();
 		StatusType status = msg.getStatus();
@@ -225,20 +190,15 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 
 	public void run() {
 		// while connection is open, listen for messages
-		System.out.println("RUNNING REPLICATE CONNECTION");
 		try {
 			while (this.isOpen) {
 				try {
 					JSONMessage receivedMessage = receiveJSONMessage();
 
 					if (receivedMessage != null) {
-						logger.info("Received message not null: " + receivedMessage);
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
-						// logger.info("swag");
 						handleMessage(receivedMessage);
-						// do we reply?
-						// sendJSONMessage(sendMessage);
 					}
 
 				} catch (EOFException e) {

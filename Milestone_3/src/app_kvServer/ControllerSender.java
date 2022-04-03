@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.CyclicBarrier;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
 import org.apache.log4j.*;
@@ -45,10 +44,7 @@ public class ControllerSender {
 
         try {
             Socket socket = new Socket(hostOfReceiver, replicate.getReplicateReceiverPort());
-			// socket.setSoTimeout(7000);
             OutputStream output = socket.getOutputStream();
-            // ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-            // oos.flush();
 
             JSONMessage json = new JSONMessage();
             switch (action) {
@@ -68,14 +64,6 @@ public class ControllerSender {
             output.flush();
             output.close();
             socket.close();
-
-            // String msgText = json.serialize();
-            // oos.writeObject(msgText);
-            // oos.flush();
-            // // oos.reset();
-            // // oos.close();
-
-            logger.info("Sent data to replicant " + nameOfReceiver);
         } catch (SocketTimeoutException s){
 			logger.info("Socket timeout in Controller sender: retrying " + s);
 		} catch (Exception e) {

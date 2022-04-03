@@ -54,7 +54,6 @@ public class Replicate {
         String[] splitData = data.split("@", 2);
         masterName = splitData[0];
         ps = new PersistantStorage("repl_" + this.masterName + "_" + getNamePortHost());
-        System.out.println("INSIDE REPLICATE: " + "repl_" + masterName + "_" + getNamePortHost());
         ps.clearStorage();
         ps.appendToStorage(splitData[1]);
     }
@@ -79,8 +78,6 @@ public class Replicate {
             String key = msg.getKey();
             String value = msg.getValue();
             StatusType status = msg.getStatus();
-
-            logger.info("Replicate operation: " + status + ":" + key + ":" + value);
 
             try {
                 ps.put(key, value);

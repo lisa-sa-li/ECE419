@@ -66,7 +66,7 @@ public class Controller {
             prevReplicateServers = new HashMap<String, ECSNode>(replicants);
             this.replicants.clear();
         } else {
-            logger.info("replicants is null");
+            logger.info("Replicants is null");
         }
 
         ArrayList<BigInteger> orderedKeys = new ArrayList<>(hashRing.values());
@@ -144,7 +144,6 @@ public class Controller {
                 TimeUnit.SECONDS.sleep(2);
                 // init new stores with cut data
                 CyclicBarrier barrier_2 = new CyclicBarrier(1);
-                // logger.info("Sending new info from replicate on MOVEDATA: " + repl.getNodePort());
                 ControllerSender controllerInit = new ControllerSender(repl, kvServer, barrier_2,
                         this.controllerName + "@" + kvServer.getAllFromStorage(), "init");
                 controllerInit.sendMsg();
@@ -159,11 +158,10 @@ public class Controller {
     public void initReplicates(ArrayList<ECSNode> replicates) {
         for (ECSNode replicate : replicates) {
             CyclicBarrier barrier = new CyclicBarrier(1);
-            // logger.info("INITIALIZING REPLICATE: " + replicate.getNodePort());
+            logger.info("INITIALIZING REPLICATE: " + replicate.getNodePort());
             ControllerSender controllerSender = new ControllerSender(replicate, kvServer, barrier,
                     this.controllerName + "@" + kvServer.getAllFromStorage(), "init");
             controllerSender.sendMsg();
-            // new Thread(controllerSender).start();
         }
     }
 
@@ -172,17 +170,11 @@ public class Controller {
         for (ECSNode repl : this.replicants.values()) {
             String updates = kvServer.getStringLogs(false);
             CyclicBarrier barrier = new CyclicBarrier(1);
-            logger.info("UPDATING REPLICATES from " + this.controllerName + ": " + updates);
-            // logger.info("IS UPDATE EMPTY?: " + updates.isEmpty());
+            logger.info("UPDATING REPLICATES: " + this.controllerName + " -> " + updates);
             if (!(updates.isEmpty())) {
-                // logger.info("SENDING NON-EMPTY UPDATE: " + updates);
                 ControllerSender controllerSender = new ControllerSender(repl, kvServer, barrier,
                         this.controllerName + "@" + updates, "update");
                 controllerSender.sendMsg();
-                // logger.info("after updateReplicates");
-                // new Thread(controllerSender).start();
-                // logger.info("after after updateReplicates");
-                // kvServer.getStringLogs(true);
             }
         }
     }
@@ -194,7 +186,6 @@ public class Controller {
             // logger.info("DELETING REPLICATE: " + repl.getNodePort());
             ControllerSender controllerSender = new ControllerSender(repl, kvServer, barrier,
                     this.controllerName, "delete");
-            // new Thread(controllerSender).start();
             controllerSender.sendMsg();
         }
     }

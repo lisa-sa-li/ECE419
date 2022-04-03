@@ -232,9 +232,8 @@ public class KVServer implements IKVServer, Runnable {
 			public void run() {
 				if (controller != null) {
 					try {
-						// logger.info("Updating replicas");
 						controller.updateReplicates();
-						logger.info("Replicas updated <3");
+						logger.info("Replicas updated");
 					} catch (Exception e) {
 						logger.info("Error when async updating: " + e);
 					}
@@ -244,29 +243,9 @@ public class KVServer implements IKVServer, Runnable {
 			}
 		};
 
-		// update every 2 minutes (delay by 1 min before starting)
-		// timer.scheduleAtFixedRate(updateReplicas, 60000, 120000);
+		// update every 30 s (delay by 30 s before starting)
 		timer.scheduleAtFixedRate(updateReplicas, 30000, 30000);
 
-		// final ScheduledFuture<?> longTaskHandler = scheduler.scheduleAtFixedRate(new
-		// TimerTask() {
-		// @Override
-		// public void run() {
-		// if (controller != null) {
-		// controller.updateReplicates();
-		// logger.info("Replicas updated <3");
-		// } else {
-		// logger.error("Controller not successfully implemented for updates");
-		// }
-		// }
-		// }, 30, 30, TimeUnit.SECONDS);
-
-		// scheduler.schedule(new Runnable() {
-		// public void run() {
-		// longTaskHandler.cancel(true);
-		// // This will cancel your LongTask after 90 sec without affecting ShortTask
-		// }
-		// }, 10, TimeUnit.SECONDS);
 	}
 
 	@Override
@@ -636,7 +615,6 @@ public class KVServer implements IKVServer, Runnable {
 		if (this.cache != null) {
 			this.cache.clear();
 		}
-		// logger.info("Cache cleared");
 	}
 
 	public String getAllFromStorage() {
@@ -661,10 +639,8 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	private boolean initializeServer() {
-		// logger.info("Initialize server ...");
 		try {
 			serverSocket = new ServerSocket(port);
-			// serverSocket.setSoTimeout(5000);
 			logger.info("Server listening on port: " + serverSocket.getLocalPort());
 			return true;
 
@@ -680,10 +656,7 @@ public class KVServer implements IKVServer, Runnable {
 	private void initializeReplicateListener() {
 		try {
 			ServerSocket replicateReceiveSocket = new ServerSocket(replicateReceiverPort);
-			System.out.println("CALLING initializeReplicateListener: " + replicateReceiveSocket);
-			// replicateReceiveSocket.setSoTimeout(5000);
 			new Thread(new ReplicateServer(replicateReceiveSocket, this)).start();
-			// logger.info("Replicate server listening on port: " + replicateReceiveSocket.getLocalPort());
 		} catch (IOException e) {
 			logger.error("Could not open replicate listening socket");
 			e.printStackTrace();

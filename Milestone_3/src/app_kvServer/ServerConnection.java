@@ -25,9 +25,6 @@ import shared.messages.Metadata;
 import app_kvServer.KVServer;
 import app_kvServer.IKVServer.ServerStatus;
 
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
-
 /**
  * Represents a connection end point for a particular client that is
  * connected to the server. This class is responsible for message reception
@@ -45,9 +42,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 	private InputStream input;
 	private OutputStream output;
 	private KVServer kvServer;
-
-	ObjectInputStream ois;
-	ObjectOutputStream oos;
 
 	/**
 	 * Constructs a new ServerConnection object for a given TCP socket.
@@ -69,10 +63,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 			output = this.serverSocket.getOutputStream();
 			input = this.serverSocket.getInputStream();
 
-			// oos = new ObjectOutputStream(output);
-			// oos.flush();
-			// ois = new ObjectInputStream(input);
-
 			logger.info(
 					"Connected to ServerConnection " + this.serverSocket.getInetAddress().getHostName() + " on port "
 							+ this.serverSocket.getPort());
@@ -86,15 +76,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 		byte[] jsonBytes = json.getJSONByte();
 		output.write(jsonBytes, 0, jsonBytes.length);
 		output.flush();
-
-		// oos = new ObjectOutputStream(output);
-		// oos.flush();
-
-		// String msgText = json.serialize();
-		// oos.writeObject(msgText);
-		// oos.flush();
-		// // oos.reset();
-		// // oos.close();
 
 		logger.info("SEND \t<" + serverSocket.getInetAddress().getHostAddress() + ":" + serverSocket.getPort() + ">: '"
 				+ json.getJSON() + "'");
@@ -179,33 +160,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 				+ serverSocket.getPort()
 				+ ">: '" + json.getJSON().trim() + "'");
 		return json;
-
-		// // oos = new ObjectOutputStream(output);
-		// // oos.flush();
-		// ois = new ObjectInputStream(input);
-
-		// String jsonStr = null;
-		// try {
-		// jsonStr = (String) ois.readObject();
-		// } catch (Exception e) {
-		// logger.error("Unable to read input stream in server connection: " + e);
-		// }
-
-		// if (jsonStr == null || jsonStr.trim().isEmpty()) {
-		// return null;
-		// }
-
-		// // ois.close();
-
-		// JSONMessage json = new JSONMessage();
-		// json.deserialize(jsonStr);
-		// logger.info("RECEIVED from client/ecs/server \t<" +
-		// serverSocket.getInetAddress().getHostAddress() + ":"
-		// + serverSocket.getPort()
-		// + ">: '" + json.getJSON().trim() + "'");
-
-		// return json;
-
 	}
 
 	private JSONMessage handleMessage(JSONMessage msg) throws IOException {
@@ -379,7 +333,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 				try {
 
 					JSONMessage receivedMessage = receiveJSONMessage();
-					logger.debug("MESSAGE RECEIVED: " + receivedMessage);
 					if (receivedMessage != null) {
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
@@ -387,7 +340,6 @@ public class ServerConnection implements IServerConnection, Runnable {
 						if (metadata == null) {
 							sendMessage = new JSONMessage();
 							ServerStatus serverStatus = this.kvServer.serverStatus;
-							// logger.debug("serverStatus: " + serverStatus);
 							if (serverStatus == ServerStatus.CLOSED) {
 								// If the status is closed, all client requests are responded to with
 								// SERVER_STOPPED messages
@@ -399,22 +351,15 @@ public class ServerConnection implements IServerConnection, Runnable {
 								sendMessage.setMessage(StatusType.SERVER_WRITE_LOCK.name(), receivedMessage.getKey(),
 										receivedMessage.getValue());
 							} else {
-								// logger.debug("IN ELSE");
 								sendMessage = handleMessage(receivedMessage);
-								logger.debug("handled message key: " + sendMessage.getKey() + " : " +
-										sendMessage.getValue() + " : " + sendMessage.getStatus());
 							}
 						} else {
 							sendMessage = handleMetadataMessage(metadata);
-							// logger.debug("sendMessage: " + sendMessage);
 						}
 						// In the case of a PUT_MANY, we do not need to send a message
 						if (sendMessage != null) {
-							logger.debug("sending sendMessage: " + sendMessage);
 							sendJSONMessage(sendMessage);
-							// logger.debug("sent success");
 						}
-						logger.debug("this.isOpen? : " + this.isOpen);
 					}
 				} catch (StreamCorruptedException e) {
 					logger.error("ServerConnection Stream Corrupted Exception: " + e);

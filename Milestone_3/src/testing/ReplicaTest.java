@@ -26,7 +26,7 @@ public class ReplicaTest extends TestCase {
 	public HashMap<String, String> serverInfo = new HashMap<String, String>();
 
 	public void setUp() {
-		ecs = new ECSClient("./test_servers.cfg");
+		ecs = new ECSClient("test_servers.cfg");
 
 		try {
 			BufferedReader file = new BufferedReader(new FileReader("./test_servers.cfg"));
@@ -103,7 +103,6 @@ public class ReplicaTest extends TestCase {
 	}
 
 	public long getFileLength(String pathToFile) {
-		System.out.println("FILE PATH: " + pathToFile);
 		File file = new File(pathToFile);
 		return file.length();
 	}
@@ -126,129 +125,127 @@ public class ReplicaTest extends TestCase {
 		return "";
 	}
 
-	// @Test
-	// public void testTwoReplicasCreated() {
-	// 	Path path;
-	// 	File f;
+	@Test
+	public void testTwoReplicasCreated() {
+		Path path;
+		File f;
 
-	// 	ecs.addNodes(2, "None", 0);
-	// 	ecs.start();
+		ecs.addNodes(2, "None", 0);
+		ecs.start();
 
-	// 	// collect available servers
-	// 	ArrayList<Integer> ports = ecs.getCurrentPorts();
-	// 	System.out.println("ports: " + ports);
-	// 	int port = ports.get(0);
-	// 	String serverName = "";
-	// 	String host = "127.0.0.1";
+		// collect available servers
+		ArrayList<Integer> ports = ecs.getCurrentPorts();
+		int port = ports.get(0);
+		String serverName = "";
+		String host = "127.0.0.1";
 
-	// 	// reset replicate files (odd behaviour early)
-	// 	for (String name : ecs.currServerMap.keySet()) {
-	// 		ECSNode node = ecs.currServerMap.get(name);
-	// 		String namePortHost = node.getNamePortHost();
-	// 		String[] details = namePortHost.split(":");
-	// 		int portNumber = Integer.valueOf(details[1]);
+		// reset replicate files (odd behaviour early)
+		for (String name : ecs.currServerMap.keySet()) {
+			ECSNode node = ecs.currServerMap.get(name);
+			String namePortHost = node.getNamePortHost();
+			String[] details = namePortHost.split(":");
+			int portNumber = Integer.valueOf(details[1]);
 
-	// 		if (portNumber == port){
-	// 			serverName = details[0];
-	// 		}
+			if (portNumber == port){
+				serverName = details[0];
+			}
 
-	// 		for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
-	// 			String nameR = entry.getKey();
-	// 			ECSNode nodeR = entry.getValue();
+			for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
+				String nameR = entry.getKey();
+				ECSNode nodeR = entry.getValue();
 
-	// 			if (nameR.equals(name)) {
-	// 				continue;
-	// 			}
+				if (nameR.equals(name)) {
+					continue;
+				}
 
-	// 			String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
-	// 					+ ":127.0.0.1_storage.txt";
-	// 			clearFile(pathToFile);
-	// 		}
-	// 	}
+				String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
+				clearFile(pathToFile);
+			}
+		}
 
-	// 	for (String name : ecs.currServerMap.keySet()) {
-	// 		ECSNode node = ecs.currServerMap.get(name);
-	// 		String namePortHost = node.getNamePortHost();
+		for (String name : ecs.currServerMap.keySet()) {
+			ECSNode node = ecs.currServerMap.get(name);
+			String namePortHost = node.getNamePortHost();
 
-	// 		for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
-	// 			String nameR = entry.getKey();
-	// 			ECSNode nodeR = entry.getValue();
+			for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
+				String nameR = entry.getKey();
+				ECSNode nodeR = entry.getValue();
 
-	// 			if (nameR.equals(name)) {
-	// 				continue;
-	// 			}
+				if (nameR.equals(name)) {
+					continue;
+				}
 
-	// 			String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
-	// 					+ ":127.0.0.1_storage.txt";
-	// 			f = new File(pathToFile);
-	// 			assertTrue(f.exists());
+				String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
+				f = new File(pathToFile);
+				assertTrue(f.exists());
 
-	// 			// deleteFile(pathToFile);
-	// 		}
-	// 	}
-	// }
+				// deleteFile(pathToFile);
+			}
+		}
+	}
 
-	// @Test
-	// public void testSixReplicasCreated() {
-	// 	Path path;
-	// 	File f;
+	@Test
+	public void testSixReplicasCreated() {
+		Path path;
+		File f;
 
-	// 	ecs.addNodes(3, "None", 0);
-	// 	ecs.start();
+		ecs.addNodes(3, "None", 0);
+		ecs.start();
 
-	// 	// collect available servers
-	// 	ArrayList<Integer> ports = ecs.getCurrentPorts();
-	// 	System.out.println("ports: " + ports);
-	// 	int port = ports.get(0);
-	// 	String serverName = "";
-	// 	String host = "127.0.0.1";
+		// collect available servers
+		ArrayList<Integer> ports = ecs.getCurrentPorts();
+		int port = ports.get(0);
+		String serverName = "";
+		String host = "127.0.0.1";
 
-	// 	// reset replicate files (odd behaviour early)
-	// 	for (String name : ecs.currServerMap.keySet()) {
-	// 		ECSNode node = ecs.currServerMap.get(name);
-	// 		String namePortHost = node.getNamePortHost();
-	// 		String[] details = namePortHost.split(":");
-	// 		int portNumber = Integer.valueOf(details[1]);
+		// reset replicate files (odd behaviour early)
+		for (String name : ecs.currServerMap.keySet()) {
+			ECSNode node = ecs.currServerMap.get(name);
+			String namePortHost = node.getNamePortHost();
+			String[] details = namePortHost.split(":");
+			int portNumber = Integer.valueOf(details[1]);
 
-	// 		if (portNumber == port){
-	// 			serverName = details[0];
-	// 		}
+			if (portNumber == port){
+				serverName = details[0];
+			}
 
-	// 		for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
-	// 			String nameR = entry.getKey();
-	// 			ECSNode nodeR = entry.getValue();
+			for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
+				String nameR = entry.getKey();
+				ECSNode nodeR = entry.getValue();
 
-	// 			if (nameR.equals(name)) {
-	// 				continue;
-	// 			}
+				if (nameR.equals(name)) {
+					continue;
+				}
 
-	// 			String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
-	// 					+ ":127.0.0.1_storage.txt";
-	// 			clearFile(pathToFile);
-	// 		}
-	// 	}
+				String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
+				clearFile(pathToFile);
+			}
+		}
 
-	// 	for (String name : ecs.currServerMap.keySet()) {
-	// 		ECSNode node = ecs.currServerMap.get(name);
-	// 		String namePortHost = node.getNamePortHost();
+		for (String name : ecs.currServerMap.keySet()) {
+			ECSNode node = ecs.currServerMap.get(name);
+			String namePortHost = node.getNamePortHost();
 
-	// 		for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
-	// 			String nameR = entry.getKey();
-	// 			ECSNode nodeR = entry.getValue();
+			for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
+				String nameR = entry.getKey();
+				ECSNode nodeR = entry.getValue();
 
-	// 			if (nameR.equals(name)) {
-	// 				continue;
-	// 			}
+				if (nameR.equals(name)) {
+					continue;
+				}
 
-	// 			String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
-	// 					+ ":127.0.0.1_storage.txt";
-	// 			f = new File(pathToFile);
-	// 			assertTrue(f.exists());
+				String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
+				f = new File(pathToFile);
+				assertTrue(f.exists());
 
-	// 			// deleteFile(pathToFile);
-	// 		}
-	// 	}
-	// }
+				// deleteFile(pathToFile);
+			}
+		}
+	}
 
 	@Test
 	public void testPutGetsReplicated() {
@@ -305,8 +302,8 @@ public class ReplicaTest extends TestCase {
 				continue;
 			}
 
-			String pathToFile = "./storage/repl_" + serverName + "_" +
-					nodeR.getNamePortHost() + ".txt";
+			String pathToFile = "./storage/repl_" + serverName + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
 			// path = Paths.get(pathToFile);
 			assertTrue(getFileLength(pathToFile) == 1);
 			assertTrue(getAllFromFile(pathToFile) == "{\"status\":\"NO_STATUS\",\"key\":\"test\",\"value\":\"1\"}\n");
@@ -371,8 +368,8 @@ public class ReplicaTest extends TestCase {
 				continue;
 			}
 
-			String pathToFile = "./storage/repl_" + serverName + "_" +
-					nodeR.getNamePortHost() + ".txt";
+			String pathToFile = "./storage/repl_" + serverName + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
 			assertTrue(getFileLength(pathToFile) == 1);
 			assertTrue(getAllFromFile(pathToFile) == "{\"status\":\"NO_STATUS\",\"key\":\"test\",\"value\":\"2\"}\n");
 		}
@@ -436,8 +433,8 @@ public class ReplicaTest extends TestCase {
 				continue;
 			}
 
-			String pathToFile = "./storage/repl_" + serverName + "_" +
-					nodeR.getNamePortHost() + ".txt";
+			String pathToFile = "./storage/repl_" + serverName + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
+						+ ":127.0.0.1_storage.txt";
 			assertTrue(getFileLength(pathToFile) == 0);
 			// assertTrue(getAllFromFile(pathToFile) ==
 			// "{\"status\":\"NO_STATUS\",\"key\":\"test\",\"value\":\"2\"}\n");
@@ -578,6 +575,8 @@ public class ReplicaTest extends TestCase {
 		ecs.addNodes(2, "None", 0);
 		ecs.start();
 
+		String serverName = "";
+		String serverNameAnother = "";
 		for (String name : ecs.currServerMap.keySet()) {
 			ECSNode node = ecs.currServerMap.get(name);
 			String namePortHost = node.getNamePortHost();
@@ -587,7 +586,10 @@ public class ReplicaTest extends TestCase {
 				ECSNode nodeR = entry.getValue();
 
 				if (nameR.equals(name)) {
+					serverName = name;
 					continue;
+				} else {
+					serverNameAnother = nameR;
 				}
 
 				String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
@@ -599,7 +601,7 @@ public class ReplicaTest extends TestCase {
 		// collect available servers
 		ArrayList<Integer> ports = ecs.getCurrentPorts();
 		int port = ports.get(0);
-		String serverName = serverInfo.get(port);
+		int portAnother = ports.get(1);
 		String host = "127.0.0.1";
 
 		// connect with KVStore and run one put and get
@@ -609,12 +611,20 @@ public class ReplicaTest extends TestCase {
 		try {
 			kvStore.connect();
 			returnString = sendAndRecieve(kvStore, "testing!", "yay");
+			if (returnString.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE){
+				kvStore.disconnect();
+				try {
+					kvStore = new KVStore(host, portAnother);
+					kvStore.connect();
+				} catch (Exception e) {
+				}
+				returnString = sendAndRecieve(kvStore, "testing!", "yay");
+			}
 			returnString = sendAndRecieve(kvStore, "testing!", "");
 		} catch (Exception e) {
 		}
-
-		assertTrue(returnString == null); /////
-		for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
+		assertTrue(returnString.getStatus() == StatusType.DELETE_SUCCESS);
+		/* for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
 			String nameR = entry.getKey();
 			ECSNode nodeR = entry.getValue();
 
@@ -624,30 +634,17 @@ public class ReplicaTest extends TestCase {
 
 			String pathToFile = "./storage/repl_" + serverName + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
 						+ ":127.0.0.1_storage.txt";
-			assertTrue(getFileLength(pathToFile) == 1);
-		}
-
+			// assertTrue(getFileLength(pathToFile) > 0);
+		}*/
 		try {
 			returnString = sendAndRecieve(kvStore, "testing!");
 		} catch (Exception e) {
 		}
+		assertTrue(returnString.getStatus() == StatusType.GET_ERROR);
 
-		assertTrue(returnString == null);
-		for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
-			String nameR = entry.getKey();
-			ECSNode nodeR = entry.getValue();
-
-			if (nameR.equals(serverName)) {
-				continue;
-			}
-
-			String pathToFile = "./storage/repl_" + serverName + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
-						+ ":127.0.0.1_storage.txt";
-
-			assertTrue(getFileLength(pathToFile) == 0);
-		}
 		kvStore.disconnect();
 	}
+
 
 	@Test
 	public void testRemoveNodeWhatHappensToReplica() {
@@ -659,9 +656,9 @@ public class ReplicaTest extends TestCase {
 
 		// collect available servers
 		ArrayList<Integer> ports = ecs.getCurrentPorts();
-		System.out.println("ports: " + ports);
 		int port = ports.get(0);
 		String serverName = "";
+		String serverNameAnother = "";
 		String host = "127.0.0.1";
 
 		for (String name : ecs.currServerMap.keySet()) {
@@ -672,6 +669,8 @@ public class ReplicaTest extends TestCase {
 
 			if (portNumber == port){
 				serverName = details[0];
+			} else {
+				serverNameAnother = details[0];
 			}
 
 			for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
@@ -684,12 +683,9 @@ public class ReplicaTest extends TestCase {
 
 				String pathToFile = "./storage/repl_" + name + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
 						+ ":127.0.0.1_storage.txt";
-				// f = new File(pathToFile);
 				clearFile(pathToFile);
 			}
 		}
-
-		System.out.println("serverName: " + serverName);
 
 		// connect with KVStore
 		KVStore kvStore = new KVStore("127.0.0.1", port);
@@ -699,25 +695,15 @@ public class ReplicaTest extends TestCase {
 			sendAndRecieve(kvStore, "test", "1");
 		} catch (Exception e) {
 		}
-
 		for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
 			String nameR = entry.getKey();
 			ECSNode nodeR = entry.getValue();
-
 			if (nameR.equals(serverName)) {
 				continue;
 			}
 
 			String pathToFile = "./storage/repl_" + serverName + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
 					+ ":127.0.0.1_storage.txt";
-			System.out.println("pathToFile: " + pathToFile);
-			System.out.println("ass1: " + getFileLength(pathToFile));
-
-			assertTrue(getFileLength(pathToFile) >= 1);
-			System.out.println("ass2");
-
-			assertTrue(getAllFromFile(pathToFile) == "{\"status\":\"NO_STATUS\",\"key\":\"test\",\"value\":\"1\"}\n");
-			System.out.println("getAllFromFile(pathToFile): " + getAllFromFile(pathToFile));
 		}
 		// Remove a node
 		ArrayList<String> servers = ecs.getCurrentServers();
@@ -727,7 +713,6 @@ public class ReplicaTest extends TestCase {
 
 		// connect to another client and check if the key is there
 		ArrayList<Integer> portsAnother = ecs.getCurrentPorts();
-		System.out.println("portsAnother: " + portsAnother);
 		int port_another = 0;
 		for (int i = 0; i < portsAnother.size(); i++){
 			int potentialPort = portsAnother.get(i);
@@ -735,9 +720,6 @@ public class ReplicaTest extends TestCase {
 				port_another = potentialPort;
 			}
 		}
-		System.out.println("port_another: " + port_another);
-		String serverNameAnother = serverInfo.get(port);
-		System.out.println("serverNameAnother: " + serverNameAnother);
 		KVStore kvStore2 = new KVStore(host, port_another);
 
 		JSONMessage output = null;
@@ -749,7 +731,6 @@ public class ReplicaTest extends TestCase {
 
 		kvStore2.disconnect();
 		kvStore.disconnect();
-		System.out.println("output: " + output.getValue());
 		assertTrue(output.getValue().equals("1"));
 		for (Map.Entry<String, ECSNode> entry : ecs.currServerMap.entrySet()) {
 			String nameR = entry.getKey();
@@ -761,9 +742,7 @@ public class ReplicaTest extends TestCase {
 
 			String pathToFileAnother = "./storage/repl_" + serverNameAnother + "_" + nameR + ":" + nodeR.getReplicateReceiverPort()
 					+ ":127.0.0.1_storage.txt";
-			System.out.println("pathToFile: " + pathToFileAnother);
-			// path = Paths.get(pathToFile);
-			assertTrue(getFileLength(pathToFileAnother) == 1);
+			assertTrue(getFileLength(pathToFileAnother) > 0);
 			assertTrue(getAllFromFile(pathToFileAnother) == "{\"status\":\"NO_STATUS\",\"key\":\"test\",\"value\":\"1\"}\n");
 		}
 	}

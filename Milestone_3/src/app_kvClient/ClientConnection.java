@@ -14,9 +14,6 @@ import shared.messages.KVMessage;
 import shared.messages.TextMessage;
 import shared.messages.KVMessage.StatusType;
 
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
-
 /**
  * Represents a connection end point for a particular client that is
  * connected to the server. This class is responsible for message reception
@@ -33,18 +30,12 @@ public class ClientConnection implements IClientConnection {
 	private Socket clientSocket;
 	private InputStream input;
 	private OutputStream output;
-	ObjectInputStream ois;
-	ObjectOutputStream oos;
 
 	public ClientConnection(Socket clientSocket) throws Exception {
 		this.clientSocket = clientSocket;
 		this.isOpen = true;
 		output = clientSocket.getOutputStream();
 		input = clientSocket.getInputStream();
-
-		// oos = new ObjectOutputStream(output);
-		// oos.flush();
-		// ois = new ObjectInputStream(input);
 	}
 
 	@Override
@@ -52,15 +43,6 @@ public class ClientConnection implements IClientConnection {
 		byte[] jsonBytes = kvJson.getJSONByte();
 		output.write(jsonBytes, 0, jsonBytes.length);
 		output.flush();
-
-		// oos = new ObjectOutputStream(output);
-		// oos.flush();
-
-		// String msgText = kvJson.serialize();
-		// oos.writeObject(msgText);
-		// oos.flush();
-		// // oos.reset();
-		// // oos.close();
 
 		logger.info(
 				"SEND \t<" + clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort() + ">: '"
@@ -73,15 +55,8 @@ public class ClientConnection implements IClientConnection {
 		byte[] msgBytes = null, tmp = null;
 		byte[] bufferBytes = new byte[BUFFER_SIZE];
 
-		// System.out.println("Receiving msg");
-		// String jsonStr = IOUtils.toString(input, StandardCharsets.UTF_8);
-		// System.out.println("Received msg: " + jsonStr);
-
-
 		// Read first char from stream
-		// System.out.println("Receiving msg");
 		byte read = (byte) input.read();
-		// System.out.println("done reading");
 		boolean reading = true;
 
 
@@ -152,30 +127,6 @@ public class ClientConnection implements IClientConnection {
 				":" + clientSocket.getPort()
 				+ ">: '" + json.getJSON().trim() + "'");
 		return json;
-
-		// // oos = new ObjectOutputStream(output);
-		// ois = new ObjectInputStream(input);
-
-		// String jsonStr = null;
-		// try {
-		// jsonStr = (String) ois.readObject();
-		// } catch (Exception e) {
-		// logger.error("Unable to read input stream in client connection: " + e);
-		// }
-
-		// if (jsonStr == null || jsonStr.trim().isEmpty()) {
-		// return null;
-		// }
-		// // ois.close();
-
-		// JSONMessage json = new JSONMessage();
-		// json.deserialize(jsonStr);
-		// logger.info("RECEIVE \t<" + clientSocket.getInetAddress().getHostAddress() +
-		// ":" + clientSocket.getPort()
-		// + ">: '" + json.getJSON().trim() + "'");
-
-		// return json;
-
 	}
 
 	public void close() throws IOException {
@@ -185,11 +136,9 @@ public class ClientConnection implements IClientConnection {
 			}
 			if (input != null) {
 				input.close();
-				// ois.close();
 			}
 			if (output != null) {
 				output.close();
-				// oos.close();
 			}
 		} catch (IOException ioe) {
 			logger.error("Error! Unable to tear down connection!", ioe);

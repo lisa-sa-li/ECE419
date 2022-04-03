@@ -26,9 +26,6 @@ import app_kvServer.KVServer;
 import ecs.ECSNode;
 import ecs.ZooKeeperApplication;
 
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
-
 /**
  * Represents a connection end point for a particular client that is
  * connected to the server. This class is responsible for message reception
@@ -54,9 +51,6 @@ public class ECSConnection {
 	private ZooKeeper zk;
 	private ZooKeeperApplication zkApp;
 
-	ObjectInputStream ois;
-	ObjectOutputStream oos;
-
 	public ECSConnection(Socket ecsSocket) throws Exception {
 		this.ecsSocket = ecsSocket;
 		this.isOpen = true;
@@ -67,10 +61,6 @@ public class ECSConnection {
 		try {
 			output = this.ecsSocket.getOutputStream();
 			input = this.ecsSocket.getInputStream();
-
-			// oos = new ObjectOutputStream(output);
-			// oos.flush();
-			// ois = new ObjectInputStream(input);
 
 			logger.info("Connected to ECS " + this.ecsSocket.getInetAddress().getHostName() + " on port "
 					+ this.ecsSocket.getPort());
@@ -85,16 +75,6 @@ public class ECSConnection {
 		byte[] jsonBytes = json.getJSONByte();
 		output.write(jsonBytes, 0, jsonBytes.length);
 		output.flush();
-
-		// oos = new ObjectOutputStream(output);
-		// oos.flush();
-
-		// String msgText = json.serialize();
-		// oos.writeObject(msgText);
-
-		// oos.flush();
-		// // oos.reset();
-		// // oos.close();
 
 		logger.info("SEND \t<" + ecsSocket.getInetAddress().getHostAddress() + ":" + ecsSocket.getPort() + ">: '"
 				+ json.getJSON() + "'");
@@ -177,31 +157,6 @@ public class ECSConnection {
 		logger.info("RECEIVE \t<" + ecsSocket.getInetAddress().getHostAddress() + ":" + ecsSocket.getPort() + ">: '"
 				+ json.getJSON().trim() + "'");
 		return json;
-
-		// // oos = new ObjectOutputStream(output);
-		// // oos.flush();
-		// ois = new ObjectInputStream(input);
-
-		// String jsonStr = null;
-		// try {
-		// jsonStr = (String) ois.readObject();
-		// } catch (Exception e) {
-		// logger.error("Unable to read input stream in ecs connection: " + e);
-		// }
-
-		// if (jsonStr == null || jsonStr.trim().isEmpty()) {
-		// return null;
-		// }
-
-		// // ois.close();
-
-		// JSONMessage json = new JSONMessage();
-		// json.deserialize(jsonStr);
-		// logger.info("RECEIVE \t<" + ecsSocket.getInetAddress().getHostAddress() + ":"
-		// + ecsSocket.getPort()
-		// + ">: '" + json.getJSON().trim() + "'");
-
-		// return json;
 
 	}
 }
