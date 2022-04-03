@@ -245,8 +245,6 @@ public class ECSInteractionTest extends TestCase {
 			ex = e;
 		}
 
-		// System.out.println("response.getStatus() " + response.getStatus().name());
-		// System.out.println("ex " + ex);
 		assertTrue(ex == null && response.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE);
 		kvStore.disconnect();
 	}
