@@ -199,10 +199,10 @@ public class KVServer implements IKVServer, Runnable {
 			zk.exists(heartbeatPath, new HeartbeatApplication(this, zk, serverName));
 		} catch (KeeperException | InterruptedException e) {
 			logger.error("Cannot create heartbeat for server " + serverName, e);
-			System.exit(1);
+			// System.exit(1);
 		} catch (Exception e) {
 			logger.error("Cannot create heartbeat for server " + serverName, e);
-			System.exit(1);
+			// System.exit(1);
 		}
 	}
 
