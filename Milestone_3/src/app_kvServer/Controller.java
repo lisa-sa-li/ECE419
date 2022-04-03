@@ -134,8 +134,6 @@ public class Controller {
         for (ECSNode repl : this.replicants.values()) {
             // delete old stores
             CyclicBarrier barrier = new CyclicBarrier(1);
-            // logger.info("Deleting old info from replicate on MOVEDATA: " +
-            // repl.getNodePort());
             ControllerSender controllerDelete = new ControllerSender(repl, kvServer, barrier,
                     "", "delete");
             controllerDelete.sendMsg();
@@ -146,7 +144,7 @@ public class Controller {
                 TimeUnit.SECONDS.sleep(2);
                 // init new stores with cut data
                 CyclicBarrier barrier_2 = new CyclicBarrier(1);
-                logger.info("Sending new info from replicate on MOVEDATA: " + repl.getNodePort());
+                // logger.info("Sending new info from replicate on MOVEDATA: " + repl.getNodePort());
                 ControllerSender controllerInit = new ControllerSender(repl, kvServer, barrier_2,
                         this.controllerName + "@" + kvServer.getAllFromStorage(), "init");
                 controllerInit.sendMsg();
@@ -193,7 +191,7 @@ public class Controller {
         // get list of replicas
         for (ECSNode repl : replicas) {
             CyclicBarrier barrier = new CyclicBarrier(1);
-            logger.info("DELETING REPLICATE: " + repl.getNodePort());
+            // logger.info("DELETING REPLICATE: " + repl.getNodePort());
             ControllerSender controllerSender = new ControllerSender(repl, kvServer, barrier,
                     this.controllerName, "delete");
             // new Thread(controllerSender).start();

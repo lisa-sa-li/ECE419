@@ -238,7 +238,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 						throw new KeyValueTooLongException("Value too long : " + value);
 					}
 					handleMessageStatus = this.kvServer.putKV(key, value);
-					logger.info(handleMessageStatus.name() + ": key " + key + " & value " + value);
+					// logger.info(handleMessageStatus.name() + ": key " + key + " & value " + value);
 				} catch (Exception e) {
 					handleMessageStatus = StatusType.PUT_ERROR;
 					logger.info("PUT_ERROR: key " + key + " & value " + value);
@@ -249,7 +249,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 				try {
 					handleMessageStatus = this.kvServer.appendToStorage(value);
 					handleMessageStatus = null;
-					logger.info("PUT_MANY success");
+					// logger.info("PUT_MANY success");
 				} catch (Exception e) {
 					handleMessageStatus = StatusType.PUT_ERROR;
 					logger.info("PUT_ERROR: key " + key + " & value " + value);
@@ -294,7 +294,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 			case DISCONNECTED:
 				this.isOpen = false;
 				handleMessageStatus = StatusType.DISCONNECTED;
-				logger.info("Client is disconnected");
+				// logger.info("Client is disconnected");
 				break;
 			default:
 				logger.error("Unknown command.");
@@ -379,6 +379,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 				try {
 
 					JSONMessage receivedMessage = receiveJSONMessage();
+					logger.debug("MESSAGE RECEIVED: " + receivedMessage);
 					if (receivedMessage != null) {
 						JSONMessage sendMessage;
 						Metadata metadata = receivedMessage.getMetadata();
@@ -386,6 +387,7 @@ public class ServerConnection implements IServerConnection, Runnable {
 						if (metadata == null) {
 							sendMessage = new JSONMessage();
 							ServerStatus serverStatus = this.kvServer.serverStatus;
+							// logger.debug("serverStatus: " + serverStatus);
 							if (serverStatus == ServerStatus.CLOSED) {
 								// If the status is closed, all client requests are responded to with
 								// SERVER_STOPPED messages
@@ -397,7 +399,10 @@ public class ServerConnection implements IServerConnection, Runnable {
 								sendMessage.setMessage(StatusType.SERVER_WRITE_LOCK.name(), receivedMessage.getKey(),
 										receivedMessage.getValue());
 							} else {
+								// logger.debug("IN ELSE");
 								sendMessage = handleMessage(receivedMessage);
+								logger.debug("handled message key: " + sendMessage.getKey() + " : " +
+										sendMessage.getValue() + " : " + sendMessage.getStatus());
 							}
 						} else {
 							sendMessage = handleMetadataMessage(metadata);
@@ -405,9 +410,11 @@ public class ServerConnection implements IServerConnection, Runnable {
 						}
 						// In the case of a PUT_MANY, we do not need to send a message
 						if (sendMessage != null) {
+							logger.debug("sending sendMessage: " + sendMessage);
 							sendJSONMessage(sendMessage);
+							// logger.debug("sent success");
 						}
-
+						logger.debug("this.isOpen? : " + this.isOpen);
 					}
 				} catch (StreamCorruptedException e) {
 					logger.error("ServerConnection Stream Corrupted Exception: " + e);
@@ -419,6 +426,8 @@ public class ServerConnection implements IServerConnection, Runnable {
 					logger.error("ServerConnection connection failed: " + e);
 				}
 			}
+		} catch (Exception e) {
+			logger.error("-----SOMETHING IS SEVERELY WRONG HERE-----");
 		} finally {
 			try {
 				// close connection

@@ -204,7 +204,7 @@ public class ReplicateConnection implements IServerConnection, Runnable {
 					kvServer.addActingReplicate(replicate);
 					break;
 				case UPDATE_REPLICATE_DATA:
-					logger.info(">>UPDATE_REPLICATE_DATA");
+					// logger.info(">>UPDATE_REPLICATE_DATA");
 					replicate.updateReplicateData(value);
 					logger.info(">>Done replicate data update on replicate side");
 					break;

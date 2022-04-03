@@ -78,13 +78,13 @@ public class ECSInteractionTest extends TestCase {
 	@Test
 	public void testMultipleServerRingTest() {
 		// test adding multiples servers
-		ecs.addNodes(3, "FIFO", 3);
+		ecs.addNodes(2, "FIFO", 3);
 		ecs.start();
 
 		// collect available servers
 		ArrayList<Integer> ports = ecs.getCurrentPorts();
 
-		assertTrue(ports.size() == 3);
+		assertTrue(ports.size() == 2);
 
 		// connect with KVStore
 		KVStore kvStore_1 = new KVStore("127.0.0.1", ports.get(0));
@@ -110,31 +110,19 @@ public class ECSInteractionTest extends TestCase {
 		assertTrue(ex_2 == null);
 
 		kvStore_2.disconnect();
-
-		KVStore kvStore_3 = new KVStore("127.0.0.1", ports.get(2));
-		Exception ex_3 = null;
-		try {
-			kvStore_3.connect();
-		} catch (Exception e) {
-			ex_3 = e;
-		}
-
-		assertTrue(ex_3 == null);
-
-		kvStore_3.disconnect();
 	}
 
 	@Test
 	public void testRemoveServer() {
 		// test adding multiples servers
-		ecs.addNodes(3, "FIFO", 3);
+		ecs.addNodes(2, "None", 0);
 		ecs.start();
 
 		// collect available servers
 		ArrayList<Integer> ports = ecs.getCurrentPorts();
 		ArrayList<String> servers = ecs.getCurrentServers();
 
-		assertTrue(ports.size() == 3 && servers.size() == 3);
+		assertTrue(ports.size() == 2 && servers.size() == 2);
 
 		ArrayList<String> nodeNames = new ArrayList<String>();
 		nodeNames.add(servers.get(0));
@@ -142,20 +130,20 @@ public class ECSInteractionTest extends TestCase {
 		ecs.removeNodes(nodeNames);
 
 		ArrayList<Integer> ports_after = ecs.getCurrentPorts();
-		assertTrue(ports_after.size() == 2);
+		assertTrue(ports_after.size() == 1);
 	}
 
 	@Test
 	public void testRemoveServers() {
 		// test adding multiples servers
-		ecs.addNodes(3, "FIFO", 3);
+		ecs.addNodes(2, "None", 0);
 		ecs.start();
 
 		// collect available servers
 		ArrayList<Integer> ports = ecs.getCurrentPorts();
 		ArrayList<String> servers = ecs.getCurrentServers();
 
-		assertTrue(ports.size() == 3 && servers.size() == 3);
+		assertTrue(ports.size() == 2 && servers.size() == 2);
 
 		ArrayList<String> nodeNames = new ArrayList<String>();
 		nodeNames.add(servers.get(0));
@@ -164,7 +152,7 @@ public class ECSInteractionTest extends TestCase {
 		ecs.removeNodes(nodeNames);
 
 		ArrayList<Integer> ports_after = ecs.getCurrentPorts();
-		assertTrue(ports_after.size() == 1);
+		assertTrue(ports_after.size() == 0);
 	}
 
 	@Test

@@ -8,6 +8,7 @@ import java.net.SocketTimeoutException;
 import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import ecs.HashRing;
 import ecs.ECSNode;
@@ -66,6 +67,7 @@ public class KVStore implements KVCommInterface, Runnable {
 	@Override
 	public void connect() throws Exception {
 		try {
+			System.out.println("CONNECTING TO: " + this.address + " : " + this.port);
 			Socket clientSocket = new Socket(this.address, this.port);
 			// clientSocket.setSoTimeout(7000);
 			this.clientConnection = new ClientConnection(clientSocket);
@@ -81,13 +83,14 @@ public class KVStore implements KVCommInterface, Runnable {
 
 	@Override
 	public void disconnect() {
-		logger.info("Tearing down the connection ...");
 		try {
 			JSONMessage jsonMessage = new JSONMessage();
 			jsonMessage.setMessage(StatusType.DISCONNECTED.name(), "disconnected", "in KVStore", null);
 
 			this.clientConnection.sendJSONMessage(jsonMessage);
+			// logger.info("Tearing down the connection ...");
 			this.clientConnection.receiveJSONMessage();
+			// System.out.println("received JSON");
 			this.clientConnection.close();
 			logger.info("Client connection closed!");
 		} catch (IOException e) {
@@ -119,26 +122,31 @@ public class KVStore implements KVCommInterface, Runnable {
 			System.out.println("Metadata stale: original address: " + this.address + " original port: " + this.port);
 			// metadata already exists (might be stale)
 			this.updateToCorrectNodeFromList(key);
-			System.out.println("Updated to correct node info: " + this.address + " new port: " + this.port);
 			this.switchServer();
+			// System.out.println("switched servers");
 		}
-
 		this.clientConnection.sendJSONMessage(jsonMessage);
+		System.out.println("Sent JSON");
 		JSONMessage returnMsg = this.clientConnection.receiveJSONMessage();
 		// System.out.println("sent message before while loop: " +
 		// returnMsg.getStatus().toString());
 		int retries = 0;
 		while (!wasSuccessful && retries < 3) {
-			System.out.println("retires: " + retries);
+			// System.out.println("retires: " + retries);
 			try {
 				if (returnMsg.getStatus() == StatusType.SERVER_NOT_RESPONSIBLE) {
 					System.out.println("originally connected to: " + this.address + " address and port: " + this.port);
-					System.out.println("Server not responsible so switching soon");
+					// System.out.println("Server not responsible so switching");
 					this.updateToCorrectNodeInfo(returnMsg, key);
+					System.out.println("switching to: " + this.address + " address and port: " + this.port);
 					this.switchServer();
-					System.out.println("switched to: " + this.address + " address and port: " + this.port);
 					this.clientConnection.sendJSONMessage(jsonMessage);
 					System.out.println("Sent message");
+					try {
+						TimeUnit.SECONDS.sleep(2);
+					} catch (Exception e) {
+						logger.error("Unable to init replicates on MoveData");
+					}
 					returnMsg = this.clientConnection.receiveJSONMessage();
 					System.out.println("returned message: " + returnMsg.getStatus().toString());
 				} else {
@@ -156,6 +164,7 @@ public class KVStore implements KVCommInterface, Runnable {
 
 	public void switchServer() throws Exception {
 		this.disconnect();
+		// TimeUnit.SECONDS.sleep(5);
 		try {
 			this.connect();
 		} catch (Exception e) {

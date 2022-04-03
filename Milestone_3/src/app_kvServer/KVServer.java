@@ -610,7 +610,6 @@ public class KVServer implements IKVServer, Runnable {
 
 	public String getStringLogs(boolean clearLogs) {
 		StringBuffer buffer = new StringBuffer();
-
 		for (Map.Entry<String, String> entry : this.logs.entrySet()) {
 			String key = entry.getKey();
 			String value = entry.getValue();
@@ -629,7 +628,6 @@ public class KVServer implements IKVServer, Runnable {
 				logLock.writeLock().unlock();
 			}
 		}
-
 		return buffer.toString();
 	}
 
@@ -638,7 +636,7 @@ public class KVServer implements IKVServer, Runnable {
 		if (this.cache != null) {
 			this.cache.clear();
 		}
-		logger.info("Cache cleared");
+		// logger.info("Cache cleared");
 	}
 
 	public String getAllFromStorage() {
@@ -663,7 +661,7 @@ public class KVServer implements IKVServer, Runnable {
 	}
 
 	private boolean initializeServer() {
-		logger.info("Initialize server ...");
+		// logger.info("Initialize server ...");
 		try {
 			serverSocket = new ServerSocket(port);
 			// serverSocket.setSoTimeout(5000);
@@ -684,7 +682,7 @@ public class KVServer implements IKVServer, Runnable {
 			ServerSocket replicateReceiveSocket = new ServerSocket(replicateReceiverPort);
 			// replicateReceiveSocket.setSoTimeout(5000);
 			new Thread(new ReplicateServer(replicateReceiveSocket, this)).start();
-			logger.info("Replicate server listening on port: " + replicateReceiveSocket.getLocalPort());
+			// logger.info("Replicate server listening on port: " + replicateReceiveSocket.getLocalPort());
 		} catch (IOException e) {
 			logger.error("Could not open replicate listening socket");
 			e.printStackTrace();

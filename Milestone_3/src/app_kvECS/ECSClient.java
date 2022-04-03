@@ -445,15 +445,15 @@ public class ECSClient implements IECSClient, Runnable {
         try {
             switch (action) {
                 case "start":
-                    System.out.println("Launching all storage servers");
+                    // System.out.println("Launching all storage servers");
                     start();
                     break;
                 case "stop":
-                    System.out.println("Stopping all storage servers");
+                    // System.out.println("Stopping all storage servers");
                     stop();
                     break;
                 case "addnode":
-                    System.out.println("Adding node");
+                    // System.out.println("Adding node");
                     addNode(tokens[1], Integer.parseInt(tokens[2]));
                     break;
                 case "addnodes":
