@@ -66,7 +66,7 @@ public class KVServer implements IKVServer, Runnable {
 	private String zkHost;
 	private int zkPort;
 
-	private ReadWriteLock logLock;
+	private ReadWriteLock logLock = new ReentrantReadWriteLock();
 
 	private int zkTimeout = 1000;
 	private ZooKeeper zk;
@@ -214,7 +214,7 @@ public class KVServer implements IKVServer, Runnable {
 		update(metadata);
 
 		// log lock
-		logLock = new ReentrantReadWriteLock();
+		// logLock = new ReentrantReadWriteLock();
 
 		// begin updates every 2 minutes, starting 1 minute after init update
 		updateReplicasAsync();
@@ -382,11 +382,11 @@ public class KVServer implements IKVServer, Runnable {
 			output.flush();
 			output.close();
 			socket.close();
-		} catch (SocketTimeoutException s){
+		} catch (SocketTimeoutException s) {
 			logger.info("Socket timeout in KVServer: retrying " + s);
 		} catch (Exception e) {
 			logger.error("Unable to send data to node " + nameOfReceiver + ", " + e);
-		} 
+		}
 
 		unLockWrite();
 
@@ -445,7 +445,7 @@ public class KVServer implements IKVServer, Runnable {
 			output.flush();
 			output.close();
 			socket.close();
-		} catch (SocketTimeoutException s){
+		} catch (SocketTimeoutException s) {
 			logger.info("Socket timeout in KVServer: retrying? " + s);
 		} catch (Exception e) {
 			logger.error("Unable to send recovery replicate data to node " + nameOfReceiver + ", " + e);
