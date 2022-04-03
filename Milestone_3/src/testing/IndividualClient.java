@@ -79,8 +79,8 @@ public class IndividualClient implements Runnable {
                                 System.out.println(e);
                             }
                             // System.out.println("Calling PUT");
-                            this.kvStore.put(key, value.substring(0, 10));
                             this.totalBytes += value.substring(0, 10).getBytes(StandardCharsets.UTF_8).length;
+                            this.kvStore.put(key, value.substring(0, 10));
                             this.numPUTRequests += 1;
                             //count += 1;
                             //System.out.println("PUT is called: " + count);
@@ -96,8 +96,8 @@ public class IndividualClient implements Runnable {
                             System.out.println(e);
                         }
                         try {
+                            this.totalBytes += 10;
                             String returnVal = this.kvStore.get(pair.get(0)).getValue();
-                            this.totalBytes += returnVal.getBytes(StandardCharsets.UTF_8).length;
                             this.numGETRequests += 1;
                         } catch (Exception e) {
                         }

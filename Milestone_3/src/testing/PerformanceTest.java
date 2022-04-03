@@ -175,6 +175,7 @@ public class PerformanceTest {
             double totalBytes = 0;
             for (int i = 0; i < numClients; i++)
                 totalBytes += clients.get(i).getTotalBytes();
+            System.out.println("totalBytes and duration: " + totalBytes + " : " + duration);
             double throughput = totalBytes / (duration);
             System.out.println("The throughput of " + this.cacheStrategy + " cache with the size of " + this.cacheSize
                     + " with " + this.numClients + " clients and " + this.numServers + " servers is: " + throughput);
@@ -217,16 +218,15 @@ public class PerformanceTest {
         // Test performance of using different numbers of servers with constant number
         // of clients
         // No caching
-        new PerformanceTest(1, 2, "None", 0, false).runTests();
         new PerformanceTest(3, 2, "None", 0, false).runTests();
-        new PerformanceTest(4, 2, "None", 0, false).runTests();
-
+        new PerformanceTest(2, 2, "None", 0, false).runTests();
+        new PerformanceTest(1, 2, "None", 0, false).runTests();
         // Test performance of using different numbers of clients with constant number
         // of servers
         // No caching
-        new PerformanceTest(2, 4, "None", 0, false).runTests();
         new PerformanceTest(2, 2, "None", 0, false).runTests();
-        new PerformanceTest(2, 1, "None", 0, false).runTests();
+        new PerformanceTest(2, 4, "None", 0, false).runTests();
+        // new PerformanceTest(2, 1, "None", 0, false).runTests();
         // Test performance of using different types of cache strategy
         // Same number of servers and clients and cache size
         new PerformanceTest(2, 1, "FIFO", 8, false).runTests();
@@ -234,8 +234,8 @@ public class PerformanceTest {
         new PerformanceTest(2, 1, "LRU", 8, false).runTests();
         // Test performance of using different cache size
         // Same number of servers and clients and cache strategy (FIFO)
-        new PerformanceTest(2, 1, "FIFO", 20, false).runTests();
-        new PerformanceTest(2, 1, "FIFO", 10, false).runTests();
+        // new PerformanceTest(2, 1, "FIFO", 20, false).runTests();
+        // new PerformanceTest(2, 1, "FIFO", 10, false).runTests();
         new PerformanceTest(2, 1, "FIFO", 3, false).runTests();
     }
 
