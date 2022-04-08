@@ -178,6 +178,11 @@ public class KVServer implements IKVServer, Runnable {
 		// Initialize the KVServer with the metadata and block it for client requests,
 		stop();
 		update(metadata);
+
+		if (inHashRing() && this.hashRing.size() == 1) {
+			// Get old data from global storage if it's the first server being booted up
+			persistantStorage.getFromGlobalStorage();
+		}
 	}
 
 	@Override
@@ -259,9 +264,20 @@ public class KVServer implements IKVServer, Runnable {
 		BigInteger hash = receiverNode.getHash();
 		BigInteger endHash = receiverNode.getEndHash();
 
-		if (nameOfReceiver == this.serverName) {
-			// If it's being told to move the data to itself, do nothing
+		if (nameOfReceiver.equals(this.serverName)) {
+			// It's being told to move the data to itself
+			if (die == true) {
+				// This is the last server and it's being told to die
+				// Move its storage to global_storage.txt
+				persistantStorage.moveToGlobalStorage();
+			}
 			unLockWrite();
+			try {
+				TimeUnit.SECONDS.sleep(5);
+				kill();
+			} catch (Exception e) {
+				logger.error("Unable to kill server");
+			}
 			return;
 		}
 

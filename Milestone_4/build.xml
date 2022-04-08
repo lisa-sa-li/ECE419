@@ -11,27 +11,27 @@
   <property name="lib.dir"       value="libs"/>
 
   <!-- Configuration for client application -->
-  <property name="clientjar.file"      value="m2-client.jar"/>
+  <property name="clientjar.file"      value="m4-client.jar"/>
   <property name="clientmanifest.file" value="CLIENT_MANIFEST.MF"/>
   <property name="clientmain.class" value="app_kvClient.KVClient"/>
 
   <!-- Configuration for server application -->
-  <property name="serverjar.file"      value="m2-server.jar"/>
+  <property name="serverjar.file"      value="m4-server.jar"/>
   <property name="servermanifest.file" value="SERVER_MANIFEST.MF"/>
   <property name="servermain.class" value="app_kvServer.KVServer"/>
 
   <!-- Configuration for ecs application -->
-  <property name="ecsjar.file"      value="m2-ecs.jar"/>
+  <property name="ecsjar.file"      value="m4-ecs.jar"/>
   <property name="ecsmanifest.file" value="ECS_MANIFEST.MF"/>
   <property name="ecsmain.class" value="app_kvECS.ECSClient"/>
 
   <!-- Configuration for performance test -->
-  <property name="performancetest.file"      value="m2-performance-test.jar"/>
+  <property name="performancetest.file"      value="m4-performance-test.jar"/>
   <property name="performancetestmanifest.file" value="PERFORMANCE_TEST_MANIFEST.MF"/>
   <property name="performancetestmain.class" value="testing.PerformanceTest"/>
 
   <!-- Configuration for multithread test -->
-  <property name="threadtest.file"      value="m2-thread-test.jar"/>
+  <property name="threadtest.file"      value="m4-thread-test.jar"/>
   <property name="threadtestmanifest.file" value="THREAD_TEST_MANIFEST.MF"/>
   <property name="threadtestmain.class" value="testing.ThreadTest"/>
 

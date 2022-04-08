@@ -14,21 +14,34 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.FileNotFoundException;
 import shared.Utils;
-import ecs.HashRing;
 
 public class PersistantStorage implements IPersistantStorage {
     private static Logger logger = Logger.getRootLogger();
     private String fileName;
     private String pathToFile;
     private String dir = "./storage";
-    private HashRing hashRing;
+    private String GLOBAL_STORAGE_PATH = dir + "/global_storage.txt";
     private Utils utils;
 
     public PersistantStorage(String name) {
         this.fileName = name.trim() + "_storage.txt";
         this.pathToFile = dir + "/" + this.fileName;
-        this.hashRing = new HashRing();
         this.utils = new Utils();
+
+        try {
+            initFile();
+        } catch (Exception e) {
+            logger.error(e);
+        }
+    }
+
+    public PersistantStorage(String name, String globalStorageFile) {
+        // Use this for testing
+        this.fileName = name.trim() + "_storage.txt";
+        this.pathToFile = dir + "/" + this.fileName;
+        this.utils = new Utils();
+
+        GLOBAL_STORAGE_PATH = globalStorageFile;
 
         try {
             initFile();
@@ -44,7 +57,7 @@ public class PersistantStorage implements IPersistantStorage {
             if (directory.mkdirs()) {
                 logger.info("Directory created: " + directory.getName());
             } else {
-                logger.info("Directory already exists.");
+                logger.info("Directory already exists: " + dir);
             }
         } catch (Exception e) {
             logger.error("Error when creating directory " + directory.getName() + ": " + e);
@@ -55,12 +68,23 @@ public class PersistantStorage implements IPersistantStorage {
             if (f.createNewFile()) {
                 logger.info("File created: " + f.getName());
             } else {
-                logger.info("File already exists.");
+                logger.info("File already exists: " + this.pathToFile);
             }
         } catch (Exception e) {
             logger.error("Error when creating file " + f.getName() + ": " + e);
         }
 
+        // Create global storage file if it does not exist
+        File f_global = new File(GLOBAL_STORAGE_PATH);
+        try {
+            if (f_global.createNewFile()) {
+                logger.info("File created: " + f_global.getName());
+            } else {
+                logger.info("File already exists: " + GLOBAL_STORAGE_PATH);
+            }
+        } catch (Exception e) {
+            logger.error("Error when creating file " + f_global.getName() + ": " + e);
+        }
     }
 
     public BigInteger getHash(String value) {
@@ -261,7 +285,7 @@ public class PersistantStorage implements IPersistantStorage {
     }
 
     @Override
-    public StatusType appendToStorage(String keyValues) throws Exception {
+    public StatusType appendToStorage(String keyValues) {
         // Appends kv-pairs to the end of the storage file
         try {
             BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
@@ -273,7 +297,6 @@ public class PersistantStorage implements IPersistantStorage {
                 inputBuffer.append('\n');
             }
             inputBuffer.append(keyValues);
-
             file.close();
             // Overwrite file with the string buffer data
             FileOutputStream fileOut = new FileOutputStream(this.pathToFile);
@@ -286,6 +309,78 @@ public class PersistantStorage implements IPersistantStorage {
             logger.error("Problem reading file to put_many.");
         }
         return StatusType.PUT_ERROR;
+    }
+
+    public String getAllFromStorage() {
+        // Appends kv-pairs to the end of the storage file
+        try {
+            BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
+            StringBuffer buffer = new StringBuffer();
+            String line;
+
+            while ((line = file.readLine()) != null) {
+                buffer.append(line);
+                buffer.append('\n');
+            }
+
+            file.close();
+            logger.info("Retrieved all key-value pairs from storage");
+            return buffer.toString();
+        } catch (Exception e) {
+            logger.error("Problem retrieving all key-value pairs from storage.");
+        }
+        return "";
+    }
+
+    public void moveToGlobalStorage() {
+        // Appends kv-pairs to global_storage.txt if it's being shut down and is the
+        // last server
+        try {
+            BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
+            StringBuffer buffer = new StringBuffer();
+            String line;
+
+            while ((line = file.readLine()) != null) {
+                buffer.append(line);
+                buffer.append('\n');
+            }
+            file.close();
+            this.clearStorage();
+            // Write all its contents to a global storage
+            FileOutputStream fileOut = new FileOutputStream(GLOBAL_STORAGE_PATH);
+            fileOut.write(buffer.toString().getBytes());
+            fileOut.close();
+            logger.info("Successfully moved kv-pairs to " + GLOBAL_STORAGE_PATH);
+        } catch (Exception e) {
+            logger.error("Problem moving kv-pairs to " + GLOBAL_STORAGE_PATH);
+        }
+    }
+
+    public void getFromGlobalStorage() {
+        // Retrieve kv-pairs from global_storage.txt if it's the first server being
+        // started up
+        try {
+            BufferedReader file = new BufferedReader(new FileReader(GLOBAL_STORAGE_PATH));
+            StringBuffer buffer = new StringBuffer();
+            String line;
+
+            while ((line = file.readLine()) != null) {
+                buffer.append(line);
+                buffer.append('\n');
+            }
+            file.close();
+
+            // Clear the file
+            PrintWriter writer = new PrintWriter(GLOBAL_STORAGE_PATH);
+            writer.print("");
+            writer.close();
+
+            // Append the kv-pairs to its own storage
+            this.appendToStorage(buffer.toString());
+            logger.info("Successfully retrieved kv-pairs from " + GLOBAL_STORAGE_PATH);
+        } catch (Exception e) {
+            logger.error("Problem retrieving kv-pairs from " + GLOBAL_STORAGE_PATH);
+        }
     }
 
 }
