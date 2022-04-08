@@ -21,6 +21,7 @@ public class PersistantStorage implements IPersistantStorage {
     private String pathToFile;
     private String dir = "./storage";
     private String GLOBAL_STORAGE_PATH = dir + "/global_storage.txt";
+    private String TRASH_PATH = dir + "/trash.txt";
     private Utils utils;
 
     public PersistantStorage(String name) {
@@ -62,28 +63,21 @@ public class PersistantStorage implements IPersistantStorage {
         } catch (Exception e) {
             logger.error("Error when creating directory " + directory.getName() + ": " + e);
         }
-        // Create file if it does not exist
-        File f = new File(this.pathToFile);
-        try {
-            if (f.createNewFile()) {
-                logger.info("File created: " + f.getName());
-            } else {
-                logger.info("File already exists: " + this.pathToFile);
-            }
-        } catch (Exception e) {
-            logger.error("Error when creating file " + f.getName() + ": " + e);
-        }
 
-        // Create global storage file if it does not exist
-        File f_global = new File(GLOBAL_STORAGE_PATH);
-        try {
-            if (f_global.createNewFile()) {
-                logger.info("File created: " + f_global.getName());
-            } else {
-                logger.info("File already exists: " + GLOBAL_STORAGE_PATH);
+        // Create storage file, global storage file, and trash file if it does not exist
+        String[] filesToCreate = new String[] { this.pathToFile, GLOBAL_STORAGE_PATH, TRASH_PATH };
+        File f;
+        for (String filePath : filesToCreate) {
+            f = new File(filePath);
+            try {
+                if (f.createNewFile()) {
+                    logger.info("File created: " + f.getName());
+                } else {
+                    logger.info("File already exists: " + f.getName());
+                }
+            } catch (Exception e) {
+                logger.error("Error when creating file " + f.getName() + ": " + e);
             }
-        } catch (Exception e) {
-            logger.error("Error when creating file " + f_global.getName() + ": " + e);
         }
     }
 
@@ -118,6 +112,8 @@ public class PersistantStorage implements IPersistantStorage {
                     // Otherwise, update the value and append to file
                     if (value.isEmpty() || value == null) {
                         putStatus = StatusType.DELETE_SUCCESS;
+                        // Add the file to trash
+                        this.appendToFile(line, TRASH_PATH);
                     } else {
                         json.setValue(value);
                         line = json.serialize(false);
@@ -286,9 +282,13 @@ public class PersistantStorage implements IPersistantStorage {
 
     @Override
     public StatusType appendToStorage(String keyValues) {
+        return appendToFile(keyValues, this.pathToFile);
+    }
+
+    public StatusType appendToFile(String keyValues, String filePath) {
         // Appends kv-pairs to the end of the storage file
         try {
-            BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
+            BufferedReader file = new BufferedReader(new FileReader(filePath));
             StringBuffer inputBuffer = new StringBuffer();
             String line;
 
@@ -299,7 +299,7 @@ public class PersistantStorage implements IPersistantStorage {
             inputBuffer.append(keyValues);
             file.close();
             // Overwrite file with the string buffer data
-            FileOutputStream fileOut = new FileOutputStream(this.pathToFile);
+            FileOutputStream fileOut = new FileOutputStream(filePath);
             fileOut.write(inputBuffer.toString().getBytes());
             fileOut.close();
 
