@@ -5,6 +5,11 @@ import java.io.File;
 import java.math.BigInteger;
 import junit.framework.TestCase;
 import org.junit.Test;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 import app_kvServer.PersistantStorage;
 
@@ -15,11 +20,13 @@ public class AdditionalTest extends TestCase {
 
 	private PersistantStorage persistantStorage;
 	private Utils utils = new Utils();
+	private String GLOBAL_STORAGE_PATH = "./storage/global_storage_test.txt";
 
 	public void setUp() {
 		try {
-			persistantStorage = new PersistantStorage("50001");
+			persistantStorage = new PersistantStorage("50001", GLOBAL_STORAGE_PATH);
 			persistantStorage.clearStorage();
+			clearFile(GLOBAL_STORAGE_PATH);
 		} catch (Exception e) {
 			System.out.println("Failed to set up persistant storage");
 			System.out.println(e);
@@ -28,6 +35,48 @@ public class AdditionalTest extends TestCase {
 
 	public void tearDown() {
 		persistantStorage.deleteStorage();
+	}
+
+	public String getAllFromFile(String pathToFile) {
+		// Appends kv-pairs to the end of the storage file
+		try {
+			BufferedReader file = new BufferedReader(new FileReader(pathToFile));
+			StringBuffer buffer = new StringBuffer();
+			String line;
+
+			while ((line = file.readLine()) != null) {
+				buffer.append(line);
+				buffer.append('\n');
+			}
+
+			file.close();
+			return buffer.toString();
+		} catch (Exception e) {
+		}
+		return "";
+	}
+
+	public void clearFile(String pathToFile) {
+		try {
+			PrintWriter writer = new PrintWriter(pathToFile);
+			writer.print("");
+			writer.close();
+		} catch (FileNotFoundException e) {
+		} catch (Exception e) {
+		}
+	}
+
+	public void writeToStorage(String pathToFile, String str) {
+		try {
+			// Overwrite file with the string buffer data
+			FileOutputStream fileOut = new FileOutputStream(pathToFile);
+			fileOut.write(str.getBytes());
+			fileOut.close();
+
+			System.out.println("Completed 'put_many' operation into storage server");
+		} catch (Exception e) {
+			System.out.println("Problem reading file to put_many.");
+		}
 	}
 
 	@Test
@@ -337,6 +386,64 @@ public class AdditionalTest extends TestCase {
 				"{\"status\":\"NO_STATUS\",\"key\":\"key1\",\"value\":\"value1\"}\n{\"status\":\"NO_STATUS\",\"key\":\"key2\",\"value\":\"value2\"}\n{\"status\":\"NO_STATUS\",\"key\":\"key3\",\"value\":\"value3\"}\n{\"status\":\"NO_STATUS\",\"key\":\"key4\",\"value\":\"value4\"}\n"));
 
 		assertTrue(persistantStorage.isEmpty() == true);
+	}
+
+	@Test
+	public void testGetAllFromStorage() {
+		String output = "";
+		Exception ex = null;
+
+		try {
+			persistantStorage.put("key1", "value1");
+			persistantStorage.put("key2", "value2");
+			persistantStorage.put("key3", "value3");
+			persistantStorage.put("key4", "value4");
+			output = persistantStorage.getAllFromStorage();
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && output.equals(
+				"{\"status\":\"NO_STATUS\",\"key\":\"key1\",\"value\":\"value1\"}\n{\"status\":\"NO_STATUS\",\"key\":\"key2\",\"value\":\"value2\"}\n{\"status\":\"NO_STATUS\",\"key\":\"key3\",\"value\":\"value3\"}\n{\"status\":\"NO_STATUS\",\"key\":\"key4\",\"value\":\"value4\"}\n"));
+
+		assertTrue(persistantStorage.isEmpty() == false);
+	}
+
+	@Test
+	public void testMoveToGlobalStorage() {
+		String output = "";
+		Exception ex = null;
+
+		try {
+			persistantStorage.put("key1", "value1");
+			persistantStorage.put("key2", "value2");
+			persistantStorage.moveToGlobalStorage();
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && getAllFromFile(GLOBAL_STORAGE_PATH).equals(
+				"{\"status\":\"NO_STATUS\",\"key\":\"key1\",\"value\":\"value1\"}\n{\"status\":\"NO_STATUS\",\"key\":\"key2\",\"value\":\"value2\"}\n"));
+
+		assertTrue(persistantStorage.isEmpty() == true);
+	}
+
+	@Test
+	public void testGetFromGlobalStorage() {
+		String output = "";
+		Exception ex = null;
+
+		try {
+			writeToStorage(GLOBAL_STORAGE_PATH,
+					"{\"status\":\"NO_STATUS\",\"key\":\"key1\",\"value\":\"value1\"}\n{\"status\":\"NO_STATUS\",\"key\":\"key2\",\"value\":\"value2\"}\n");
+			persistantStorage.getFromGlobalStorage();
+		} catch (Exception e) {
+			ex = e;
+		}
+
+		assertTrue(ex == null && persistantStorage.getAllFromStorage().equals(
+				"{\"status\":\"NO_STATUS\",\"key\":\"key1\",\"value\":\"value1\"}\n{\"status\":\"NO_STATUS\",\"key\":\"key2\",\"value\":\"value2\"}\n"));
+		assertTrue(persistantStorage.isEmpty() == false);
 	}
 
 }
