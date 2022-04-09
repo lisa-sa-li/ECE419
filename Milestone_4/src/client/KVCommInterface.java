@@ -39,9 +39,22 @@ public interface KVCommInterface {
 	 *            the key that identifies the value.
 	 * @return the value, which is indexed by the given key.
 	 * @throws Exception
-	 *                   if put command cannot be executed (e.g. not connected to
+	 *                   if get command cannot be executed (e.g. not connected to
 	 *                   any
 	 *                   KV server).
 	 */
 	public JSONMessage get(String key) throws Exception;
+
+	/**
+	 * Attempts to recover the key in persistent storage.
+	 *
+	 * @param key
+	 *            the key that want to be recovered.
+	 * @return JSONMessage with the status update.
+	 * @throws Exception
+	 *                   if recover command cannot be executed (e.g. not connected to
+	 *                   any
+	 *                   KV server).
+	 */
+	public JSONMessage recover(String key) throws Exception;
 }

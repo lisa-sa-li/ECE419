@@ -106,6 +106,13 @@ public class KVStore implements KVCommInterface, Runnable {
 		return this.runPutGet(jsonMessage, key);
 	}
 
+	@Override
+	public JSONMessage recover(String key) throws Exception {
+		JSONMessage jsonMessage = new JSONMessage();
+		jsonMessage.setMessage(StatusType.RECOVER.name(), key, "", null);
+		return this.runPutGet(jsonMessage, key);
+	}
+
 	public JSONMessage runPutGet(JSONMessage jsonMessage, String key) throws Exception {
 		JSONMessage finalMsg = null;
 		wasSuccessful = false;
