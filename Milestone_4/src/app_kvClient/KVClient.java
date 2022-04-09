@@ -194,6 +194,36 @@ public class KVClient implements IKVClient, Runnable {
                         }
                     }
                     break;
+                case "recover":
+                    if (tokens.length > 2) {
+                        logger.error("Invalid number of parameters!");
+                    } else {
+                        if (this.kvStore != null) {
+                            String key = tokens[1];
+                            if (key.length() <= 20 && key.length() > 0) {
+                                try {
+                                    JSONMessage msg = this.kvStore.recover(key);
+                                    printMsgFromServer(msg);
+                                } catch (SocketException se) {
+                                    try {
+                                        this.kvStore.connect();
+                                        JSONMessage msg = this.kvStore.recover(key);
+                                        printMsgFromServer(msg);
+                                    } catch (Exception e) {
+                                        System.out.println("Socket connection to server is closed.");
+                                    }
+                                } catch (Exception e) {
+                                    System.out.println("Error recovering key: " + e);
+                                }
+                            } else {
+                                logger.error("Key length must be between 1 and 20.");
+                            }
+                        } else {
+                            System.out.println("Not connected to any store.");
+                            logger.warn("Not connected to any store.");
+                        }
+                    }
+                    break;
                 case "disconnect":
                     if (this.kvStore != null) {
                         disconnect();
@@ -286,6 +316,8 @@ public class KVClient implements IKVClient, Runnable {
         sb.append("\t Deletes the entry for the given key if <value> is empty \n");
         sb.append(PROMPT).append("get <key>");
         sb.append("\t\t Retrieves the value for the given key from the storage server \n");
+        sb.append(PROMPT).append("recover <key>");
+        sb.append("\t\t Attemps to recover the key in the storage server \n");
         sb.append(PROMPT).append("logLevel <level>");
         sb.append("\t Changes the logLevel to the specified level \n");
         sb.append(PROMPT).append("\t\t\t ");
