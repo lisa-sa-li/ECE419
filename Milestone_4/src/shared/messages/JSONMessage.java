@@ -5,6 +5,7 @@ import java.util.StringTokenizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.*;
+import java.time.LocalDateTime;
 
 import org.apache.log4j.*;
 import com.google.gson.Gson;
@@ -121,12 +122,16 @@ public class JSONMessage implements KVMessage, Serializable {
         this.json = null;
     }
 
-    public String getTimestamp() {
-        return this.timestamp;
+    public LocalDateTime getTimestamp() {
+        return LocalDateTime.parse(this.timestamp);
     }
 
-    public void setTimestamp(String ts) {
-        this.timestamp = ts;
+    public void setTimestamp(LocalDateTime ts) {
+        if (ts == null) {
+            this.timestamp = null;
+        } else {
+            this.timestamp = ts.toString();
+        }
     }
 
     public void setMetadata(Metadata metadata) {

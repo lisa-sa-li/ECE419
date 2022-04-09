@@ -13,6 +13,9 @@ import shared.messages.JSONMessage;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.FileNotFoundException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import shared.Utils;
 
 public class PersistantStorage implements IPersistantStorage {
@@ -51,6 +54,15 @@ public class PersistantStorage implements IPersistantStorage {
         }
     }
 
+    public PersistantStorage(boolean test) {
+        // Use this for soft delete
+        this.fileName = "trash.txt";
+        this.pathToFile = dir + "/" + this.fileName;
+        this.utils = new Utils();
+
+        GLOBAL_STORAGE_PATH = dir + "/global_storage.txt";
+    }
+
     private void initFile() throws Exception {
         // Create directory if it does not exist
         File directory = new File(dir);
@@ -85,6 +97,56 @@ public class PersistantStorage implements IPersistantStorage {
         return utils.getHash(value);
     }
 
+    public boolean clearTrash() {
+        // get current time
+        LocalDateTime currTime = LocalDateTime.now();
+
+        // iterate through all keys in the file and remove expired ones <3
+        try {
+            BufferedReader file = new BufferedReader(new FileReader(this.pathToFile));
+            StringBuffer inputBuffer = new StringBuffer();
+            String line;
+            JSONMessage json;
+            LocalDateTime ts;
+
+            while ((line = file.readLine()) != null) {
+                // Covert each line to a JSON so we can read the timestamp
+                json = new JSONMessage();
+                json.deserialize(line);
+                ts = json.getTimestamp();
+
+                if (currTime.isAfter(ts)) {
+                    // we keep
+                    inputBuffer.append(line + '\n');
+                }
+            }
+            file.close();
+
+            // Overwrite file with the string buffer data
+            FileOutputStream fileOut = new FileOutputStream(this.pathToFile);
+            fileOut.write(inputBuffer.toString().getBytes());
+            fileOut.close();
+
+            logger.info("Cleared trash.txt of expired kv-pairs");
+            return true;
+
+        } catch (Exception e) {
+            logger.info("Error clearing trash.txt");
+            return false;
+        }
+        return false;
+
+        // turn string back into date
+
+        // String str = "2016-03-04 11:30";
+        // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd
+        // HH:mm");
+        // LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
+
+        // LocalDateTime now = LocalDateTime.now();
+        // LocalDateTime pastDate = LocalDateTime.parse("2017-01-14T15:32:56.000");
+    }
+
     @Override
     public StatusType put(String key, String value) throws Exception {
         try {
@@ -112,8 +174,8 @@ public class PersistantStorage implements IPersistantStorage {
                     // Otherwise, update the value and append to file
                     if (value.isEmpty() || value == null) {
                         putStatus = StatusType.DELETE_SUCCESS;
-                        // Add the file to trash
-                        json.setTimestamp("blah");
+                        // Add the file to trash, with an expiry of 1 minute
+                        json.setTimestamp(LocalDateTime.now().plusMinutes(1));
                         this.appendToFile(json.serialize(false), TRASH_PATH);
                     } else {
                         json.setValue(value);
@@ -213,7 +275,7 @@ public class PersistantStorage implements IPersistantStorage {
                 json.deserialize(line);
                 keyFromFile = json.getKey();
 
-                // The key exists in the file, update the old value with the new value
+                // The key exists in the file
                 if (keyFromFile.equals(key) && foundKey == false) {
                     foundKey = true;
                     json.setTimestamp(null);
@@ -241,13 +303,11 @@ public class PersistantStorage implements IPersistantStorage {
             fileOut.close();
 
             logger.info("Completed 'recover' operation into storage server " + putStatus.name());
-            // return putStatus;
             return recoveredValue;
         } catch (Exception e) {
             logger.error("Problem reading trash.txt to recover.");
         }
         return null;
-        // StatusType.RECOVER_ERROR;
     }
 
     @Override

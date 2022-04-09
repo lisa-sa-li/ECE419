@@ -1,5 +1,7 @@
 package app_kvECS;
 
+import static java.util.concurrent.TimeUnit.*;
+
 import java.util.Map;
 import java.util.Collection;
 import org.apache.log4j.Level;
@@ -22,10 +24,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
+
+import app_kvServer.PersistantStorage;
+
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.KeeperException;
@@ -47,6 +55,7 @@ public class ECSClient implements IECSClient, Runnable {
     private HashMap<String, ECSNode> currServerMap = new HashMap<String, ECSNode>();
     private HashMap<String, String> serverInfo = new HashMap<String, String>();
     private HashRing hashRing;
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     private int zkPort = 2181;
     private String zkHost = "127.0.0.1";
@@ -136,6 +145,21 @@ public class ECSClient implements IECSClient, Runnable {
         } catch (Exception e) {
             logger.error("Could not read from file");
         }
+    }
+
+    public void clearTrash() {
+        final Runnable clearTrash = new Runnable() {
+            public void run() {
+                System.out.println("Clearing trash.");
+                PersistantStorage ps = new PersistantStorage(true);
+                if (ps.clearTrash()) {
+                    System.out.println("Successfully cleared trash");
+                } else {
+                    System.out.println("Error clearing trash");
+                }
+            }
+        };
+        final ScheduledFuture<?> clearTrashHandler = scheduler.scheduleAtFixedRate(clearTrash, 60, 30, SECONDS);
     }
 
     public ArrayList<Integer> getCurrentPorts() {
@@ -491,6 +515,7 @@ public class ECSClient implements IECSClient, Runnable {
     }
 
     public void run() {
+        clearTrash();
         while (!stop) {
             BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
             System.out.print(PROMPT);
