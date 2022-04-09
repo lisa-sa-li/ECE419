@@ -115,7 +115,7 @@ public class PersistantStorage implements IPersistantStorage {
                 json.deserialize(line);
                 ts = json.getTimestamp();
 
-                if (currTime.isAfter(ts)) {
+                if (currTime.isBefore(ts)) {
                     // we keep
                     inputBuffer.append(line + '\n');
                 }
@@ -131,20 +131,62 @@ public class PersistantStorage implements IPersistantStorage {
             return true;
 
         } catch (Exception e) {
-            logger.info("Error clearing trash.txt");
+            logger.error("Error clearing trash.txt", e);
             return false;
         }
-        return false;
+    }
 
-        // turn string back into date
+    public StatusType addToTrash(String key, JSONMessage updatedJson) throws Exception {
+        updatedJson.setTimestamp(LocalDateTime.now().plusMinutes(1));
 
-        // String str = "2016-03-04 11:30";
-        // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd
-        // HH:mm");
-        // LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
+        try {
+            BufferedReader file = new BufferedReader(new FileReader(TRASH_PATH));
+            StringBuffer inputBuffer = new StringBuffer();
+            String line;
+            String keyFromFile;
+            boolean foundKey = false;
+            JSONMessage json;
+            StatusType putStatus = StatusType.NO_STATUS;
 
-        // LocalDateTime now = LocalDateTime.now();
-        // LocalDateTime pastDate = LocalDateTime.parse("2017-01-14T15:32:56.000");
+            while ((line = file.readLine()) != null) {
+                // Covert each line to a JSON so we can read the key and value
+                json = new JSONMessage();
+                json.deserialize(line);
+                keyFromFile = json.getKey();
+
+                // The key exists in the file, update the old value with the new value
+                if (keyFromFile.equals(key) && foundKey == false) {
+                    foundKey = true;
+                    line = updatedJson.serialize(false);
+                    inputBuffer.append(line + '\n');
+                } else if (keyFromFile.equals(key) && foundKey == true) {
+                    // This should never happen, but if there are more than 1 instances of a
+                    // key in a file, remove the subsequent keys
+                    continue;
+                } else {
+                    // If it's not the key-value we're looking for, copy the line over to the buffer
+                    inputBuffer.append(line + '\n');
+                }
+            }
+
+            // If key does not exist in the file, append to end of file
+            if (foundKey == false) {
+                line = updatedJson.serialize(false);
+                inputBuffer.append(line + '\n');
+            }
+            file.close();
+
+            // Overwrite file with the string buffer data
+            FileOutputStream fileOut = new FileOutputStream(TRASH_PATH);
+            fileOut.write(inputBuffer.toString().getBytes());
+            fileOut.close();
+
+            logger.info("Completed 'put' operation into storage server " + putStatus.name());
+            return putStatus;
+        } catch (Exception e) {
+            logger.error("Problem reading file to put.");
+        }
+        return StatusType.PUT_ERROR;
     }
 
     @Override
@@ -175,8 +217,7 @@ public class PersistantStorage implements IPersistantStorage {
                     if (value.isEmpty() || value == null) {
                         putStatus = StatusType.DELETE_SUCCESS;
                         // Add the file to trash, with an expiry of 1 minute
-                        json.setTimestamp(LocalDateTime.now().plusMinutes(1));
-                        this.appendToFile(json.serialize(false), TRASH_PATH);
+                        this.addToTrash(key, json);
                     } else {
                         json.setValue(value);
                         line = json.serialize(false);
@@ -189,10 +230,8 @@ public class PersistantStorage implements IPersistantStorage {
                     // key in a file, remove the subsequent keys
                     continue;
                 } else {
-                    // If it's not the key-value we're looking for, copy the line over to the string
-                    // buffer
-                    inputBuffer.append(line);
-                    inputBuffer.append('\n');
+                    // If it's not the key-value we're looking for, copy the line over to the buffer
+                    inputBuffer.append(line + '\n');
                 }
             }
 
