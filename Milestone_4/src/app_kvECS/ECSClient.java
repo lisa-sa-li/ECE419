@@ -150,16 +150,16 @@ public class ECSClient implements IECSClient, Runnable {
     public void clearTrash() {
         final Runnable clearTrash = new Runnable() {
             public void run() {
-                System.out.println("Clearing trash.");
+                logger.info("Clearing trash.");
                 PersistantStorage ps = new PersistantStorage(true);
                 if (ps.clearTrash()) {
-                    System.out.println("Successfully cleared trash");
+                    logger.info("Successfully cleared trash");
                 } else {
-                    System.out.println("Error clearing trash");
+                    logger.info("Error clearing trash");
                 }
             }
         };
-        final ScheduledFuture<?> clearTrashHandler = scheduler.scheduleAtFixedRate(clearTrash, 60, 30, SECONDS);
+        final ScheduledFuture<?> clearTrashHandler = scheduler.scheduleAtFixedRate(clearTrash, 30, 30, SECONDS);
     }
 
     public ArrayList<Integer> getCurrentPorts() {

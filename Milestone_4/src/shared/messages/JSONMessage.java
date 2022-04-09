@@ -123,7 +123,11 @@ public class JSONMessage implements KVMessage, Serializable {
     }
 
     public LocalDateTime getTimestamp() {
-        return LocalDateTime.parse(this.timestamp);
+        System.out.println("this.timestamp " + this.timestamp);
+        if (this.timestamp != null) {
+            return LocalDateTime.parse(this.timestamp);
+        }
+        return null;
     }
 
     public void setTimestamp(LocalDateTime ts) {
@@ -189,10 +193,12 @@ public class JSONMessage implements KVMessage, Serializable {
         String val = msg.getValue();
         String metadataStr = msg.getMetadataStr();
         StatusType status = msg.getStatus();
+        LocalDateTime ts = msg.getTimestamp();
 
         setStatus(status.name());
         setKey(key);
         setValue(val);
         setMetadataStr(metadataStr);
+        setTimestamp(ts);
     }
 }
