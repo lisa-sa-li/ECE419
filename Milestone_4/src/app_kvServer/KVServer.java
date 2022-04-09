@@ -399,6 +399,20 @@ public class KVServer implements IKVServer, Runnable {
 		return this.persistantStorage.put(key, value);
 	}
 
+	public String recoverKV(String key) throws Exception {
+		String value = this.persistantStorage.recover(key);
+
+		if (value != null) {
+			if (this.cache != null) {
+				this.cache.put(key, value);
+			}
+		} else {
+			logger.warn("Key " + key + " cannot be recovered");
+			throw new Exception("Key cannot be recovered");
+		}
+		return value;
+	}
+
 	public StatusType appendToStorage(String keyValues) throws Exception {
 		return this.persistantStorage.appendToStorage(keyValues);
 	}

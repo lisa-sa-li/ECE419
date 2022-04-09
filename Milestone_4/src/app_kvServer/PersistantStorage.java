@@ -113,7 +113,8 @@ public class PersistantStorage implements IPersistantStorage {
                     if (value.isEmpty() || value == null) {
                         putStatus = StatusType.DELETE_SUCCESS;
                         // Add the file to trash
-                        this.appendToFile(line, TRASH_PATH);
+                        json.setTimestamp("blah");
+                        this.appendToFile(json.serialize(false), TRASH_PATH);
                     } else {
                         json.setValue(value);
                         line = json.serialize(false);
@@ -193,6 +194,60 @@ public class PersistantStorage implements IPersistantStorage {
 
         // The key does not exist in the file
         return null;
+    }
+
+    public String recover(String key) throws Exception {
+        try {
+            BufferedReader file = new BufferedReader(new FileReader(TRASH_PATH));
+            StringBuffer inputBuffer = new StringBuffer();
+            String line;
+            String keyFromFile;
+            String recoveredValue = null;
+            boolean foundKey = false;
+            JSONMessage json;
+            StatusType putStatus = StatusType.NO_STATUS;
+
+            while ((line = file.readLine()) != null) {
+                // Covert each line to a JSON so we can read the key and value
+                json = new JSONMessage();
+                json.deserialize(line);
+                keyFromFile = json.getKey();
+
+                // The key exists in the file, update the old value with the new value
+                if (keyFromFile.equals(key) && foundKey == false) {
+                    foundKey = true;
+                    json.setTimestamp(null);
+                    this.appendToStorage(json.serialize(false));
+                    putStatus = StatusType.RECOVER_SUCCESS;
+                    recoveredValue = json.getValue();
+                } else if (keyFromFile.equals(key) && foundKey == true) {
+                    // This should never happen, but if there are more than 1 instances of a
+                    // key in a file, remove the subsequent keys
+                    continue;
+                } else {
+                    // If it's not the key-value we're looking for, copy the line over to the buffer
+                    inputBuffer.append(line + '\n');
+                }
+            }
+
+            if (foundKey == false) {
+                putStatus = StatusType.RECOVER_ERROR;
+            }
+            file.close();
+
+            // Overwrite file with the string buffer data
+            FileOutputStream fileOut = new FileOutputStream(TRASH_PATH);
+            fileOut.write(inputBuffer.toString().getBytes());
+            fileOut.close();
+
+            logger.info("Completed 'recover' operation into storage server " + putStatus.name());
+            // return putStatus;
+            return recoveredValue;
+        } catch (Exception e) {
+            logger.error("Problem reading trash.txt to recover.");
+        }
+        return null;
+        // StatusType.RECOVER_ERROR;
     }
 
     @Override
@@ -293,8 +348,7 @@ public class PersistantStorage implements IPersistantStorage {
             String line;
 
             while ((line = file.readLine()) != null) {
-                inputBuffer.append(line);
-                inputBuffer.append('\n');
+                inputBuffer.append(line + '\n');
             }
             inputBuffer.append(keyValues);
             file.close();
@@ -303,7 +357,12 @@ public class PersistantStorage implements IPersistantStorage {
             fileOut.write(inputBuffer.toString().getBytes());
             fileOut.close();
 
-            logger.info("Completed 'put_many' operation into storage server");
+            if (filePath.equals(this.pathToFile)) {
+                logger.info("Completed 'put_many' operation into storage server");
+            } else {
+                logger.info("Appended kv-pair(s) to file " + filePath);
+            }
+
             return StatusType.PUT_SUCCESS;
         } catch (Exception e) {
             logger.error("Problem reading file to put_many.");

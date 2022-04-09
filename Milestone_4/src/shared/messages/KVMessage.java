@@ -6,6 +6,7 @@ public interface KVMessage {
 		GET, /* Get - request */
 		GET_ERROR, /* requested tuple (i.e. value) not found */
 		GET_SUCCESS, /* requested tuple (i.e. value) found */
+		RECOVER,
 		PUT, /* Put - request */
 		PUT_MANY, /*
 					 * Put - request, given a bunch of keys at once, seperated by \n, used for ECS
@@ -16,6 +17,8 @@ public interface KVMessage {
 		PUT_ERROR, /* Put - request not successful */
 		DELETE_SUCCESS, /* Delete - request successful */
 		DELETE_ERROR, /* Delete - request not successful */
+		RECOVER_SUCCESS, /* Recover - request successful */
+		RECOVER_ERROR, /* Recover - request not successful */
 		DISCONNECTED, /* Server or client is disconnected */
 		NO_STATUS, /* Equivalent to null */
 

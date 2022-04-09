@@ -211,11 +211,9 @@ public class ServerConnection implements IServerConnection, Runnable {
 					break;
 				}
 				try {
-					/*
-					 * if (key.length() > 20) {
-					 * throw new KeyValueTooLongException("Key too long: " + key);
-					 * }
-					 */
+					if (key.length() > 20) {
+						throw new KeyValueTooLongException("Key too long: " + key);
+					}
 					if (!value.trim().isEmpty() && value != null) {
 						throw new UnexpectedValueException("Unexpected value for GET: " + value);
 					}
@@ -228,6 +226,28 @@ public class ServerConnection implements IServerConnection, Runnable {
 				} catch (Exception e) {
 					handleMessageStatus = StatusType.GET_ERROR;
 					logger.info("GET_ERROR: key " + key + " & value " + handleMessageValue);
+				}
+				break;
+			case RECOVER:
+				if (this.kvServer.hash != null && !this.kvServer.isMe(key)) {
+					handleMessageStatus = StatusType.SERVER_NOT_RESPONSIBLE;
+					order = this.kvServer.getOrder();
+					// send back metadata
+					break;
+				}
+				try {
+					if (key.length() > 20) {
+						throw new KeyValueTooLongException("Key too long: " + key);
+					}
+					if (key.trim().isEmpty() || key == null) {
+						throw new InvalidKeyException("Invalid key: " + key);
+					}
+					handleMessageValue = this.kvServer.recoverKV(key);
+					handleMessageStatus = StatusType.RECOVER_SUCCESS;
+					logger.info("RECOVER_SUCCESS: key " + key + " & value " + handleMessageValue);
+				} catch (Exception e) {
+					handleMessageStatus = StatusType.RECOVER_ERROR;
+					logger.info("RECOVER_ERROR: key " + key + " & value " + handleMessageValue);
 				}
 				break;
 			case DISCONNECTED:

@@ -23,6 +23,7 @@ public class JSONMessage implements KVMessage, Serializable {
     private String key;
     private String value;
     private String metadataStr;
+    private String timestamp;
 
     private byte[] byteJSON;
     private String json;
@@ -118,6 +119,14 @@ public class JSONMessage implements KVMessage, Serializable {
 
     public void setJSONtoNull() {
         this.json = null;
+    }
+
+    public String getTimestamp() {
+        return this.timestamp;
+    }
+
+    public void setTimestamp(String ts) {
+        this.timestamp = ts;
     }
 
     public void setMetadata(Metadata metadata) {
