@@ -7,6 +7,7 @@ import junit.framework.TestCase;
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
 import java.util.concurrent.TimeUnit;
+import java.util.*;
 import app_kvECS.ECSClient;
 
 public class RecoveryTest extends TestCase {
@@ -15,10 +16,14 @@ public class RecoveryTest extends TestCase {
     private ECSClient ecs;
 
     public void setUp() {
-        kvStore = new KVStore("localhost", 50000);
         ecs = new ECSClient("./test_servers.cfg");
         ecs.addNode("FIFO", 3);
+
         try {
+            TimeUnit.SECONDS.sleep(3);
+            ecs.start();
+            ArrayList<Integer> ports = ecs.getCurrentPorts();
+            kvStore = new KVStore("localhost", ports.get(0));
             kvStore.connect();
         } catch (Exception e) {
             // logger.info("FAILED TO CONNECT CLIENT");
