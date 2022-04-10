@@ -123,7 +123,6 @@ public class JSONMessage implements KVMessage, Serializable {
     }
 
     public LocalDateTime getTimestamp() {
-        System.out.println("this.timestamp " + this.timestamp);
         if (this.timestamp != null) {
             return LocalDateTime.parse(this.timestamp);
         }
