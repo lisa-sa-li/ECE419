@@ -59,6 +59,8 @@ public class KVClient implements IKVClient, Runnable {
             System.out.println("The server is closed and can't be written to or read from.");
         } else if (status == StatusType.SERVER_WRITE_LOCK) {
             System.out.println("The server is locked for write. Only get is possible right now.");
+        } else if (status == StatusType.RECOVER_ERROR) {
+            System.out.println("The key " + key + " cannot be recovered anymore.");
         } else if (value == null || value.isEmpty()) {
             System.out.println(status + "\t key: " + key);
         } else {

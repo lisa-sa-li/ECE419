@@ -138,6 +138,7 @@ public class PersistantStorage implements IPersistantStorage {
 
     public StatusType addToTrash(String key, JSONMessage updatedJson) throws Exception {
         updatedJson.setTimestamp(LocalDateTime.now().plusMinutes(1));
+        logger.info(">>>addToTrash " + updatedJson.serialize(false));
 
         try {
             BufferedReader file = new BufferedReader(new FileReader(TRASH_PATH));
@@ -221,8 +222,7 @@ public class PersistantStorage implements IPersistantStorage {
                     } else {
                         json.setValue(value);
                         line = json.serialize(false);
-                        inputBuffer.append(line);
-                        inputBuffer.append('\n');
+                        inputBuffer.append(line + '\n');
                         putStatus = StatusType.PUT_UPDATE;
                     }
                 } else if (keyFromFile.equals(key) && foundKey == true) {
@@ -246,8 +246,7 @@ public class PersistantStorage implements IPersistantStorage {
                     json = new JSONMessage();
                     json.setMessage("NO_STATUS", key, value); // We don't care about status here
                     line = json.serialize(false);
-                    inputBuffer.append(line);
-                    inputBuffer.append('\n');
+                    inputBuffer.append(line + '\n');
                     putStatus = StatusType.PUT_SUCCESS;
                 }
             }
@@ -298,6 +297,7 @@ public class PersistantStorage implements IPersistantStorage {
     }
 
     public String recover(String key) throws Exception {
+        logger.info("HELLOW");
         try {
             BufferedReader file = new BufferedReader(new FileReader(TRASH_PATH));
             StringBuffer inputBuffer = new StringBuffer();
@@ -313,6 +313,7 @@ public class PersistantStorage implements IPersistantStorage {
                 json = new JSONMessage();
                 json.deserialize(line);
                 keyFromFile = json.getKey();
+                logger.info(">>>recover " + line);
 
                 // The key exists in the file
                 if (keyFromFile.equals(key) && foundKey == false) {
@@ -384,6 +385,30 @@ public class PersistantStorage implements IPersistantStorage {
         }
     }
 
+    public void clearGlobalStorage() {
+        try {
+            PrintWriter writer = new PrintWriter(GLOBAL_STORAGE_PATH);
+            writer.print("");
+            writer.close();
+        } catch (FileNotFoundException e) {
+            logger.error("File not found. Cannot clear file.");
+        } catch (Exception e) {
+            logger.error("Error clearing storage.");
+        }
+    }
+
+    public void clearTrashTxt() {
+        try {
+            PrintWriter writer = new PrintWriter(TRASH_PATH);
+            writer.print("");
+            writer.close();
+        } catch (FileNotFoundException e) {
+            logger.error("File not found. Cannot clear file.");
+        } catch (Exception e) {
+            logger.error("Error clearing storage.");
+        }
+    }
+
     @Override
     public String getDataInRange(BigInteger hash, BigInteger endHash, Boolean die) {
         // Removes kv-pairs from the storage where the key falls within hash:endHash
@@ -407,16 +432,13 @@ public class PersistantStorage implements IPersistantStorage {
                 if (die == true) {
                     // This indicates the server has been removed from the hashring
                     // We need to remove everything from its storage to send to another server
-                    outputBuffer.append(line);
-                    outputBuffer.append('\n');
+                    outputBuffer.append(line + '\n');
                 } else if (utils.isKeyInRange(hash, endHash, keyFromFile)) {
                     // We have to move this to a new server, write it to an output string buffer
-                    outputBuffer.append(line);
-                    outputBuffer.append('\n');
+                    outputBuffer.append(line + '\n');
                 } else {
                     // We keep this in the current server
-                    inputBuffer.append(line);
-                    inputBuffer.append('\n');
+                    inputBuffer.append(line + '\n');
                 }
             }
 
@@ -477,8 +499,7 @@ public class PersistantStorage implements IPersistantStorage {
             String line;
 
             while ((line = file.readLine()) != null) {
-                buffer.append(line);
-                buffer.append('\n');
+                buffer.append(line + '\n');
             }
 
             file.close();
@@ -499,8 +520,7 @@ public class PersistantStorage implements IPersistantStorage {
             String line;
 
             while ((line = file.readLine()) != null) {
-                buffer.append(line);
-                buffer.append('\n');
+                buffer.append(line + '\n');
             }
             file.close();
             this.clearStorage();
@@ -523,8 +543,7 @@ public class PersistantStorage implements IPersistantStorage {
             String line;
 
             while ((line = file.readLine()) != null) {
-                buffer.append(line);
-                buffer.append('\n');
+                buffer.append(line + '\n');
             }
             file.close();
 
