@@ -59,7 +59,7 @@ public class RecoveryTest extends TestCase {
         }
 
         try {
-            TimeUnit.SECONDS.sleep(60);
+            TimeUnit.SECONDS.sleep(10);
         } catch (Exception e) {
             ex = e;
         }
@@ -121,7 +121,7 @@ public class RecoveryTest extends TestCase {
         }
 
         try {
-            TimeUnit.SECONDS.sleep(60);
+            TimeUnit.SECONDS.sleep(10);
         } catch (Exception e) {
             ex = e;
         }
@@ -233,7 +233,7 @@ public class RecoveryTest extends TestCase {
         }
 
         try {
-            TimeUnit.SECONDS.sleep(90);
+            TimeUnit.SECONDS.sleep(10);
         } catch (Exception e) {
             ex = e;
         }
