@@ -113,9 +113,13 @@ public class RecoveryTest extends TestCase {
 
         try {
             response = kvStore.put(key, value);
+            // System.out.println("response 1: " + response.getStatus());
             response = kvStore.put(key2, value2);
+            // System.out.println("response 2: " + response.getStatus());
             response = kvStore.put(key, "");
+            // System.out.println("response 3: " + response.getStatus());
             response = kvStore.put(key2, "");
+            // System.out.println("response 4: " + response.getStatus());
         } catch (Exception e) {
             ex = e;
         }
@@ -128,13 +132,17 @@ public class RecoveryTest extends TestCase {
 
         try {
             final_response = kvStore.recover(key);
+            // System.out.println("final_response 1: " + final_response.getStatus());
             final_response2 = kvStore.recover(key2);
+            // System.out.println("final_response 2: " + final_response2.getStatus());
         } catch (Exception e) {
             ex_final = e;
         }
         assertTrue(ex_final == null && final_response.getStatus() == StatusType.RECOVER_SUCCESS);
+        // System.out.println("final_response value: " + final_response.getValue());
         assertTrue(final_response.getValue().equals("val2"));
         assertTrue(final_response2.getStatus() == StatusType.RECOVER_SUCCESS);
+        // System.out.println("final_response 2 value: " + final_response2.getValue());
         assertTrue(final_response2.getValue().equals("val3"));
     }
 
