@@ -7,13 +7,17 @@ import junit.framework.TestCase;
 import shared.messages.JSONMessage;
 import shared.messages.KVMessage.StatusType;
 import java.util.concurrent.TimeUnit;
+import app_kvECS.ECSClient;
 
 public class RecoveryTest extends TestCase {
 
     private KVStore kvStore;
+    private ECSClient ecs;
 
     public void setUp() {
         kvStore = new KVStore("localhost", 50000);
+        ecs = new ECSClient("./test_servers.cfg");
+        ecs.addNode("FIFO", 3);
         try {
             kvStore.connect();
         } catch (Exception e) {
@@ -25,6 +29,12 @@ public class RecoveryTest extends TestCase {
 
     public void tearDown() {
         kvStore.disconnect();
+        ecs.shutdown();
+        try {
+            TimeUnit.SECONDS.sleep(10);
+        } catch (Exception e) {
+
+        }
     }
 
     @Test
@@ -56,34 +66,37 @@ public class RecoveryTest extends TestCase {
 
         assertTrue(ex_final == null && final_response.getStatus() == StatusType.RECOVER_SUCCESS);
     }
+
     /*
-    @Test
-    public void testCannotRecover() {
-        String key = "key1", value = "val1";
-        JSONMessage response = null;
-        JSONMessage final_response = null;
-        Exception ex = null;
-        Exception ex_final = null;
-
-        try {
-            response = kvStore.put(key, value);
-            System.out.println("response first: " + response.getStatus());
-            response = kvStore.put(key, "");
-            System.out.println("response second: " + response.getStatus());
-        } catch (Exception e) {
-            ex = e;
-        }
-
-        try {
-            final_response = kvStore.recover(key);
-            System.out.println("final_response: " + final_response.getStatus() + final_response.getKey() + final_response.getValue());
-        } catch (Exception e) {
-            ex_final = e;
-        }
-
-        assertTrue(ex_final == null && final_response.getStatus() == StatusType.RECOVER_ERROR);
-    }
-    */
+     * @Test
+     * public void testCannotRecover() {
+     * String key = "key1", value = "val1";
+     * JSONMessage response = null;
+     * JSONMessage final_response = null;
+     * Exception ex = null;
+     * Exception ex_final = null;
+     * 
+     * try {
+     * response = kvStore.put(key, value);
+     * System.out.println("response first: " + response.getStatus());
+     * response = kvStore.put(key, "");
+     * System.out.println("response second: " + response.getStatus());
+     * } catch (Exception e) {
+     * ex = e;
+     * }
+     * 
+     * try {
+     * final_response = kvStore.recover(key);
+     * System.out.println("final_response: " + final_response.getStatus() +
+     * final_response.getKey() + final_response.getValue());
+     * } catch (Exception e) {
+     * ex_final = e;
+     * }
+     * 
+     * assertTrue(ex_final == null && final_response.getStatus() ==
+     * StatusType.RECOVER_ERROR);
+     * }
+     */
     @Test
     public void testMultipleKeys() {
         String key = "key2", value = "val2";
@@ -243,7 +256,8 @@ public class RecoveryTest extends TestCase {
         } catch (Exception e) {
             ex = e;
         }
-        assertTrue(ex == null && response.getStatus() == StatusType.GET_SUCCESS && response.getValue().equals("val8"));
+        assertTrue(ex == null && response.getStatus() == StatusType.GET_SUCCESS &&
+                response.getValue().equals("val8"));
 
         try {
             final_response = kvStore.recover(key);
