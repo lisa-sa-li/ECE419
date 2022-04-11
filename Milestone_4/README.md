@@ -39,7 +39,7 @@ Open a new terminal and execute:
 
 Zookeeper should now be running.
 
-### Running the code
+### Initializing the hashring and client
 
 Open a new terminal. Begin by running the `ant` command to build all the `.jar` files.
 
@@ -126,3 +126,5 @@ For demo purposes, the expiry of a key is 1 minute after it is deleted. After th
 KVClient> RECOVER soft
 >> RECOVER_ERROR
 ```
+
+If you try to recover a non-existent key, you will also receive an error.
