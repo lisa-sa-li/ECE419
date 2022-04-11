@@ -21,7 +21,6 @@ public class LFUCacheTest extends TestCase {
     public void testLFUCache() {
         assertTrue(this.cache.getCacheSize() == 5);
         assertTrue(!this.cache.containsKey("keyThatShouldNotExist"));
-        // assertNull(this.cache.get("keyThatAlsoShouldNotExist"));
         this.cache.put("1", "pqr");
         this.cache.put("2", "stu");
         this.cache.put("3", "vwx");
