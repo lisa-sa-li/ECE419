@@ -33,16 +33,16 @@ public class RecoveryTest extends TestCase {
     }
 
     public void tearDown() {
-
+        /*
         kvStore.disconnect();
         ecs.shutdown();
         try {
             TimeUnit.SECONDS.sleep(10);
         } catch (Exception e) {
 
-        }
+        }*/
     }
-    
+    /*
     @Test
     public void testRecover() {
         String key = "key0", value = "val0";
@@ -160,7 +160,7 @@ public class RecoveryTest extends TestCase {
 
         assertTrue(ex == null && response.getStatus() == StatusType.RECOVER_ERROR);
     }
-
+    */
     @Test
     public void testRecoverOverTimeDuration() {
         String key = "key5", value = "val5";
@@ -171,25 +171,29 @@ public class RecoveryTest extends TestCase {
 
         try {
             response = kvStore.put(key, value);
+            System.out.println("response 1: " + response.getStatus());
+            response = kvStore.put(key, "");
+            System.out.println("response 2: " + response.getStatus());
         } catch (Exception e) {
             ex = e;
         }
-        // System.out.println("response 1: " + response.getStatus());
+
         try {
-            TimeUnit.SECONDS.sleep(90);
+            TimeUnit.SECONDS.sleep(100);
         } catch (Exception e) {
             ex = e;
         }
 
         try {
             final_response = kvStore.recover(key);
+            System.out.println("final_response 2: " + final_response.getStatus());
+            System.out.println("final_response 2 value: " + final_response.getValue());
         } catch (Exception e) {
             final_ex = e;
         }
-        // System.out.println("final_response 2: " + final_response.getStatus());
         assertTrue(final_ex == null && final_response.getStatus() == StatusType.RECOVER_ERROR);
     }
-
+    /*
     @Test
     public void testRecoverOverTimeDurationMultiple() {
         String key = "key5", value = "val5";
@@ -244,21 +248,6 @@ public class RecoveryTest extends TestCase {
             ex = e;
         }
 
-        /* try {
-            TimeUnit.SECONDS.sleep(10);
-        } catch (Exception e) {
-            ex = e;
-        }
-
-        try {
-            response = kvStore.get(key);
-            System.out.println("response 2: " + response.getStatus());
-        } catch (Exception e) {
-            ex = e;
-        }
-
-        assertTrue(ex == null && response.getStatus() == StatusType.GET_ERROR);
-        */
         try {
             response = kvStore.put(key, newVal);
             // System.out.println("response 3: " + response.getStatus());
@@ -286,5 +275,5 @@ public class RecoveryTest extends TestCase {
         assertTrue(ex == null && response.getStatus() == StatusType.GET_SUCCESS &&
                 response.getValue().equals("val7"));
     }
-
+    */
 }
