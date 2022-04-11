@@ -40,7 +40,7 @@ public class RecoveryTest extends TestCase {
         kvStore.disconnect();
         ecs.shutdown();
         try {
-            TimeUnit.SECONDS.sleep(10);
+            TimeUnit.SECONDS.sleep(3);
         } catch (Exception e) {
         }
         ps.clearGlobalStorage();
@@ -131,7 +131,7 @@ public class RecoveryTest extends TestCase {
             kvStore.put(key, value);
             kvStore.put(key, "");
 
-            TimeUnit.SECONDS.sleep(100);
+            TimeUnit.SECONDS.sleep(90);
 
             response = kvStore.recover(key);
         } catch (Exception e) {
