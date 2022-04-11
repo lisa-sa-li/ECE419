@@ -210,7 +210,7 @@ public class PerformanceTest {
     public static void main(String[] args) {
         // Test performance of adding and removing the server nodes
         new PerformanceTest(1, 0, "None", 0, true).runTests();
-        new PerformanceTest(3, 0, "None", 0, true).runTests();
+        /*new PerformanceTest(3, 0, "None", 0, true).runTests();
         new PerformanceTest(5, 0, "None", 0, true).runTests();
         new PerformanceTest(7, 0, "None", 0, true).runTests();
         new PerformanceTest(10, 0, "None", 0, true).runTests();
@@ -236,7 +236,7 @@ public class PerformanceTest {
         // Same number of servers and clients and cache strategy (FIFO)
         new PerformanceTest(2, 1, "FIFO", 20, false).runTests();
         new PerformanceTest(2, 1, "FIFO", 10, false).runTests();
-        new PerformanceTest(2, 1, "FIFO", 3, false).runTests();
+        new PerformanceTest(2, 1, "FIFO", 3, false).runTests();*/
     }
 
 }
