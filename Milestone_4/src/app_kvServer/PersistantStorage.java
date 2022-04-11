@@ -138,7 +138,6 @@ public class PersistantStorage implements IPersistantStorage {
 
     public StatusType addToTrash(String key, JSONMessage updatedJson) throws Exception {
         updatedJson.setTimestamp(LocalDateTime.now().plusMinutes(1));
-        logger.info(">>>addToTrash " + updatedJson.serialize(false));
 
         try {
             BufferedReader file = new BufferedReader(new FileReader(TRASH_PATH));
@@ -297,7 +296,6 @@ public class PersistantStorage implements IPersistantStorage {
     }
 
     public String recover(String key) throws Exception {
-        logger.info("HELLOW");
         try {
             BufferedReader file = new BufferedReader(new FileReader(TRASH_PATH));
             StringBuffer inputBuffer = new StringBuffer();
@@ -313,7 +311,6 @@ public class PersistantStorage implements IPersistantStorage {
                 json = new JSONMessage();
                 json.deserialize(line);
                 keyFromFile = json.getKey();
-                logger.info(">>>recover " + line);
 
                 // The key exists in the file
                 if (keyFromFile.equals(key) && foundKey == false) {
