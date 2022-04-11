@@ -319,9 +319,9 @@ public class PersistantStorage implements IPersistantStorage {
                 if (keyFromFile.equals(key) && foundKey == false) {
                     foundKey = true;
                     json.setTimestamp(null);
-                    this.appendToStorage(json.serialize(false));
-                    putStatus = StatusType.RECOVER_SUCCESS;
                     recoveredValue = json.getValue();
+                    this.put(keyFromFile, recoveredValue);
+                    putStatus = StatusType.RECOVER_SUCCESS;
                 } else if (keyFromFile.equals(key) && foundKey == true) {
                     // This should never happen, but if there are more than 1 instances of a
                     // key in a file, remove the subsequent keys
