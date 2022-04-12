@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 public class IndividualClient implements Runnable {
     int numPUTRequests = 0;
     int numGETRequests = 0;
+    int numRecoverRequests = 0;
     private KVStore kvStore;
     private List<ArrayList<String>> associatedData;
     Random randomNumber = new Random();
@@ -71,7 +72,7 @@ public class IndividualClient implements Runnable {
                     }
                     // System.out.println("-----------------------------------------------------------------");
                 } else {
-                    if (Math.random() <= 0.5) {
+                    if (Math.random() <= 0.33) {
                         try {
                             try {
                                 TimeUnit.SECONDS.sleep(waitCount);
@@ -79,14 +80,14 @@ public class IndividualClient implements Runnable {
                                 System.out.println(e);
                             }
                             // System.out.println("Calling PUT");
-                            this.kvStore.put(key, value.substring(0, 10));
                             this.totalBytes += value.substring(0, 10).getBytes(StandardCharsets.UTF_8).length;
+                            this.kvStore.put(key, value.substring(0, 10));
                             this.numPUTRequests += 1;
                             //count += 1;
                             //System.out.println("PUT is called: " + count);
                         } catch (Exception e) {
                         }
-                    } else {
+                    } else if (Math.random() <= 0.66) {
                         // System.out.println("Calling GET");
                         int randomIndex = this.randomNumber.nextInt(this.otherData.size());
                         ArrayList<String> pair = this.otherData.get(randomIndex);
@@ -101,12 +102,26 @@ public class IndividualClient implements Runnable {
                             this.numGETRequests += 1;
                         } catch (Exception e) {
                         }
+                    } else {
+                        int randomIndex = this.randomNumber.nextInt(this.otherData.size());
+                        ArrayList<String> pair = this.otherData.get(randomIndex);
+                        try {
+                            TimeUnit.SECONDS.sleep(waitCount);
+                        } catch (Exception e) {
+                            System.out.println(e);
+                        }
+                        try {
+                            this.totalBytes += value.substring(0, 10).getBytes(StandardCharsets.UTF_8).length;
+                            String returnVal = this.kvStore.recover(pair.get(0)).getValue();
+                            this.numRecoverRequests += 1;
+                        } catch (Exception e) {
+                        }
                     }
                     /*if (count % 5 == 0 && count != 0){
                         System.out.println("Key value pair count " + count);
                     }*/
                 }
-                if (this.numPUTRequests + this.numGETRequests == this.associatedData.size()) {
+                if (this.numPUTRequests + this.numGETRequests + this.numRecoverRequests == this.associatedData.size()) {
                     break;
                 }
             }

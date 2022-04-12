@@ -72,12 +72,13 @@ public class RecoveryTest extends TestCase {
         Exception ex = null;
 
         try {
-            kvStore.put(key, value);
+            response = kvStore.put(key, value);
+            // System.out.println("response 1: " + response.getStatus());
             response = kvStore.recover(key);
         } catch (Exception e) {
             ex = e;
         }
-
+        System.out.println("response 2: " + response.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.RECOVER_ERROR);
     }
 
@@ -128,12 +129,14 @@ public class RecoveryTest extends TestCase {
         Exception ex = null;
 
         try {
-            kvStore.put(key, value);
-            kvStore.put(key, "");
-
+            response = kvStore.put(key, value);
+            // System.out.println("response 3: " + response.getStatus());
+            response = kvStore.put(key, "");
+            // System.out.println("response 4: " + response.getStatus());
             TimeUnit.SECONDS.sleep(90);
 
             response = kvStore.recover(key);
+            // System.out.println("response 5: " + response.getStatus());
         } catch (Exception e) {
             ex = e;
         }

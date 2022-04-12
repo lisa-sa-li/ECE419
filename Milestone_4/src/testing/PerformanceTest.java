@@ -210,7 +210,7 @@ public class PerformanceTest {
     public static void main(String[] args) {
         // Test performance of adding and removing the server nodes
         new PerformanceTest(1, 0, "None", 0, true).runTests();
-        /*new PerformanceTest(3, 0, "None", 0, true).runTests();
+        new PerformanceTest(3, 0, "None", 0, true).runTests();
         new PerformanceTest(5, 0, "None", 0, true).runTests();
         new PerformanceTest(7, 0, "None", 0, true).runTests();
         new PerformanceTest(10, 0, "None", 0, true).runTests();
@@ -220,23 +220,23 @@ public class PerformanceTest {
         new PerformanceTest(1, 2, "None", 0, false).runTests();
         new PerformanceTest(3, 2, "None", 0, false).runTests();
         new PerformanceTest(4, 2, "None", 0, false).runTests();
-
         // Test performance of using different numbers of clients with constant number
         // of servers
         // No caching
         new PerformanceTest(2, 4, "None", 0, false).runTests();
         new PerformanceTest(2, 2, "None", 0, false).runTests();
-        new PerformanceTest(2, 1, "None", 0, false).runTests();
+        // new PerformanceTest(2, 1, "None", 0, false).runTests();
         // Test performance of using different types of cache strategy
         // Same number of servers and clients and cache size
         new PerformanceTest(2, 1, "FIFO", 8, false).runTests();
         new PerformanceTest(2, 1, "LFU", 8, false).runTests();
+
         new PerformanceTest(2, 1, "LRU", 8, false).runTests();
         // Test performance of using different cache size
         // Same number of servers and clients and cache strategy (FIFO)
-        new PerformanceTest(2, 1, "FIFO", 20, false).runTests();
+        // new PerformanceTest(2, 1, "FIFO", 20, false).runTests();
         new PerformanceTest(2, 1, "FIFO", 10, false).runTests();
-        new PerformanceTest(2, 1, "FIFO", 3, false).runTests();*/
+        new PerformanceTest(2, 1, "FIFO", 3, false).runTests();
     }
 
 }
