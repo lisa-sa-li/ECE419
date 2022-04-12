@@ -121,10 +121,9 @@ public class PerformanceTest {
             // System.out.println("originalData.size() " + originalData.size()); // 517310
             List<ArrayList<String>> populatingData = originalData.subList(0, numRequests);
             List<ArrayList<String>> clientAllocatingData = originalData.subList(numRequests, numRequests * 2);
-            // System.out.println("allocated data");
             // Set up ECSClient and add server nodes
             ecsClient = new ECSClient("./servers.cfg");
-            // System.out.println("initialized client");
+
             ecsClient.addNodes(this.numServers, this.cacheStrategy, this.cacheSize);
             ecsClient.start();
             try {

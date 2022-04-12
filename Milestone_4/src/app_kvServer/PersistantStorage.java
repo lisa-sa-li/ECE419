@@ -181,10 +181,10 @@ public class PersistantStorage implements IPersistantStorage {
             fileOut.write(inputBuffer.toString().getBytes());
             fileOut.close();
 
-            logger.info("Completed 'put' operation into storage server " + putStatus.name());
+            logger.info("Added key to trash " + putStatus.name());
             return putStatus;
         } catch (Exception e) {
-            logger.error("Problem reading file to put.");
+            logger.error("Problem adding key to trash.txt.");
         }
         return StatusType.PUT_ERROR;
     }
