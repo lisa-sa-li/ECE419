@@ -199,13 +199,8 @@ public class ZooKeeperApplication implements Watcher {
     // ***************************************************************
     public static void main(String[] args) {
         try {
-            // new LogSetup("logs/ecs-client.log", Level.INFO);
             demo = new ZooKeeperApplication(ZK_NODE_ROOT_PATH, ZKPORT, ZKHOST);
             demo.run();
-            // } catch (IOException e) {
-            // System.out.println("Error! Unable to initialize logger!");
-            // e.printStackTrace();
-            // System.exit(1);
         } catch (Exception ex) {
             System.out.println("Unknown error!");
             ex.printStackTrace();

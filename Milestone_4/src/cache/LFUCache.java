@@ -6,7 +6,7 @@ import java.util.Iterator;
 
 // Least frequently used
 public class LFUCache extends Cache {
-    private HashMap<String,Integer> frequencyMap;
+    private HashMap<String, Integer> frequencyMap;
 
     public LFUCache(Integer cacheSize) {
         super(cacheSize);
@@ -14,7 +14,7 @@ public class LFUCache extends Cache {
         this.frequencyMap = new HashMap<String, Integer>(this.getCacheSize());
     }
 
-    public void organizeBasedOnFrequency(String key){
+    public void organizeBasedOnFrequency(String key) {
         int counter;
         if (this.getCacheSize() == 0) {
             return;
@@ -29,22 +29,18 @@ public class LFUCache extends Cache {
             String leastFrequentlyUsedKey;
             Iterator iteratorFrequency = this.frequencyMap.entrySet().iterator();
             Map.Entry entry;
-            entry = (Map.Entry)iteratorFrequency.next();
-            counter = (int)entry.getValue();
-            leastFrequentlyUsedKey = (String)entry.getKey();
-            // System.out.println(leastFrequentlyUsedKey);
+            entry = (Map.Entry) iteratorFrequency.next();
+            counter = (int) entry.getValue();
+            leastFrequentlyUsedKey = (String) entry.getKey();
             while (iteratorFrequency.hasNext()) {
-                entry = (Map.Entry)iteratorFrequency.next();
-                if ((int)entry.getValue() < counter) {
-                    counter = (int)entry.getValue();
-                    leastFrequentlyUsedKey = (String)entry.getKey();
+                entry = (Map.Entry) iteratorFrequency.next();
+                if ((int) entry.getValue() < counter) {
+                    counter = (int) entry.getValue();
+                    leastFrequentlyUsedKey = (String) entry.getKey();
                 }
             }
             this.cacheMap.remove(leastFrequentlyUsedKey);
-            // System.out.println(leastFrequentlyUsedKey);
             this.frequencyMap.remove(leastFrequentlyUsedKey);
-            // System.out.println(this.cacheMap.size());
-            // System.out.println(this.frequencyMap.size());
         }
         counter = 1;
         this.frequencyMap.put(key, counter);

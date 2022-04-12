@@ -37,10 +37,8 @@ public class IndividualClient implements Runnable {
 
     public void run() {
         try {
-            // System.out.println("start of individual client run() ");
             try {
                 this.kvStore.connect();
-                // System.out.println("KVStore connected ");
                 // Had to comment out initHeartBeat() in KVServer.java
             } catch (Exception e) {
                 System.out.println("KVStore not connected: " + e);
@@ -52,22 +50,23 @@ public class IndividualClient implements Runnable {
                 String value = keyValuePair.get(1);
                 if (this.initialPopulating) {
                     try {
-                        //System.out.println("before PUT");
-                        //System.out.println("key: " + key);
-                        //System.out.println("value length: " + value.length());
+                        // System.out.println("before PUT");
+                        // System.out.println("key: " + key);
+                        // System.out.println("value length: " + value.length());
                         try {
                             TimeUnit.SECONDS.sleep(waitCount);
                         } catch (Exception e) {
                             System.out.println(e);
                         }
-                        // status = this.kvStore.put(key, value.substring(0, 10)).getStatus().toString();
+                        // status = this.kvStore.put(key, value.substring(0,
+                        // 10)).getStatus().toString();
                         this.kvStore.put(key, value.substring(0, 10));
-                        //System.out.println("END OF PUT Status: " + status);
+                        // System.out.println("END OF PUT Status: " + status);
                         this.numPUTRequests += 1;
                         count += 1;
                     } catch (Exception e) {
                     }
-                    if (count % 5 == 0 && count != 0){
+                    if (count % 5 == 0 && count != 0) {
                         System.out.println("Key value pair count " + count);
                     }
                     // System.out.println("-----------------------------------------------------------------");
@@ -83,8 +82,8 @@ public class IndividualClient implements Runnable {
                             this.totalBytes += value.substring(0, 10).getBytes(StandardCharsets.UTF_8).length;
                             this.kvStore.put(key, value.substring(0, 10));
                             this.numPUTRequests += 1;
-                            //count += 1;
-                            //System.out.println("PUT is called: " + count);
+                            // count += 1;
+                            // System.out.println("PUT is called: " + count);
                         } catch (Exception e) {
                         }
                     } else if (Math.random() <= 0.66) {
@@ -117,9 +116,11 @@ public class IndividualClient implements Runnable {
                         } catch (Exception e) {
                         }
                     }
-                    /*if (count % 5 == 0 && count != 0){
-                        System.out.println("Key value pair count " + count);
-                    }*/
+                    /*
+                     * if (count % 5 == 0 && count != 0){
+                     * System.out.println("Key value pair count " + count);
+                     * }
+                     */
                 }
                 if (this.numPUTRequests + this.numGETRequests + this.numRecoverRequests == this.associatedData.size()) {
                     break;
