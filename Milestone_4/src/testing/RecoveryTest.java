@@ -21,9 +21,10 @@ public class RecoveryTest extends TestCase {
         ps = new PersistantStorage("50001");
         ecs = new ECSClient("./test_servers.cfg");
         ecs.addNode("FIFO", 3);
-        ArrayList<Integer> ports = ecs.getCurrentPorts();
 
         try {
+            TimeUnit.SECONDS.sleep(10);
+            ArrayList<Integer> ports = ecs.getCurrentPorts();
             ecs.start();
             TimeUnit.SECONDS.sleep(5);
             kvStore = new KVStore("localhost", ports.get(0));
@@ -40,12 +41,12 @@ public class RecoveryTest extends TestCase {
         kvStore.disconnect();
         ecs.shutdown();
         try {
-            TimeUnit.SECONDS.sleep(3);
+            TimeUnit.SECONDS.sleep(10);
+            ps.clearGlobalStorage();
+            ps.deleteStorage();
+            TimeUnit.SECONDS.sleep(1);
         } catch (Exception e) {
         }
-        ps.clearGlobalStorage();
-        ps.clearTrashTxt();
-        ps.deleteStorage();
     }
 
     @Test
@@ -62,6 +63,7 @@ public class RecoveryTest extends TestCase {
             ex = e;
         }
 
+        // System.out.println("testRecover: " + response.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.RECOVER_SUCCESS);
     }
 
@@ -73,12 +75,12 @@ public class RecoveryTest extends TestCase {
 
         try {
             response = kvStore.put(key, value);
-            // System.out.println("response 1: " + response.getStatus());
             response = kvStore.recover(key);
         } catch (Exception e) {
             ex = e;
         }
-        System.out.println("response 2: " + response.getStatus());
+
+        // System.out.println("testCannotRecover: " + response.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.RECOVER_ERROR);
     }
 
@@ -101,6 +103,8 @@ public class RecoveryTest extends TestCase {
             ex = e;
         }
 
+        // System.out.println("testMultipleKeys1: " + response.getStatus());
+        // System.out.println("testMultipleKeys2: " + response2.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.RECOVER_SUCCESS);
         assertTrue(response.getValue().equals("val2"));
         assertTrue(response2.getStatus() == StatusType.RECOVER_SUCCESS);
@@ -119,6 +123,7 @@ public class RecoveryTest extends TestCase {
             ex = e;
         }
 
+        // System.out.println("testRecoverNonExistentKey: " + response.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.RECOVER_ERROR);
     }
 
@@ -129,17 +134,16 @@ public class RecoveryTest extends TestCase {
         Exception ex = null;
 
         try {
-            response = kvStore.put(key, value);
-            // System.out.println("response 3: " + response.getStatus());
-            response = kvStore.put(key, "");
-            // System.out.println("response 4: " + response.getStatus());
+            kvStore.put(key, value);
+            kvStore.put(key, "");
             TimeUnit.SECONDS.sleep(90);
 
             response = kvStore.recover(key);
-            // System.out.println("response 5: " + response.getStatus());
         } catch (Exception e) {
             ex = e;
         }
+
+        // System.out.println("testRecoverOverTimeDuration: " + response.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.RECOVER_ERROR);
     }
 
@@ -164,6 +168,10 @@ public class RecoveryTest extends TestCase {
             ex = e;
         }
 
+        // System.out.println("testRecoverOverTimeDurationMultiple1: " +
+        // response.getStatus());
+        // System.out.println("testRecoverOverTimeDurationMultiple2: " +
+        // response2.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.RECOVER_ERROR);
         assertTrue(response2.getStatus() == StatusType.RECOVER_ERROR);
     }
@@ -185,6 +193,8 @@ public class RecoveryTest extends TestCase {
             ex = e;
         }
 
+        // System.out.println("testRecoverOverwriteWithUpdate1: " +
+        // response.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.RECOVER_SUCCESS);
         assertTrue(response.getValue().equals(value));
 
@@ -194,6 +204,8 @@ public class RecoveryTest extends TestCase {
             ex = e;
         }
 
+        // System.out.println("testRecoverOverwriteWithUpdate2: " +
+        // response.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.GET_SUCCESS &&
                 response.getValue().equals(value));
     }
