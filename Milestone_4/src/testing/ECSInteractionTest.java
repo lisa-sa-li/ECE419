@@ -233,10 +233,11 @@ public class ECSInteractionTest extends TestCase {
 	public void testServerNotResponsible() {
 		ecs.addNodes(2, "FIFO", 3);
 		try {
-			TimeUnit.SECONDS.sleep(6);
+			TimeUnit.SECONDS.sleep(10);
+			ecs.start();
+			TimeUnit.SECONDS.sleep(5);
 		} catch (Exception e) {
 		}
-		ecs.start();
 
 		int port = ecs.getCurrentPorts().get(0);
 		KVStore kvStore = new KVStore("127.0.0.1", port);

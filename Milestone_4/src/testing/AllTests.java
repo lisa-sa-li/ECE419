@@ -29,11 +29,11 @@ public class AllTests {
 		clientSuite.addTestSuite(InteractionTest.class);
 		clientSuite.addTestSuite(ConnectionTest.class);
 		clientSuite.addTestSuite(AdditionalTest.class);
-		clientSuite.addTestSuite(ECSInteractionTest.class);
+		clientSuite.addTestSuite(RecoveryTest.class);
 		clientSuite.addTestSuite(FIFOCacheTest.class);
 		clientSuite.addTestSuite(LRUCacheTest.class);
 		clientSuite.addTestSuite(LFUCacheTest.class);
-		clientSuite.addTestSuite(RecoveryTest.class);
+		clientSuite.addTestSuite(ECSInteractionTest.class);
 		return clientSuite;
 	}
 

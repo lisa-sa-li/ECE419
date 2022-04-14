@@ -62,18 +62,15 @@ public class PerformanceTest {
         for (File f : fileContent) {
             // recursive file read in nested folders
             if (f.isDirectory()) {
-                // System.out.println("RECURSIVE CALL FOR readKeyValuePair");
                 readKeyValuePair(originalDataPath, f.getPath(), keyValuePairList);
             } else {
                 String key = f.getPath().substring(originalDataPath.length()); // full path under maildir
-                // System.out.println("key: " + key);
                 String value; // contents of the file if exists correctly
                 try {
                     // https://howtodoinjava.com/java11/files-readstring-read-file-to-string/
                     // value = Files.readString(f.toPath(), Charset.defaultCharset());
                     value = new String(Files.readAllBytes(Paths.get(String.valueOf(f.toPath()))));
                 } catch (Exception e) {
-                    // System.out.println("readKeyValuePair catch: " + e);
                     continue;
                 }
                 ArrayList<String> oneKeyValPair = new ArrayList<>();
@@ -88,9 +85,7 @@ public class PerformanceTest {
         Thread[] threads = new Thread[this.numClients];
         for (int i = 0; i < this.numClients; i++) {
             threads[i] = new Thread(clientList.get(i));
-            // System.out.println("created thread " + i);
             threads[i].start();
-            // System.out.println("started thread " + i);
             try {
                 TimeUnit.SECONDS.sleep(5);
             } catch (Exception e) {
@@ -118,7 +113,6 @@ public class PerformanceTest {
         if (!nodeTest) {
             // Mail data handling
             List<ArrayList<String>> originalData = this.readInMailData(mailDataPath);
-            // System.out.println("originalData.size() " + originalData.size()); // 517310
             List<ArrayList<String>> populatingData = originalData.subList(0, numRequests);
             List<ArrayList<String>> clientAllocatingData = originalData.subList(numRequests, numRequests * 2);
             // Set up ECSClient and add server nodes
@@ -146,9 +140,8 @@ public class PerformanceTest {
                     System.out.println(e);
                 }
             }
-            // System.out.println("added client threads");
             runClientThreads(clients);
-            // System.out.println("runClientThreads(populatingClients);");
+
             // Prepare the clients for latency and throughput computation
             clients = new ArrayList<>();
             spacing = (clientAllocatingData.size() / numClients);
@@ -166,7 +159,6 @@ public class PerformanceTest {
             long startTime = System.currentTimeMillis();
             runClientThreads(clients);
             long endTime = System.currentTimeMillis();
-            // System.out.println("runClientThreads(clients);");
             long duration = endTime - startTime;
             long latency = 1000 * duration / numRequests;
             System.out.println("The latency (ms) of " + this.cacheStrategy + " cache with the size of " + this.cacheSize

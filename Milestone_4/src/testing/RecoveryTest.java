@@ -63,7 +63,6 @@ public class RecoveryTest extends TestCase {
             ex = e;
         }
 
-        // System.out.println("testRecover: " + response.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.RECOVER_SUCCESS);
     }
 
@@ -80,7 +79,6 @@ public class RecoveryTest extends TestCase {
             ex = e;
         }
 
-        // System.out.println("testCannotRecover: " + response.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.RECOVER_ERROR);
     }
 
@@ -103,8 +101,6 @@ public class RecoveryTest extends TestCase {
             ex = e;
         }
 
-        // System.out.println("testMultipleKeys1: " + response.getStatus());
-        // System.out.println("testMultipleKeys2: " + response2.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.RECOVER_SUCCESS);
         assertTrue(response.getValue().equals("val2"));
         assertTrue(response2.getStatus() == StatusType.RECOVER_SUCCESS);
@@ -123,7 +119,6 @@ public class RecoveryTest extends TestCase {
             ex = e;
         }
 
-        // System.out.println("testRecoverNonExistentKey: " + response.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.RECOVER_ERROR);
     }
 
@@ -143,7 +138,6 @@ public class RecoveryTest extends TestCase {
             ex = e;
         }
 
-        // System.out.println("testRecoverOverTimeDuration: " + response.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.RECOVER_ERROR);
     }
 
@@ -168,10 +162,6 @@ public class RecoveryTest extends TestCase {
             ex = e;
         }
 
-        // System.out.println("testRecoverOverTimeDurationMultiple1: " +
-        // response.getStatus());
-        // System.out.println("testRecoverOverTimeDurationMultiple2: " +
-        // response2.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.RECOVER_ERROR);
         assertTrue(response2.getStatus() == StatusType.RECOVER_ERROR);
     }
@@ -193,8 +183,6 @@ public class RecoveryTest extends TestCase {
             ex = e;
         }
 
-        // System.out.println("testRecoverOverwriteWithUpdate1: " +
-        // response.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.RECOVER_SUCCESS);
         assertTrue(response.getValue().equals(value));
 
@@ -204,8 +192,6 @@ public class RecoveryTest extends TestCase {
             ex = e;
         }
 
-        // System.out.println("testRecoverOverwriteWithUpdate2: " +
-        // response.getStatus());
         assertTrue(ex == null && response.getStatus() == StatusType.GET_SUCCESS &&
                 response.getValue().equals(value));
     }
